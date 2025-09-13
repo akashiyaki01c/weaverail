@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Station } from "./sharpdia-model/Station";
 import { immer } from "zustand/middleware/immer";
 import { Line, Segment } from "./sharpdia-model/Line";
+import { TrainType } from "./sharpdia-model/TrainType";
 
 export interface Store {
 	stations: Station[];
@@ -13,6 +14,10 @@ export interface Store {
 	updateLine: (index: number, data: Line) => void;
 	setLines: (fn: (prev: Line[]) => Line[]) => void;
 	setSegments: (index: number, fn: (prev: Segment[]) => Segment[]) => void;
+
+	trainTypes: TrainType[];
+	updateTrainType: (index: number, data: TrainType) => void;
+	setTrainTypes: (fn: (prev: TrainType[]) => TrainType[]) => void;
 }
 
 let useGlobalState = create(immer<Store>((set, _) => ({
@@ -56,6 +61,20 @@ let useGlobalState = create(immer<Store>((set, _) => ({
 	}),
 	setSegments: (index: number, data: (prev: Segment[]) => Segment[]) => set((state) => {
 		state.lines[index].segments = [...data(state.lines[index].segments)];
+	}),
+
+	trainTypes: [],
+	updateTrainType: (index: number, data: TrainType) => set((state) => {
+		if (state.trainTypes[index]) {
+			Object.assign(state.trainTypes[index], data);
+		} else {
+			state.trainTypes.push(Station.default());
+			Object.assign(state.trainTypes[index], data);
+		}
+		state.trainTypes = [...state.trainTypes];
+	}),
+	setTrainTypes: (data: (prev: TrainType[]) => TrainType[]) => set((state) => {
+		state.trainTypes = [...data(state.trainTypes)];
 	}),
 })));
 

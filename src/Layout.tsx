@@ -11,7 +11,7 @@ export function Layout() {
           <li>
             <Link to="/stations">駅一覧</Link>
           </li>
-          <li>列車種別一覧</li>
+          <li><Link to="/train-types">列車種別一覧</Link></li>
           <li>
             <summary>
               <Link to="/lines">物理路線一覧</Link>

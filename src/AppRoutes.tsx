@@ -5,6 +5,7 @@ import { StationTableViewer } from "./StationViewer/StationTableViewer";
 import { LinesViewer } from "./LinesViewer/LinesViewer";
 import { Layout } from "./Layout";
 import { LineViewer } from "./LineViewer/LineViewer";
+import { TrainTypeViewer } from "./TrainTypeViewer/TrainTypeViewer";
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,7 @@ const AppRoutes = () => {
             <Route path="/stations" element={<StationTableViewer />} />
             <Route path="/lines" element={<LinesViewer />} />
             <Route path="/lines/:lineId" element={<LineViewer />} />
+            <Route path="/train-types" element={<TrainTypeViewer />} />
           </Route>
         </Routes>
       </BrowserRouter>
