@@ -1,20 +1,47 @@
 @import "tailwindcss";
 
 html * {
-	overscroll-behavior: none;
+  overscroll-behavior: none;
 }
 #root {
-	display: flex;
+  display: flex;
 }
 .tree-view-outer {
-	height: 100dvh;
-	width: 15ic;
-	ul {
-		margin-left: 1ic;
-	}
+  height: 100dvh;
+  width: 20ic;
+  height: 100dvh;
+  overflow-y: scroll;
+  ul {
+    padding-left: 1ic;
+  }
+  li {
+    position: relative;
+    cursor: pointer;
+  }
+  li::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: -12px;
+    width: 10px;
+    height: 1px;
+    background: #444; /* 親子をつなぐ線 */
+  }
+  li::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -12px;
+    width: 1px;
+    height: 100%;
+    background: #444; /* 縦線 */
+  }
+  li:last-child::after {
+    height: 12px; /* 最後の子だけ縦線を短く */
+  }
 }
 .page-outer {
-	height: 100dvh;
-	overflow-y: scroll;
-	flex: 1;
+  height: 100dvh;
+  overflow-y: scroll;
+  flex: 1;
 }

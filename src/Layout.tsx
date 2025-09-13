@@ -1,0 +1,79 @@
+import { Link, Outlet } from "react-router-dom";
+import useGlobalState from "./useGlobalState";
+
+export function Layout() {
+	const globalState = useGlobalState();
+  return (
+    <>
+      <div className="tree-view-outer bg-gray-100 border-r-1 border-r-gray-600 p-2">
+        <summary>摂播電鉄各線</summary>
+        <ul>
+          <li>
+            <Link to="/stations">駅一覧</Link>
+          </li>
+          <li>列車種別一覧</li>
+          <li>
+            <summary>
+              <Link to="/lines">物理路線一覧</Link>
+            </summary>
+            <ul>
+              {globalState.lines.map((v) => (
+                <li className="h-6"><Link to={`/lines/${v.id}`}>{v.name}</Link></li>
+              ))}
+            </ul>
+          </li>
+          <li>
+            <summary>時刻表一覧</summary>
+            <ul>
+              <li>
+                <summary>1号表 (平日)</summary>
+                <ul>
+                  <li>本線系統 時刻表</li>
+                  <li>新線系統 時刻表</li>
+                  <li>本線〜尼宝線系統 時刻表</li>
+                  <li>新線〜尼宝線系統 時刻表</li>
+                  <li>西大阪線〜尼宝線系統 時刻表</li>
+                  <li>西大阪線〜本線系統 時刻表</li>
+                  <li>西大阪線〜新線系統 時刻表</li>
+                  <li>本線〜神福線系統 時刻表</li>
+                  <li>新線〜神福線系統 時刻表</li>
+                </ul>
+              </li>
+              <li>
+                <summary>2号表 (休日)</summary>
+                <ul>
+                  <li>本線系統 時刻表</li>
+                  <li>新線系統 時刻表</li>
+                  <li>本線〜尼宝線系統 時刻表</li>
+                  <li>新線〜尼宝線系統 時刻表</li>
+                  <li>西大阪線〜尼宝線系統 時刻表</li>
+                  <li>西大阪線〜本線系統 時刻表</li>
+                  <li>西大阪線〜新線系統 時刻表</li>
+                  <li>本線〜神福線系統 時刻表</li>
+                  <li>新線〜神福線系統 時刻表</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <summary>ダイヤグラム一覧</summary>
+            <ul>
+              <li>ダイヤグラム(〜〜線)</li>
+              <li>ダイヤグラム(〜〜線)</li>
+              <li>ダイヤグラム(〜〜線)</li>
+            </ul>
+          </li>
+          <li>
+            <summary>その他</summary>
+            <ul>
+              <li>一般設定</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+			<div className="page-outer">
+				<Outlet />
+			</div>
+    </>
+  );
+}
