@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
 import { TableViewer } from "../TableViewer/TableViewer";
 import useGlobalState from "../globalState/useGlobalState";
-import { TrainType } from "../sharpdia-model/TrainType";
-import { TrainTypeService } from "../globalState/TrainTypeService";
 import { Timetable } from "../sharpdia-model/Timetable";
 import { TimetableService } from "../globalState/TimetableService";
 
