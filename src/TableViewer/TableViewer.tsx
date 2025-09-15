@@ -152,9 +152,10 @@ export function TableViewer<T>(props: Props<T>) {
           </div>
           {props.data.map((d, i) => (
             <>
-              <div className="flex z-0 h-[1.5ic]">
+              <div className="flex z-0 h-[1.5ic]" key={(d as any).key || undefined}>
                 {props.columnSettings.map((v, j) => (
                   <div
+                    key={j}
                     className={cellDefaultClass(v.widthIc, j, i)}
                     onClick={() => selectCell(j, i)}
                     onDoubleClick={() => startEdit(j, i)}

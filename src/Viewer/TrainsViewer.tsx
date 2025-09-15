@@ -1,14 +1,29 @@
-import { useRef, useState } from "react";
-import { TableViewer } from "../TableViewer/TableViewer";
+import { useParams } from "react-router-dom";
 import useGlobalState from "../globalState/useGlobalState";
-import { Timetable } from "../sharpdia-model/Timetable";
 import { TimetableService } from "../globalState/TimetableService";
+import { TableViewer } from "../TableViewer/TableViewer";
+import { useRef, useState } from "react";
+import { Train } from "../sharpdia-model/Train";
+import { TrainService } from "../globalState/TrainService";
+import { StationService } from "../globalState/StationService";
 
-export function TimetableViewer() {
+export function TrainsViewer() {
   const globalState = useGlobalState();
-
-  const maxX = 2;
-  const maxY = globalState.root.timetables.length + 1;
+  const params = useParams();
+  const timetableId = params.timetableId;
+  if (!timetableId) {
+    throw new Error("timetable id null");
+  }
+  const timetable = TimetableService.findById(globalState.root, timetableId);
+  const timetableIndex = TimetableService.findIndexById(
+    globalState.root,
+    timetableId
+  );
+  if (!timetable) {
+    throw new Error("timetable is null");
+  }
+  const maxX = 4;
+  const maxY = timetable.trains.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
@@ -21,14 +36,14 @@ export function TimetableViewer() {
   const [editState, setEditState] = useState(
     "viwer" as "viewer" | "new" | "insert" | "edit"
   );
-  const [editData, setEditData] = useState(Timetable.default());
+  const [editData, setEditData] = useState(Train.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
-      setEditData(Timetable.default());
+      setEditData(Train.default());
       setEditState("new");
     } else {
-      setEditData(globalState.root.timetables[y]);
+      setEditData(timetable.trains[y]);
       setEditState("edit");
     }
     dialogRef.current?.showModal();
@@ -37,22 +52,28 @@ export function TimetableViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => TimetableService.delete(prev, y));
+    globalState.setRoot((prev) => TrainService.delete(prev, timetableIndex, y));
   };
   const insertData = (_: number) => {
-    setEditData(Timetable.default());
+    setEditData(Train.default());
     setEditState("insert");
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.setRoot(prev => TimetableService.update(prev, selectedCellY, editData));
+      globalState.setRoot((prev) =>
+        TrainService.update(prev, timetableIndex, selectedCellY, editData)
+      );
     } else if (editState === "insert") {
-      globalState.setRoot(prev => TimetableService.insert(prev, selectedCellY, editData));
+      globalState.setRoot((prev) =>
+        TrainService.insert(prev, timetableIndex, selectedCellY, editData)
+      );
     } else if (editState === "new") {
+      globalState.setRoot((prev) =>
+        TrainService.append(prev, timetableIndex, editData)
+      );
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => TimetableService.append(prev, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -70,7 +91,7 @@ export function TimetableViewer() {
         startEdit={startEdit}
         deleteData={deleteData}
         insertData={insertData}
-        data={globalState.root.timetables}
+        data={timetable.trains}
         columnSettings={[
           {
             headerText: "番号",
@@ -80,14 +101,40 @@ export function TimetableViewer() {
             },
           },
           {
-            headerText: "時刻表名",
-            widthIc: 6.4,
+            headerText: "列車番号",
+            widthIc: 4.4,
             cellText(value, _) {
-              return value.name;
+              return value.number;
+            },
+          },
+          {
+            headerText: "開始駅",
+            widthIc: 4.4,
+            cellText(value, _) {
+              return (
+                StationService.findById(
+                  globalState.root,
+                  TrainService.getStartingStation(globalState.root, value)
+                    ?.startId || ""
+                )?.name || ""
+              );
+            },
+          },
+          {
+            headerText: "終了駅",
+            widthIc: 4.4,
+            cellText(value, _) {
+              return (
+                StationService.findById(
+                  globalState.root,
+                  TrainService.getStartingStation(globalState.root, value)
+                    ?.endId || ""
+                )?.name || ""
+              );
             },
           },
         ]}
-        defaultValue={Timetable.default()}
+        defaultValue={Train.default()}
       />
       <div className="fixed">
         <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
@@ -98,16 +145,16 @@ export function TimetableViewer() {
             }}
           >
             <label>
-              時刻表名
+              列車番号
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
                 type="text"
-                value={editData.name}
+                value={editData.number}
                 ref={(el) => {
                   inputRefs.current[0] = el;
                 }}
                 onChange={(e) =>
-                  setEditData({ ...editData, name: e.target.value })
+                  setEditData({ ...editData, number: e.target.value })
                 }
               />
             </label>

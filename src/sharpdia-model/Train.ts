@@ -20,7 +20,7 @@ export class TrainSegment {
 	id: string;
 
 	constructor(
-		public segmentId: string[],
+		public segments: { id: string, isReversed: boolean }[],
 		public arrivalTime: number,
 		public departureTime: number,
 	) {

@@ -20,7 +20,7 @@ export class TrackService {
 		if (stationIndex < 0 || root.stations.length <= stationIndex) {
 			throw new RangeError("存在しないインデックス");
 		}
-		if (trackIndex < 0 || root.stations[stationIndex].tracks.length <= trackIndex) {
+		if (trackIndex < 0 || root.stations[stationIndex].tracks.length < trackIndex) {
 			throw new RangeError("存在しないインデックス");
 		}
 		const tracks = [...root.stations[stationIndex].tracks];
@@ -31,7 +31,7 @@ export class TrackService {
 		return { ...root, stations };
 	}
 	static append(root: Root, stationIndex: number, data: Track): Root {
-		return this.insert(root, stationIndex, root.stations.length, data);
+		return this.insert(root, stationIndex, root.stations[stationIndex].tracks.length, data);
 	}
 	static delete(root: Root, stationIndex: number, trackIndex: number): Root {
 		if (stationIndex < 0 || root.stations.length <= stationIndex) {

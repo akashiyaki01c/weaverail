@@ -34,7 +34,12 @@ export function Layout() {
             <ul>
               {globalState.root.timetables.map(v => (
                 <li>
-                  <summary>{v.name}</summary>
+                  <summary><Link to={`/timetables/${v.id}`}>{v.name}</Link></summary>
+                  <ul>
+                    {v.trains.map(v => (<li>
+                      {v.number} 列車
+                    </li>))}
+                  </ul>
                 </li>
               ))}
             </ul>
