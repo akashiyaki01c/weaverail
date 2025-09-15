@@ -1,8 +1,9 @@
 import { useParams } from "react-router-dom";
-import useGlobalState from "../useGlobalState";
+import useGlobalState from "../globalState/useGlobalState";
 import { useRef, useState } from "react";
-import { TableViewer } from "../TableViwer/TableViewer";
+import { TableViewer } from "../TableViewer/TableViewer";
 import { Segment } from "../sharpdia-model/Line";
+import { SegmentService } from "../globalState/SegmentService";
 
 export function LineViewer() {
   const globalState = useGlobalState();
@@ -11,8 +12,8 @@ export function LineViewer() {
   if (!lineId) {
     throw new Error("line id null");
   }
-  const lineIndex = globalState.lines.findIndex((v) => v.id === lineId);
-  const line = globalState.lines[lineIndex];
+  const lineIndex = globalState.root.lines.findIndex((v) => v.id === lineId);
+  const line = globalState.root.lines[lineIndex];
   if (!line) {
     throw new Error("line is null");
   }
@@ -53,10 +54,7 @@ export function LineViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setSegments(lineIndex, (prev) => {
-      prev.splice(y, 1);
-      return prev;
-    });
+    globalState.setRoot(prev => SegmentService.delete(prev, lineIndex, selectedCellY));
   };
   const insertData = (_: number) => {
     const value = Segment.default();
@@ -72,21 +70,12 @@ export function LineViewer() {
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.setSegments(lineIndex, (prev) => {
-        prev[selectedCellY] = editData;
-        return prev;
-      });
+      globalState.setRoot(prev => SegmentService.update(prev, lineIndex, selectedCellY, editData));
     } else if (editState === "insert") {
-      globalState.setSegments(lineIndex, (prev) => {
-        prev.splice(selectedCellY, 0, editData);
-        return prev;
-      });
+      globalState.setRoot(prev => SegmentService.insert(prev, lineIndex, selectedCellY, editData));
     } else if (editState === "new") {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setSegments(lineIndex, (prev) => {
-        prev.push(editData);
-        return prev;
-      });
+      globalState.setRoot(prev => SegmentService.append(prev, lineIndex, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -107,7 +96,7 @@ export function LineViewer() {
             headerText: "開始駅",
             widthIc: 6,
             cellText: function (segment: Segment, _: number): string {
-              const station = globalState.stations.find(
+              const station = globalState.root.stations.find(
                 (v) => v.id === segment.startId
               )!;
               return station?.name;
@@ -117,7 +106,7 @@ export function LineViewer() {
             headerText: "終了駅",
             widthIc: 6,
             cellText: function (segment: Segment, _: number): string {
-              const station = globalState.stations.find(
+              const station = globalState.root.stations.find(
                 (v) => v.id === segment.endId
               )!;
               return station?.name;
@@ -154,7 +143,7 @@ export function LineViewer() {
                 disabled={selectedCellY !== 0}
               >
                 <option value="">選択してください</option>
-                {globalState.stations.map((v, i) => (
+                {globalState.root.stations.map((v, i) => (
                   <option value={v.id}>
                     {i}. {v.name}
                   </option>
@@ -170,7 +159,7 @@ export function LineViewer() {
                 }
               >
                 <option value="">選択してください</option>
-                {globalState.stations.map((v, i) => (
+                {globalState.root.stations.map((v, i) => (
                   <option value={v.id}>
                     {i}. {v.name}
                   </option>

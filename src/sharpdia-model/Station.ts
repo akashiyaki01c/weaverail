@@ -23,9 +23,12 @@ export class Station {
 
 /** 番線を表す */
 export class Track {
+	id: string;
 	constructor(
 		public name: string,
-	) { }
+	) {
+		this.id = crypto.randomUUID();
+	}
 
 	static fromOuDia(value: OuDia_EkiTrack2) {
 		const obj = new Track(value.trackName);

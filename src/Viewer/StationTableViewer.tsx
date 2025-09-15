@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
 import { Station } from "../sharpdia-model/Station";
-import { TableViewer } from "../TableViwer/TableViewer";
-import useGlobalState from "../useGlobalState";
+import { TableViewer } from "../TableViewer/TableViewer";
+import useGlobalState from "../globalState/useGlobalState";
+import { StationService } from "../globalState/StationService";
 
 export function StationTableViewer() {
   const globalState = useGlobalState();
 
   const maxX = 4;
-  const maxY = globalState.stations.length + 1;
+  const maxY = globalState.root.stations.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
@@ -27,7 +28,7 @@ export function StationTableViewer() {
       setEditData(Station.default());
       setEditState("new");
     } else {
-      setEditData(globalState.stations[y]);
+      setEditData(globalState.root.stations[y]);
       setEditState("edit");
     }
     dialogRef.current?.showModal();
@@ -36,7 +37,7 @@ export function StationTableViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.deleteStation(y);
+    globalState.setRoot(prev => StationService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(Station.default());
@@ -46,15 +47,12 @@ export function StationTableViewer() {
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.updateStation(selectedCellY, editData);
+      globalState.setRoot(prev => StationService.update(prev, selectedCellY, editData));
     } else if (editState === "insert") {
-      globalState.setStations((prev) => {
-        prev.splice(selectedCellY, 0, editData);
-        return prev;
-      });
+      globalState.setRoot(prev => StationService.insert(prev, selectedCellY, editData));
     } else if (editState === "new") {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setStations((prev) => [...prev, editData]);
+      globalState.setRoot(prev => StationService.append(prev, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -72,7 +70,7 @@ export function StationTableViewer() {
         startEdit={startEdit}
         deleteData={deleteData}
         insertData={insertData}
-        data={globalState.stations}
+        data={globalState.root.stations}
         columnSettings={[
           {
             headerText: "番号",

@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
-import useGlobalState from "../useGlobalState";
+import useGlobalState from "../globalState/useGlobalState";
 import { Line } from "../sharpdia-model/Line";
-import { TableViewer } from "../TableViwer/TableViewer";
+import { TableViewer } from "../TableViewer/TableViewer";
+import { LineService } from "../globalState/LineService";
 
 export function LinesViewer() {
   const globalState = useGlobalState();
 
   const maxX = 2;
-  const maxY = globalState.lines.length + 1;
+  const maxY = globalState.root.lines.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
@@ -27,7 +28,7 @@ export function LinesViewer() {
       setEditData(Line.default());
       setEditState("new");
     } else {
-      setEditData(globalState.lines[y]);
+      setEditData(globalState.root.lines[y]);
       setEditState("edit");
     }
     dialogRef.current?.showModal();
@@ -36,10 +37,7 @@ export function LinesViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setLines((prev) => {
-      prev.splice(y, 1);
-      return prev;
-    });
+    globalState.setRoot(prev => LineService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(Line.default());
@@ -49,15 +47,12 @@ export function LinesViewer() {
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.updateLine(selectedCellY, editData);
+      globalState.setRoot(prev => LineService.update(prev, selectedCellY, editData));
     } else if (editState === "insert") {
-      globalState.setLines((prev) => {
-        prev.splice(selectedCellY, 0, editData);
-        return prev;
-      });
+      globalState.setRoot(prev => LineService.insert(prev, selectedCellY, editData));
     } else if (editState === "new") {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setLines((prev) => [...prev, editData]);
+      globalState.setRoot(prev => LineService.append(prev, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -75,7 +70,7 @@ export function LinesViewer() {
         startEdit={startEdit}
         deleteData={deleteData}
         insertData={insertData}
-        data={globalState.lines}
+        data={globalState.root.lines}
         columnSettings={[
           {
             headerText: "番号",

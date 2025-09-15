@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
-import { TableViewer } from "../TableViwer/TableViewer";
-import useGlobalState from "../useGlobalState";
+import { TableViewer } from "../TableViewer/TableViewer";
+import useGlobalState from "../globalState/useGlobalState";
 import { TrainType } from "../sharpdia-model/TrainType";
+import { TrainTypeService } from "../globalState/TrainTypeService";
 
 export function TrainTypeViewer() {
   const globalState = useGlobalState();
 
   const maxX = 2;
-  const maxY = globalState.trainTypes.length + 1;
+  const maxY = globalState.root.trainTypes.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
@@ -27,7 +28,7 @@ export function TrainTypeViewer() {
       setEditData(TrainType.default());
       setEditState("new");
     } else {
-      setEditData(globalState.trainTypes[y]);
+      setEditData(globalState.root.trainTypes[y]);
       setEditState("edit");
     }
     dialogRef.current?.showModal();
@@ -36,10 +37,7 @@ export function TrainTypeViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setTrainTypes((prev) => {
-      prev.splice(y, 1);
-      return prev;
-    });
+    globalState.setRoot(prev => TrainTypeService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(TrainType.default());
@@ -49,15 +47,12 @@ export function TrainTypeViewer() {
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.updateTrainType(selectedCellY, editData);
+      globalState.setRoot(prev => TrainTypeService.update(prev, selectedCellY, editData));
     } else if (editState === "insert") {
-      globalState.setTrainTypes((prev) => {
-        prev.splice(selectedCellY, 0, editData);
-        return prev;
-      });
+      globalState.setRoot(prev => TrainTypeService.insert(prev, selectedCellY, editData));
     } else if (editState === "new") {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setTrainTypes((prev) => [...prev, editData]);
+      globalState.setRoot(prev => TrainTypeService.append(prev, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -75,7 +70,7 @@ export function TrainTypeViewer() {
         startEdit={startEdit}
         deleteData={deleteData}
         insertData={insertData}
-        data={globalState.trainTypes}
+        data={globalState.root.trainTypes}
         columnSettings={[
           {
             headerText: "番号",

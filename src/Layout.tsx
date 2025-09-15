@@ -1,5 +1,5 @@
 import { Link, Outlet } from "react-router-dom";
-import useGlobalState from "./useGlobalState";
+import useGlobalState from "./globalState/useGlobalState";
 import { OpenFile, SaveFile } from "./commands/FileIO";
 
 export function Layout() {
@@ -20,7 +20,7 @@ export function Layout() {
               <Link to="/lines">物理路線一覧</Link>
             </summary>
             <ul>
-              {globalState.lines.map((v) => (
+              {globalState.root.lines.map((v) => (
                 <li className="h-6">
                   <Link to={`/lines/${v.id}`}>{v.name}</Link>
                 </li>
@@ -28,36 +28,15 @@ export function Layout() {
             </ul>
           </li>
           <li>
-            <summary>時刻表一覧</summary>
+            <summary>
+              <Link to="/timetables">時刻表一覧</Link>
+            </summary>
             <ul>
-              <li>
-                <summary>1号表 (平日)</summary>
-                <ul>
-                  <li>本線系統 時刻表</li>
-                  <li>新線系統 時刻表</li>
-                  <li>本線〜尼宝線系統 時刻表</li>
-                  <li>新線〜尼宝線系統 時刻表</li>
-                  <li>西大阪線〜尼宝線系統 時刻表</li>
-                  <li>西大阪線〜本線系統 時刻表</li>
-                  <li>西大阪線〜新線系統 時刻表</li>
-                  <li>本線〜神福線系統 時刻表</li>
-                  <li>新線〜神福線系統 時刻表</li>
-                </ul>
-              </li>
-              <li>
-                <summary>2号表 (休日)</summary>
-                <ul>
-                  <li>本線系統 時刻表</li>
-                  <li>新線系統 時刻表</li>
-                  <li>本線〜尼宝線系統 時刻表</li>
-                  <li>新線〜尼宝線系統 時刻表</li>
-                  <li>西大阪線〜尼宝線系統 時刻表</li>
-                  <li>西大阪線〜本線系統 時刻表</li>
-                  <li>西大阪線〜新線系統 時刻表</li>
-                  <li>本線〜神福線系統 時刻表</li>
-                  <li>新線〜神福線系統 時刻表</li>
-                </ul>
-              </li>
+              {globalState.root.timetables.map(v => (
+                <li>
+                  <summary>{v.name}</summary>
+                </li>
+              ))}
             </ul>
           </li>
           <li>
@@ -78,8 +57,18 @@ export function Layout() {
       </div>
       <div className="page-outer">
         <div className="tool-bar w-[100%] h-[2ic] bg-gray-100 flex items-center">
-          <button className="bg-gray-200 p-[0.15ic] border-1 border-gray-600 rounded" onClick={() => OpenFile(globalState)}>開く…</button>
-          <button className="bg-gray-200 p-[0.15ic] border-1 border-gray-600 rounded" onClick={() => SaveFile(globalState)}>保存…</button>
+          <button
+            className="bg-gray-200 p-[0.15ic] border-1 border-gray-600 rounded"
+            onClick={() => OpenFile(globalState)}
+          >
+            開く…
+          </button>
+          <button
+            className="bg-gray-200 p-[0.15ic] border-1 border-gray-600 rounded"
+            onClick={() => SaveFile(globalState)}
+          >
+            保存…
+          </button>
         </div>
         <Outlet />
       </div>

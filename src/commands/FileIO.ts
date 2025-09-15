@@ -1,11 +1,8 @@
 import { open as openDialog, save as saveDialog } from '@tauri-apps/plugin-dialog';
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 
-import { Store } from '../useGlobalState';
-import { Station } from '../sharpdia-model/Station';
-import { Line } from '../sharpdia-model/Line';
-import { TrainType } from '../sharpdia-model/TrainType';
-
+import { Store } from '../globalState/useGlobalState';
+import { Root } from '../sharpdia-model/Root';
 
 export async function OpenFile(store: Store) {
 	const filePath = await openDialog({
@@ -25,10 +22,7 @@ export async function OpenFile(store: Store) {
 	const text = await readTextFile(filePath);
 	const parsed = JSON.parse(text);
 
-	console.log(parsed);
-	store.setStations(() => parsed.stations.map((v: any) => ({...(Station.default()), ...v})) || []);
-	store.setLines(() => parsed.lines.map((v: any) => ({...(Line.default()), ...v})) || []);
-	store.setTrainTypes(() => parsed.trainTypes.map((v: any) => ({...(TrainType.default()), ...v})) || []);
+	store.setRoot(_ => ({ ...new Root(), ...parsed }));
 }
 
 export async function SaveFile(store: Store) {
@@ -43,10 +37,6 @@ export async function SaveFile(store: Store) {
 	if (!filePath) {
 		return;
 	}
-	const contents = JSON.stringify({
-		stations: store.stations,
-		lines: store.lines,
-		trainTypes: store.trainTypes,
-	});
+	const contents = JSON.stringify(store.root);
 	await writeTextFile(filePath, contents, {});
 }

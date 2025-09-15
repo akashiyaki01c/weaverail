@@ -1,11 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Index from "./Index";
 import "./AppRoutes.css";
-import { StationTableViewer } from "./StationViewer/StationTableViewer";
-import { LinesViewer } from "./LinesViewer/LinesViewer";
+import { StationTableViewer } from "./Viewer/StationTableViewer";
+import { LinesViewer } from "./Viewer/LinesViewer";
 import { Layout } from "./Layout";
-import { LineViewer } from "./LineViewer/LineViewer";
-import { TrainTypeViewer } from "./TrainTypeViewer/TrainTypeViewer";
+import { LineViewer } from "./Viewer/LineViewer";
+import { TrainTypeViewer } from "./Viewer/TrainTypeViewer";
+import { TimetableViewer } from "./Viewer/TimetableViewer";
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
             <Route path="/lines" element={<LinesViewer />} />
             <Route path="/lines/:lineId" element={<LineViewer />} />
             <Route path="/train-types" element={<TrainTypeViewer />} />
+            <Route path="/timetables" element={<TimetableViewer />} />
           </Route>
         </Routes>
       </BrowserRouter>
