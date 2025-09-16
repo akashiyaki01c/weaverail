@@ -177,6 +177,7 @@ export function TableViewer<T>(props: Props<T>) {
           <div className="sticky top-0 flex z-0 h-[1.5ic]">
             {props.columnSettings.map((v, j) => (
               <div
+                key={j}
                 className={cellDefaultClass(v.widthIc, j, maxY - 1)}
                 onClick={() => selectCell(j, maxY - 1)}
                 onDoubleClick={() => startEdit(j, maxY - 1)}

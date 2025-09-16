@@ -1,3 +1,4 @@
+import { DiagramLine } from "./DiagramLine";
 import { Line } from "./Line";
 import { Station } from "./Station";
 import { Timetable } from "./Timetable";
@@ -9,5 +10,6 @@ export class Root {
 		public lines: Line[] = [],
 		public trainTypes: TrainType[] = [],
 		public timetables: Timetable[] = [],
+		public diagramLines: DiagramLine[] = [],
 	) {}
 }

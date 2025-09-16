@@ -6,6 +6,8 @@ import { useRef, useState } from "react";
 import { Train } from "../sharpdia-model/Train";
 import { TrainService } from "../globalState/TrainService";
 import { StationService } from "../globalState/StationService";
+import { toTimeString } from "../sharpdia-model/TimeParser";
+import { TrainTypeService } from "../globalState/TrainTypeService";
 
 export function TrainsViewer() {
   const globalState = useGlobalState();
@@ -94,22 +96,31 @@ export function TrainsViewer() {
         data={timetable.trains}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: "#",
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "列車番号",
+            headerText: "列番",
             widthIc: 4.4,
             cellText(value, _) {
               return value.number;
             },
           },
           {
-            headerText: "開始駅",
-            widthIc: 4.4,
+            headerText: "列車種別",
+            widthIc: 6.4,
+            cellText(value, _) {
+              return (
+                TrainTypeService.findById(globalState.root, value.trainTypeId)?.name || ""
+              );
+            },
+          },
+          {
+            headerText: "始発駅",
+            widthIc: 6.4,
             cellText(value, _) {
               return (
                 StationService.findById(
@@ -121,13 +132,31 @@ export function TrainsViewer() {
             },
           },
           {
-            headerText: "終了駅",
-            widthIc: 4.4,
+            headerText: "始発時刻",
+            widthIc: 4.9,
+            cellText(value, _) {
+              return (
+                toTimeString(value.segments[0]?.departureTime)
+              );
+            },
+          },
+                    {
+            headerText: "終着時刻",
+            widthIc: 4.9,
+            cellText(value, _) {
+              return (
+                toTimeString(value.segments[value.segments.length - 1]?.arrivalTime)
+              );
+            },
+          },
+          {
+            headerText: "終着駅",
+            widthIc: 6.4,
             cellText(value, _) {
               return (
                 StationService.findById(
                   globalState.root,
-                  TrainService.getStartingStation(globalState.root, value)
+                  TrainService.getDestinationStation(globalState.root, value)
                     ?.endId || ""
                 )?.name || ""
               );

@@ -9,6 +9,7 @@ import { TrainTypeViewer } from "./Viewer/TrainTypeViewer";
 import { TimetableViewer } from "./Viewer/TimetableViewer";
 import { TrainsViewer } from "./Viewer/TrainsViewer";
 import { TrainViewer } from "./Viewer/TrainViewer";
+import { DiagramLinesViewer } from "./Viewer/DiagramLinesViewer";
 
 const AppRoutes = () => {
   return (
@@ -24,6 +25,7 @@ const AppRoutes = () => {
             <Route path="/timetables" element={<TimetableViewer />} />
             <Route path="/timetables/:timetableId" element={<TrainsViewer />} />
             <Route path="/timetables/:timetableId/:trainId" element={<TrainViewer />} />
+            <Route path="/diagram-lines" element={<DiagramLinesViewer />} />
           </Route>
         </Routes>
       </BrowserRouter>

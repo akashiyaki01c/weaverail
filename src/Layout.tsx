@@ -21,7 +21,7 @@ export function Layout() {
             </summary>
             <ul>
               {globalState.root.lines.map((v) => (
-                <li className="h-6">
+                <li className="h-6" key={v.id}>
                   <Link to={`/lines/${v.id}`}>{v.name}</Link>
                 </li>
               ))}
@@ -32,16 +32,28 @@ export function Layout() {
               <Link to="/timetables">時刻表一覧</Link>
             </summary>
             <ul>
-              {globalState.root.timetables.map(v => (
-                <li>
-                  <summary><Link to={`/timetables/${v.id}`}>{v.name}</Link></summary>
+              {globalState.root.timetables.map((v) => (
+                <li key={v.id}>
+                  <summary>
+                    <Link to={`/timetables/${v.id}`}>{v.name}</Link>
+                  </summary>
                   <ul>
-                    {v.trains.map(v => (<li>
-                      {v.number} 列車
-                    </li>))}
+                    {v.trains.map((k) => (
+                      <li key={k.id}>
+                        <Link to={`/timetables/${v.id}/${k.id}`}>{k.number} 列車</Link>
+                      </li>
+                    ))}
                   </ul>
                 </li>
               ))}
+            </ul>
+          </li>
+          <li>
+            <summary><Link to="/diagram-lines">ダイヤ設定一覧</Link></summary>
+            <ul>
+              <li>ダイヤグラム(〜〜線)</li>
+              <li>ダイヤグラム(〜〜線)</li>
+              <li>ダイヤグラム(〜〜線)</li>
             </ul>
           </li>
           <li>

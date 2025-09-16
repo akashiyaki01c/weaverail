@@ -3,11 +3,12 @@ export class TrainType {
 
 	constructor(
 		public name: string,
+		public color: string,
 	) {
 		this.id = crypto.randomUUID();
 	}
 
 	static default() {
-		return new TrainType("");
+		return new TrainType("", "#000000");
 	}
 }

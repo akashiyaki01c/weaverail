@@ -1,14 +1,14 @@
 import { useRef, useState } from "react";
 import { TableViewer } from "../TableViewer/TableViewer";
 import useGlobalState from "../globalState/useGlobalState";
-import { TrainType } from "../sharpdia-model/TrainType";
-import { TrainTypeService } from "../globalState/TrainTypeService";
+import { DiagramLine } from "../sharpdia-model/DiagramLine";
+import { DiagramLineService } from "../globalState/DiagramLineService";
 
-export function TrainTypeViewer() {
+export function DiagramLinesViewer() {
   const globalState = useGlobalState();
 
   const maxX = 2;
-  const maxY = globalState.root.trainTypes.length + 1;
+  const maxY = globalState.root.diagramLines.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
@@ -21,14 +21,14 @@ export function TrainTypeViewer() {
   const [editState, setEditState] = useState(
     "viwer" as "viewer" | "new" | "insert" | "edit"
   );
-  const [editData, setEditData] = useState(TrainType.default());
+  const [editData, setEditData] = useState(DiagramLine.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
-      setEditData(TrainType.default());
+      setEditData(DiagramLine.default());
       setEditState("new");
     } else {
-      setEditData(globalState.root.trainTypes[y]);
+      setEditData(globalState.root.diagramLines[y]);
       setEditState("edit");
     }
     dialogRef.current?.showModal();
@@ -37,22 +37,22 @@ export function TrainTypeViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => TrainTypeService.delete(prev, y));
+    globalState.setRoot(prev => DiagramLineService.delete(prev, y));
   };
   const insertData = (_: number) => {
-    setEditData(TrainType.default());
+    setEditData(DiagramLine.default());
     setEditState("insert");
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
     if (editState === "edit") {
-      globalState.setRoot(prev => TrainTypeService.update(prev, selectedCellY, editData));
+      globalState.setRoot(prev => DiagramLineService.update(prev, selectedCellY, editData));
     } else if (editState === "insert") {
-      globalState.setRoot(prev => TrainTypeService.insert(prev, selectedCellY, editData));
+      globalState.setRoot(prev => DiagramLineService.insert(prev, selectedCellY, editData));
     } else if (editState === "new") {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => TrainTypeService.append(prev, editData));
+      globalState.setRoot(prev => DiagramLineService.append(prev, editData));
     }
     setEditState("viewer");
     dialogRef.current?.close();
@@ -70,7 +70,7 @@ export function TrainTypeViewer() {
         startEdit={startEdit}
         deleteData={deleteData}
         insertData={insertData}
-        data={globalState.root.trainTypes}
+        data={globalState.root.diagramLines}
         columnSettings={[
           {
             headerText: "番号",
@@ -80,14 +80,14 @@ export function TrainTypeViewer() {
             },
           },
           {
-            headerText: "列車種別名",
+            headerText: "ダイヤ設定名",
             widthIc: 6.4,
             cellText(value, _) {
               return value.name;
             },
           },
         ]}
-        defaultValue={TrainType.default()}
+        defaultValue={DiagramLine.default()}
       />
       <div className="fixed">
         <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
@@ -98,7 +98,7 @@ export function TrainTypeViewer() {
             }}
           >
             <label>
-              列車種別名
+              ダイヤ設定名
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
                 type="text"
@@ -108,20 +108,6 @@ export function TrainTypeViewer() {
                 }}
                 onChange={(e) =>
                   setEditData({ ...editData, name: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              種別色
-              <input
-                className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
-                type="text"
-                value={editData.color}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
-                  setEditData({ ...editData, color: e.target.value })
                 }
               />
             </label>
