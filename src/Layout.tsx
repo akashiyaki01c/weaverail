@@ -1,6 +1,7 @@
 import { Link, Outlet } from "react-router-dom";
 import useGlobalState from "./globalState/useGlobalState";
 import { OpenFile, SaveFile } from "./commands/FileIO";
+import "./Layout.css";
 
 export function Layout() {
   const globalState = useGlobalState();
@@ -39,9 +40,9 @@ export function Layout() {
                   </summary>
                   <ul>
                     {v.trains.map((k) => (
-                      <li key={k.id}>
-                        <Link to={`/timetables/${v.id}/${k.id}`}>{k.number} 列車</Link>
-                      </li>
+                      <li key={k.id}><Link to={`/timetables/${v.id}/${k.id}`}>
+                        {k.number} 列車種別一覧
+                      </Link></li>
                     ))}
                   </ul>
                 </li>
@@ -51,9 +52,9 @@ export function Layout() {
           <li>
             <summary><Link to="/diagram-lines">ダイヤ設定一覧</Link></summary>
             <ul>
-              <li>ダイヤグラム(〜〜線)</li>
-              <li>ダイヤグラム(〜〜線)</li>
-              <li>ダイヤグラム(〜〜線)</li>
+              {globalState.root.diagramLines.map(v => (<li>
+                <Link to={`/diagram-lines/${v.id}`}>{v.name}</Link>
+              </li>))}
             </ul>
           </li>
           <li>

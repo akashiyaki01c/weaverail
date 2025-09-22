@@ -3,11 +3,22 @@ export class DiagramLine {
 
 	constructor(
 		public name: string,
-		public segments: { id: string, isReversed: boolean }[]
+		public segments: DiagramLineSegment[]
 	) {
 		this.id = crypto.randomUUID();
 	}
 	static default() {
 		return new DiagramLine("", []);
+	}
+}
+
+export class DiagramLineSegment {
+	constructor(
+		public id: string,
+		public isReversed: boolean,
+	) {}
+
+	static default() {
+		return new DiagramLineSegment("", false);
 	}
 }
