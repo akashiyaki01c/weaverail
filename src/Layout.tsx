@@ -40,9 +40,11 @@ export function Layout() {
                   </summary>
                   <ul>
                     {v.trains.map((k) => (
-                      <li key={k.id}><Link to={`/timetables/${v.id}/${k.id}`}>
-                        {k.number} 列車種別一覧
-                      </Link></li>
+                      <li key={k.id}>
+                        <Link to={`/timetables/${v.id}/${k.id}`}>
+                          {k.number} 列車
+                        </Link>
+                      </li>
                     ))}
                   </ul>
                 </li>
@@ -50,19 +52,34 @@ export function Layout() {
             </ul>
           </li>
           <li>
-            <summary><Link to="/diagram-lines">ダイヤ設定一覧</Link></summary>
+            <summary>
+              <Link to="/diagram-lines">ダイヤ設定一覧</Link>
+            </summary>
             <ul>
-              {globalState.root.diagramLines.map(v => (<li>
-                <Link to={`/diagram-lines/${v.id}`}>{v.name}</Link>
-              </li>))}
+              {globalState.root.diagramLines.map((v) => (
+                <li>
+                  <Link to={`/diagram-lines/${v.id}`}>{v.name}</Link>
+                </li>
+              ))}
             </ul>
           </li>
           <li>
             <summary>ダイヤグラム一覧</summary>
             <ul>
-              <li>ダイヤグラム(〜〜線)</li>
-              <li>ダイヤグラム(〜〜線)</li>
-              <li>ダイヤグラム(〜〜線)</li>
+              {globalState.root.timetables.map((timetable) => (
+                <li>
+                  <summary>{timetable.name}</summary>
+                  <ul>
+                    {globalState.root.diagramLines.map((lines) => (
+                      <li>
+                        <Link to={`/diagram/${lines.id}/${timetable.id}`}>
+                          {lines.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </ul>
           </li>
           <li>

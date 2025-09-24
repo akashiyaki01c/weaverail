@@ -5,7 +5,6 @@ import { DiagramLineSegment } from "../sharpdia-model/DiagramLine";
 import { DiagramLineSegmentService } from "../globalState/DiagramLineSegmentService";
 import { TableViewer } from "../TableViewer/TableViewer";
 import { StationService } from "../globalState/StationService";
-import { LineService } from "../globalState/LineService";
 import { SegmentService } from "../globalState/SegmentService";
 
 export function DiagramLineViewer() {
@@ -23,11 +22,9 @@ export function DiagramLineViewer() {
     throw new Error("diagram line is null");
   }
 
-  const maxX = 2;
   const maxY = diagramLine.segments.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);

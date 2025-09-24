@@ -18,11 +18,9 @@ export function LineViewer() {
     throw new Error("line is null");
   }
 
-  const maxX = 2;
   const maxY = line.segments.length + 1;
 
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);
