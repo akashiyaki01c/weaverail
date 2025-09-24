@@ -1,7 +1,10 @@
-# Tauri + React + Typescript
+# Weaverail
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Weaverail は直感的で強力な次世代の鉄道ダイヤグラムエディタです。
+複数路線を跨ぐ列車の定義、スクリプトによるデータ変換、拡張機能プラグインに対応します。
 
-## Recommended IDE Setup
+## 特徴
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+* 複数の路線を跨いだ列車が直感的に設定可能
+* スクリプト機能によるデータの自動加工
+* 拡張機能による機能追加が可能
