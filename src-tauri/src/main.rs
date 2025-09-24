@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    diagram_edit_lib::run()
+    weaverail_lib::run()
 }
