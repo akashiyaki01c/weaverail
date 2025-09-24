@@ -4,6 +4,10 @@
   <img src="docs/image/diagram_logo.svg" alt="Weaverail Logo" width="200"/>
 </p>
 
+![GitHub release](https://img.shields.io/github/v/release/akashiyaki01c/weaverail)
+![License](https://img.shields.io/github/license/akashiyaki01c/weaverail)
+
+
 Weaverail は直感的で強力な次世代の鉄道ダイヤグラムエディタです。
 複数路線を跨ぐ列車の定義、スクリプトによるデータ変換、拡張機能プラグインに対応します。
 
