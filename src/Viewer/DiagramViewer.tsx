@@ -77,11 +77,12 @@ export function DiagramViewer() {
   }
   const yChoords = getYChoords(globalState.root, diagramLine);
 
-  const [option, _setOption] = useState(new DiagramViewerOption(.2, .4, 0, 0));
+  const [option, _setOption] = useState(new DiagramViewerOption(.1, .3, 0, 0));
 
+  const yPadding = 50;
   const viewBoxWidth = option.xScale * 60 * 60 * 24;
   const viewBoxHeight =
-    option.yScale * yChoords[yChoords.length - 1]?.lowerStationYChoord + 50;
+    option.yScale * yChoords[yChoords.length - 1]?.lowerStationYChoord + yPadding * 2;
 
   return (
     <>
@@ -105,7 +106,7 @@ export function DiagramViewer() {
         <div className="w-[max-content]">
           <div className="h-0">
             <svg
-              className="diagram-main-svg overflow-x-scroll overflow-y-hidden relative top-0 left-0 block"
+              className="diagram-main-svg overflow-x-scroll overflow-y-hidden relative top-0 left-[120px] block"
               viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
               width={viewBoxWidth}
               height={viewBoxHeight}
@@ -121,11 +122,11 @@ export function DiagramViewer() {
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.upperStationYChoord + option.yOffset) *
-                          option.yScale
+                          option.yScale + yPadding
                         }
                         y2={
                           (v.upperStationYChoord + option.yOffset) *
-                          option.yScale
+                          option.yScale + yPadding
                         }
                         stroke="#000"
                         strokeWidth="0.5"
@@ -137,11 +138,11 @@ export function DiagramViewer() {
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.lowerStationYChoord + option.yOffset) *
-                          option.yScale
+                          option.yScale + yPadding
                         }
                         y2={
                           (v.lowerStationYChoord + option.yOffset) *
-                          option.yScale
+                          option.yScale + yPadding
                         }
                         stroke="#000"
                         strokeWidth="0.5"
@@ -150,15 +151,38 @@ export function DiagramViewer() {
                   ))}
                 </g>
                 <g className="x-axis">
-                  {[...Array(24 * 60)].map((_, v) => (
+                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 2 === 0).map((v) => (
                     <line
                       key={v}
                       x1={(option.xOffset + v * 60) * option.xScale}
                       x2={(option.xOffset + v * 60) * option.xScale}
-                      y1={0}
-                      y2={viewBoxHeight}
+                      y1={yPadding}
+                      y2={viewBoxHeight + yPadding}
                       stroke="#000"
                       strokeWidth="0.5"
+                      strokeDasharray="1 1"
+                    />
+                  ))}
+                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 10 === 0).map((v) => (
+                    <line
+                      id={`${v}-1`}
+                      x1={(option.xOffset + v * 60) * option.xScale}
+                      x2={(option.xOffset + v * 60) * option.xScale}
+                      y1={yPadding}
+                      y2={viewBoxHeight + yPadding}
+                      stroke="#000"
+                      strokeWidth="1"
+                    />
+                  ))}
+                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 30 === 0).map((v) => (
+                    <line
+                      id={`${v}-1`}
+                      x1={(option.xOffset + v * 60) * option.xScale}
+                      x2={(option.xOffset + v * 60) * option.xScale}
+                      y1={yPadding}
+                      y2={viewBoxHeight + yPadding}
+                      stroke="#000"
+                      strokeWidth="2"
                     />
                   ))}
                 </g>
@@ -184,13 +208,13 @@ export function DiagramViewer() {
                             (yChoords.find(
                               (v) => v.segmentId === segment.segments[0].id
                             )?.upperStationYChoord || 0 + option.yOffset) *
-                            option.yScale
+                            option.yScale + yPadding
                           }
                           y1={
                             (yChoords.find(
                               (v) => v.segmentId === segment.segments[0].id
                             )?.lowerStationYChoord || 0 + option.yOffset) *
-                            option.yScale
+                            option.yScale + yPadding
                           }
                           stroke="#000"
                           strokeWidth="1"
@@ -206,13 +230,13 @@ export function DiagramViewer() {
                             (yChoords.find(
                               (v) => v.segmentId === segment.segments[0].id
                             )?.upperStationYChoord || 0 + option.yOffset) *
-                            option.yScale
+                            option.yScale + yPadding
                           }
                           y2={
                             (yChoords.find(
                               (v) => v.segmentId === segment.segments[0].id
                             )?.lowerStationYChoord || 0 + option.yOffset) *
-                            option.yScale
+                            option.yScale + yPadding
                           }
                           stroke="#000"
                           strokeWidth="1"
@@ -244,7 +268,7 @@ export function DiagramViewer() {
                   <text
                     key={`${v.segmentId}-upper-text`}
                     x={60}
-                    y={(v.upperStationYChoord + option.yOffset) * option.yScale}
+                    y={(v.upperStationYChoord + option.yOffset) * option.yScale + yPadding}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                   >
@@ -261,10 +285,10 @@ export function DiagramViewer() {
                     x1={0}
                     x2={60 * 60 * 24 * option.xScale}
                     y1={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale
+                      (v.upperStationYChoord + option.yOffset) * option.yScale + yPadding
                     }
                     y2={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale
+                      (v.upperStationYChoord + option.yOffset) * option.yScale + yPadding
                     }
                     stroke="#000"
                     strokeWidth="1"
@@ -272,7 +296,7 @@ export function DiagramViewer() {
 									<text
                     key={`${v.segmentId}-lower-text`}
                     x={60}
-                    y={(v.lowerStationYChoord + option.yOffset) * option.yScale}
+                    y={(v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                   >
@@ -289,10 +313,10 @@ export function DiagramViewer() {
                     x1={0}
                     x2={60 * 24 * option.xScale}
                     y1={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding
                     }
                     y2={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding
                     }
                     stroke="#000"
                     strokeWidth="1"
