@@ -1,14 +1,11 @@
-import { useParams } from "react-router-dom";
 import useGlobalState from "../globalState/useGlobalState";
 import { useRef, useState } from "react";
 import { TableViewer } from "../TableViewer/TableViewer";
 import { Segment } from "../sharpdia-model/Line";
 import { SegmentService } from "../globalState/SegmentService";
 
-export function LineViewer() {
+export function LineViewer({lineId}: {lineId: string}) {
   const globalState = useGlobalState();
-  const params = useParams();
-  const lineId = params.lineId;
   if (!lineId) {
     throw new Error("line id null");
   }

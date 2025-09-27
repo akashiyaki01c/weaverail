@@ -1,6 +1,5 @@
 import { useState } from "react";
 import useGlobalState from "../globalState/useGlobalState";
-import { useParams } from "react-router-dom";
 import { DiagramLine } from "../sharpdia-model/DiagramLine";
 import { Root } from "../sharpdia-model/Root";
 import { SegmentService } from "../globalState/SegmentService";
@@ -27,7 +26,7 @@ function getYChoords(root: Root, diagramLine: DiagramLine) {
     if (segment == null) {
       throw new Error("Error");
     }
-		const addSeconds = lineSegment.displaySeconds || 5;
+    const addSeconds = lineSegment.displaySeconds || 5;
     if (lineSegment.isReversed) {
       result.push({
         segmentId: segment.id,
@@ -50,10 +49,14 @@ function getYChoords(root: Root, diagramLine: DiagramLine) {
   return result;
 }
 
-export function DiagramViewer() {
+export function DiagramViewer({
+  timetableId,
+  diagramLineId,
+}: {
+  timetableId: string;
+  diagramLineId: string;
+}) {
   const globalState = useGlobalState();
-  const params = useParams();
-  const diagramLineId = params.diagramLineId;
   if (!diagramLineId) {
     throw new Error("diagram line id null");
   }
@@ -64,7 +67,6 @@ export function DiagramViewer() {
   if (!diagramLine) {
     throw new Error("diagram line is null");
   }
-  const timetableId = params.timetableId;
   if (!timetableId) {
     throw new Error("timetable id null");
   }
@@ -77,12 +79,15 @@ export function DiagramViewer() {
   }
   const yChoords = getYChoords(globalState.root, diagramLine);
 
-  const [option, _setOption] = useState(new DiagramViewerOption(.1, .3, 0, 0));
+  const [option, _setOption] = useState(
+    new DiagramViewerOption(0.1, 0.3, 0, 0)
+  );
 
   const yPadding = 50;
   const viewBoxWidth = option.xScale * 60 * 60 * 24;
   const viewBoxHeight =
-    option.yScale * yChoords[yChoords.length - 1]?.lowerStationYChoord + yPadding * 2;
+    option.yScale * yChoords[yChoords.length - 1]?.lowerStationYChoord +
+    yPadding * 2;
 
   return (
     <>
@@ -122,11 +127,13 @@ export function DiagramViewer() {
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.upperStationYChoord + option.yOffset) *
-                          option.yScale + yPadding
+                            option.yScale +
+                          yPadding
                         }
                         y2={
                           (v.upperStationYChoord + option.yOffset) *
-                          option.yScale + yPadding
+                            option.yScale +
+                          yPadding
                         }
                         stroke="#000"
                         strokeWidth="0.5"
@@ -138,11 +145,13 @@ export function DiagramViewer() {
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.lowerStationYChoord + option.yOffset) *
-                          option.yScale + yPadding
+                            option.yScale +
+                          yPadding
                         }
                         y2={
                           (v.lowerStationYChoord + option.yOffset) *
-                          option.yScale + yPadding
+                            option.yScale +
+                          yPadding
                         }
                         stroke="#000"
                         strokeWidth="0.5"
@@ -151,40 +160,49 @@ export function DiagramViewer() {
                   ))}
                 </g>
                 <g className="x-axis">
-                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 2 === 0).map((v) => (
-                    <line
-                      key={v}
-                      x1={(option.xOffset + v * 60) * option.xScale}
-                      x2={(option.xOffset + v * 60) * option.xScale}
-                      y1={yPadding}
-                      y2={viewBoxHeight + yPadding}
-                      stroke="#000"
-                      strokeWidth="0.5"
-                      strokeDasharray="1 1"
-                    />
-                  ))}
-                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 10 === 0).map((v) => (
-                    <line
-                      id={`${v}-1`}
-                      x1={(option.xOffset + v * 60) * option.xScale}
-                      x2={(option.xOffset + v * 60) * option.xScale}
-                      y1={yPadding}
-                      y2={viewBoxHeight + yPadding}
-                      stroke="#000"
-                      strokeWidth="1"
-                    />
-                  ))}
-                  {[...Array(24 * 60)].map((_, i) => i).filter((v) => v % 30 === 0).map((v) => (
-                    <line
-                      id={`${v}-1`}
-                      x1={(option.xOffset + v * 60) * option.xScale}
-                      x2={(option.xOffset + v * 60) * option.xScale}
-                      y1={yPadding}
-                      y2={viewBoxHeight + yPadding}
-                      stroke="#000"
-                      strokeWidth="2"
-                    />
-                  ))}
+                  {[...Array(24 * 60)]
+                    .map((_, i) => i)
+                    .filter((v) => v % 2 === 0)
+                    .map((v) => (
+                      <line
+                        key={v}
+                        x1={(option.xOffset + v * 60) * option.xScale}
+                        x2={(option.xOffset + v * 60) * option.xScale}
+                        y1={yPadding}
+                        y2={viewBoxHeight + yPadding}
+                        stroke="#000"
+                        strokeWidth="0.5"
+                        strokeDasharray="1 1"
+                      />
+                    ))}
+                  {[...Array(24 * 60)]
+                    .map((_, i) => i)
+                    .filter((v) => v % 10 === 0)
+                    .map((v) => (
+                      <line
+                        id={`${v}-1`}
+                        x1={(option.xOffset + v * 60) * option.xScale}
+                        x2={(option.xOffset + v * 60) * option.xScale}
+                        y1={yPadding}
+                        y2={viewBoxHeight + yPadding}
+                        stroke="#000"
+                        strokeWidth="1"
+                      />
+                    ))}
+                  {[...Array(24 * 60)]
+                    .map((_, i) => i)
+                    .filter((v) => v % 30 === 0)
+                    .map((v) => (
+                      <line
+                        id={`${v}-1`}
+                        x1={(option.xOffset + v * 60) * option.xScale}
+                        x2={(option.xOffset + v * 60) * option.xScale}
+                        y1={yPadding}
+                        y2={viewBoxHeight + yPadding}
+                        stroke="#000"
+                        strokeWidth="2"
+                      />
+                    ))}
                 </g>
               </g>
               <g className="trains">
@@ -199,50 +217,57 @@ export function DiagramViewer() {
                       if (arrivalTime < 0) {
                         arrivalTime += 24 * 60 * 60;
                       }
-											if (segment.segments[0].isReversed) {
-												return (
-                        <line
-                          x1={(departureTime + option.xOffset) * option.xScale}
-                          x2={(arrivalTime + option.xOffset) * option.xScale}
-                          y2={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id
-                            )?.upperStationYChoord || 0 + option.yOffset) *
-                            option.yScale + yPadding
-                          }
-                          y1={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id
-                            )?.lowerStationYChoord || 0 + option.yOffset) *
-                            option.yScale + yPadding
-                          }
-                          stroke="#000"
-                          strokeWidth="1"
-                        />
-                      );
-											}
-                      else {
-												return (
-                        <line
-                          x1={(departureTime + option.xOffset) * option.xScale}
-                          x2={(arrivalTime + option.xOffset) * option.xScale}
-                          y1={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id
-                            )?.upperStationYChoord || 0 + option.yOffset) *
-                            option.yScale + yPadding
-                          }
-                          y2={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id
-                            )?.lowerStationYChoord || 0 + option.yOffset) *
-                            option.yScale + yPadding
-                          }
-                          stroke="#000"
-                          strokeWidth="1"
-                        />
-                      );
-											}
+                      if (segment.segments[0].isReversed) {
+                        return (
+                          <line
+                            x1={
+                              (departureTime + option.xOffset) * option.xScale
+                            }
+                            x2={(arrivalTime + option.xOffset) * option.xScale}
+                            y2={
+                              (yChoords.find(
+                                (v) => v.segmentId === segment.segments[0].id
+                              )?.upperStationYChoord || 0 + option.yOffset) *
+                                option.yScale +
+                              yPadding
+                            }
+                            y1={
+                              (yChoords.find(
+                                (v) => v.segmentId === segment.segments[0].id
+                              )?.lowerStationYChoord || 0 + option.yOffset) *
+                                option.yScale +
+                              yPadding
+                            }
+                            stroke="#000"
+                            strokeWidth="1"
+                          />
+                        );
+                      } else {
+                        return (
+                          <line
+                            x1={
+                              (departureTime + option.xOffset) * option.xScale
+                            }
+                            x2={(arrivalTime + option.xOffset) * option.xScale}
+                            y1={
+                              (yChoords.find(
+                                (v) => v.segmentId === segment.segments[0].id
+                              )?.upperStationYChoord || 0 + option.yOffset) *
+                                option.yScale +
+                              yPadding
+                            }
+                            y2={
+                              (yChoords.find(
+                                (v) => v.segmentId === segment.segments[0].id
+                              )?.lowerStationYChoord || 0 + option.yOffset) *
+                                option.yScale +
+                              yPadding
+                            }
+                            stroke="#000"
+                            strokeWidth="1"
+                          />
+                        );
+                      }
                     })}
                   </g>
                 ))}
@@ -268,7 +293,10 @@ export function DiagramViewer() {
                   <text
                     key={`${v.segmentId}-upper-text`}
                     x={60}
-                    y={(v.upperStationYChoord + option.yOffset) * option.yScale + yPadding}
+                    y={
+                      (v.upperStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
+                    }
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                   >
@@ -285,18 +313,23 @@ export function DiagramViewer() {
                     x1={0}
                     x2={60 * 60 * 24 * option.xScale}
                     y1={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale + yPadding
+                      (v.upperStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
                     }
                     y2={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale + yPadding
+                      (v.upperStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
                     }
                     stroke="#000"
                     strokeWidth="1"
                   />
-									<text
+                  <text
                     key={`${v.segmentId}-lower-text`}
                     x={60}
-                    y={(v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding}
+                    y={
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
+                    }
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                   >
@@ -313,10 +346,12 @@ export function DiagramViewer() {
                     x1={0}
                     x2={60 * 24 * option.xScale}
                     y1={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
                     }
                     y2={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale + yPadding
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
+                      yPadding
                     }
                     stroke="#000"
                     strokeWidth="1"

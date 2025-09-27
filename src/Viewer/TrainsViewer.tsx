@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import useGlobalState from "../globalState/useGlobalState";
 import { TimetableService } from "../globalState/TimetableService";
 import { TableViewer } from "../TableViewer/TableViewer";
@@ -9,10 +8,8 @@ import { StationService } from "../globalState/StationService";
 import { toTimeString } from "../sharpdia-model/TimeParser";
 import { TrainTypeService } from "../globalState/TrainTypeService";
 
-export function TrainsViewer() {
+export function TrainsViewer({ timetableId }: { timetableId: string }) {
   const globalState = useGlobalState();
-  const params = useParams();
-  const timetableId = params.timetableId;
   if (!timetableId) {
     throw new Error("timetable id null");
   }
@@ -114,7 +111,8 @@ export function TrainsViewer() {
             widthIc: 6.4,
             cellText(value, _) {
               return (
-                TrainTypeService.findById(globalState.root, value.trainTypeId)?.name || ""
+                TrainTypeService.findById(globalState.root, value.trainTypeId)
+                  ?.name || ""
               );
             },
           },
@@ -135,17 +133,15 @@ export function TrainsViewer() {
             headerText: "始発時刻",
             widthIc: 4.9,
             cellText(value, _) {
-              return (
-                toTimeString(value.segments[0]?.departureTime)
-              );
+              return toTimeString(value.segments[0]?.departureTime);
             },
           },
-                    {
+          {
             headerText: "終着時刻",
             widthIc: 4.9,
             cellText(value, _) {
-              return (
-                toTimeString(value.segments[value.segments.length - 1]?.arrivalTime)
+              return toTimeString(
+                value.segments[value.segments.length - 1]?.arrivalTime
               );
             },
           },

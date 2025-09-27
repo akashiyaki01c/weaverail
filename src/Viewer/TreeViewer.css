@@ -1,14 +1,4 @@
-@import "tailwindcss";
-
-html * {
-  overscroll-behavior: none;
-}
-#root {
-  display: flex;
-}
 .tree-view-outer {
-  height: 100dvh;
-  width: 20ic;
   height: 100dvh;
   overflow-y: scroll;
   ul {
@@ -39,9 +29,4 @@ html * {
   li:last-child::after {
     height: 12px; /* 最後の子だけ縦線を短く */
   }
-}
-.page-outer {
-  height: 100dvh;
-  overflow-y: scroll;
-  flex: 1;
 }

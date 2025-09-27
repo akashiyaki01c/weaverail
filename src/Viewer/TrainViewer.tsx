@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import useGlobalState from "../globalState/useGlobalState";
 import { TimetableService } from "../globalState/TimetableService";
 import { TrainService } from "../globalState/TrainService";
@@ -10,10 +9,8 @@ import { StationService } from "../globalState/StationService";
 import { TrainSegmentService } from "../globalState/TrainSegmentService";
 import { parseTime, toTimeString } from "../sharpdia-model/TimeParser";
 
-export function TrainViewer() {
+export function TrainViewer({timetableId, trainId}: {timetableId: string, trainId: string}) {
   const globalState = useGlobalState();
-  const params = useParams();
-  const timetableId = params.timetableId;
   if (!timetableId) {
     throw new Error("timetable id null");
   }
@@ -25,7 +22,6 @@ export function TrainViewer() {
   if (!timetable) {
     throw new Error("timetable is null");
   }
-  const trainId = params.trainId;
   if (!trainId) {
     throw new Error("train id null");
   }

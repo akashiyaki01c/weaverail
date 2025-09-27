@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import useGlobalState from "../globalState/useGlobalState";
 import { useRef, useState } from "react";
 import { DiagramLineSegment } from "../sharpdia-model/DiagramLine";
@@ -7,10 +6,13 @@ import { TableViewer } from "../TableViewer/TableViewer";
 import { StationService } from "../globalState/StationService";
 import { SegmentService } from "../globalState/SegmentService";
 
-export function DiagramLineViewer() {
+export function DiagramLineViewer({
+  diagramLineId,
+}: {
+  diagramLineId: string;
+}) {
   const globalState = useGlobalState();
-  const params = useParams();
-  const diagramLineId = params.diagramLineId;
+
   if (!diagramLineId) {
     throw new Error("diagram line id null");
   }
