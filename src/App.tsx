@@ -91,6 +91,7 @@ export function App() {
           <Layout
             model={globalState.model}
             factory={factory}
+            realtimeResize={true}
           />
         </div>
       </div>
