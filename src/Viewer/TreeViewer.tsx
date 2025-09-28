@@ -4,6 +4,25 @@ import "./TreeViewer.css";
 
 export function TreeViewer() {
   const globalState = useGlobalState();
+
+  const setCenter = () => {
+    const center = globalState.model?.getNodeById("center");
+    if (!center && globalState.model) {
+      globalState.model.doAction(
+        Actions.addNode(
+          {
+            type: "tabset",
+            id: "center",
+            weight: 100,
+          },
+          globalState.model.getRoot().getId(),
+          DockLocation.CENTER,
+          -1
+        )
+      );
+    }
+  };
+
   return (
     <div className="tree-view-outer bg-gray-100 p-2">
       <summary>摂播電鉄各線</summary>
@@ -11,7 +30,8 @@ export function TreeViewer() {
         <li>
           <div
             onClick={() => {
-              globalState.model.doAction(
+              setCenter()
+globalState.model.doAction(
                 Actions.addNode(
                   {
                     type: "tab",
@@ -32,7 +52,8 @@ export function TreeViewer() {
         <li>
           <div
             onClick={() => {
-              globalState.model?.doAction(
+              setCenter()
+globalState.model.doAction(
                 Actions.addNode(
                   {
                     type: "tab",
@@ -54,7 +75,8 @@ export function TreeViewer() {
           <summary>
             <div
               onClick={() => {
-                globalState.model?.doAction(
+                setCenter()
+globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -77,7 +99,8 @@ export function TreeViewer() {
               <li className="h-6" key={v.id}>
                 <div
                   onClick={() => {
-                    globalState.model?.doAction(
+                    setCenter()
+globalState.model.doAction(
                       Actions.addNode(
                         {
                           type: "tab",
@@ -102,7 +125,8 @@ export function TreeViewer() {
           <summary>
             <div
               onClick={() => {
-                globalState.model?.doAction(
+                setCenter()
+globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -126,7 +150,8 @@ export function TreeViewer() {
                 <summary>
                   <div
                     onClick={() => {
-                      globalState.model?.doAction(
+                      setCenter()
+globalState.model.doAction(
                         Actions.addNode(
                           {
                             type: "tab",
@@ -149,8 +174,8 @@ export function TreeViewer() {
                     <li key={k.id}>
                       <div
                         onClick={() => {
-                          console.log(globalState.model);
-                          globalState.model?.doAction(
+                          setCenter()
+globalState.model.doAction(
                             Actions.addNode(
                               {
                                 type: "tab",
@@ -178,7 +203,8 @@ export function TreeViewer() {
           <summary>
             <div
               onClick={() => {
-                globalState.model?.doAction(
+                setCenter()
+globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -201,7 +227,8 @@ export function TreeViewer() {
               <li>
                 <div
                   onClick={() => {
-                    globalState.model?.doAction(
+                    setCenter()
+globalState.model.doAction(
                       Actions.addNode(
                         {
                           type: "tab",
@@ -233,7 +260,8 @@ export function TreeViewer() {
                     <li>
                       <div
                         onClick={() => {
-                          globalState.model?.doAction(
+                          setCenter()
+globalState.model.doAction(
                             Actions.addNode(
                               {
                                 type: "tab",

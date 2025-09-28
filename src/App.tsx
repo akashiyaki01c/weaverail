@@ -17,7 +17,6 @@ import "./App.css";
 
 export function App() {
   const globalState = useGlobalState();
-
   const factory = (node: TabNode) => {
     const component = node.getComponent();
 
@@ -89,7 +88,10 @@ export function App() {
           </div>
         </div>
         <div className="flex-1 relative">
-          <Layout model={globalState.model} factory={factory} />
+          <Layout
+            model={globalState.model}
+            factory={factory}
+          />
         </div>
       </div>
     </>
