@@ -1,9 +1,9 @@
-import { useState } from "react";
-import useGlobalState from "../globalState/useGlobalState";
-import { DiagramLine } from "../sharpdia-model/DiagramLine";
-import { Root } from "../sharpdia-model/Root";
-import { SegmentService } from "../globalState/SegmentService";
-import { StationService } from "../globalState/StationService";
+import { useState } from 'react';
+import useGlobalState from '../globalState/useGlobalState';
+import { DiagramLine } from '../sharpdia-model/DiagramLine';
+import { Root } from '../sharpdia-model/Root';
+import { SegmentService } from '../globalState/SegmentService';
+import { StationService } from '../globalState/StationService';
 
 interface StationChoord {
   // 駅間ID
@@ -24,7 +24,7 @@ function getYChoords(root: Root, diagramLine: DiagramLine) {
   for (const lineSegment of diagramLine.segments) {
     const segment = SegmentService.findByIdAll(root, lineSegment.id);
     if (segment == null) {
-      throw new Error("Error");
+      throw new Error('Error');
     }
     const addSeconds = lineSegment.displaySeconds || 5;
     if (lineSegment.isReversed) {
@@ -58,29 +58,29 @@ export function DiagramViewer({
 }) {
   const globalState = useGlobalState();
   if (!diagramLineId) {
-    throw new Error("diagram line id null");
+    throw new Error('diagram line id null');
   }
   const diagramLineIndex = globalState.root.diagramLines.findIndex(
-    (v) => v.id === diagramLineId
+    (v) => v.id === diagramLineId,
   );
   const diagramLine = globalState.root.diagramLines[diagramLineIndex];
   if (!diagramLine) {
-    throw new Error("diagram line is null");
+    throw new Error('diagram line is null');
   }
   if (!timetableId) {
-    throw new Error("timetable id null");
+    throw new Error('timetable id null');
   }
   const timetableIndex = globalState.root.timetables.findIndex(
-    (v) => v.id === timetableId
+    (v) => v.id === timetableId,
   );
   const timetable = globalState.root.timetables[timetableIndex];
   if (!timetable) {
-    throw new Error("timetable is null");
+    throw new Error('timetable is null');
   }
   const yChoords = getYChoords(globalState.root, diagramLine);
 
   const [option, _setOption] = useState(
-    new DiagramViewerOption(0.1, 0.3, 0, 0)
+    new DiagramViewerOption(0.1, 0.3, 0, 0),
   );
 
   const yPadding = 50;
@@ -226,14 +226,14 @@ export function DiagramViewer({
                             x2={(arrivalTime + option.xOffset) * option.xScale}
                             y2={
                               (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id
+                                (v) => v.segmentId === segment.segments[0].id,
                               )?.upperStationYChoord || 0 + option.yOffset) *
                                 option.yScale +
                               yPadding
                             }
                             y1={
                               (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id
+                                (v) => v.segmentId === segment.segments[0].id,
                               )?.lowerStationYChoord || 0 + option.yOffset) *
                                 option.yScale +
                               yPadding
@@ -251,14 +251,14 @@ export function DiagramViewer({
                             x2={(arrivalTime + option.xOffset) * option.xScale}
                             y1={
                               (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id
+                                (v) => v.segmentId === segment.segments[0].id,
                               )?.upperStationYChoord || 0 + option.yOffset) *
                                 option.yScale +
                               yPadding
                             }
                             y2={
                               (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id
+                                (v) => v.segmentId === segment.segments[0].id,
                               )?.lowerStationYChoord || 0 + option.yOffset) *
                                 option.yScale +
                               yPadding
@@ -303,7 +303,7 @@ export function DiagramViewer({
                     {
                       StationService.findById(
                         globalState.root,
-                        v.upperStationId
+                        v.upperStationId,
                       )?.name
                     }
                   </text>
@@ -336,7 +336,7 @@ export function DiagramViewer({
                     {
                       StationService.findById(
                         globalState.root,
-                        v.lowerStationId
+                        v.lowerStationId,
                       )?.name
                     }
                   </text>
@@ -371,6 +371,6 @@ export class DiagramViewerOption {
     public xScale: number,
     public yScale: number,
     public xOffset: number,
-    public yOffset: number
+    public yOffset: number,
   ) {}
 }

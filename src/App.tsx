@@ -1,58 +1,58 @@
-import { Layout, TabNode } from "flexlayout-react";
-import "flexlayout-react/style/rounded.css";
-import { StationTableViewer } from "./Viewer/StationTableViewer";
-import { LinesViewer } from "./Viewer/LinesViewer";
-import { LineViewer } from "./Viewer/LineViewer";
-import { TrainTypeViewer } from "./Viewer/TrainTypeViewer";
-import { TimetableViewer } from "./Viewer/TimetableViewer";
-import { TrainsViewer } from "./Viewer/TrainsViewer";
-import { TrainViewer } from "./Viewer/TrainViewer";
-import { DiagramLinesViewer } from "./Viewer/DiagramLinesViewer";
-import { DiagramLineViewer } from "./Viewer/DiagramLineViewer";
-import { DiagramViewer } from "./Viewer/DiagramViewer";
-import { TreeViewer } from "./Viewer/TreeViewer";
-import useGlobalState from "./globalState/useGlobalState";
-import { OpenFile, SaveFile } from "./commands/FileIO";
-import "./App.css";
+import { Layout, TabNode } from 'flexlayout-react';
+import 'flexlayout-react/style/rounded.css';
+import { StationTableViewer } from './Viewer/StationTableViewer';
+import { LinesViewer } from './Viewer/LinesViewer';
+import { LineViewer } from './Viewer/LineViewer';
+import { TrainTypeViewer } from './Viewer/TrainTypeViewer';
+import { TimetableViewer } from './Viewer/TimetableViewer';
+import { TrainsViewer } from './Viewer/TrainsViewer';
+import { TrainViewer } from './Viewer/TrainViewer';
+import { DiagramLinesViewer } from './Viewer/DiagramLinesViewer';
+import { DiagramLineViewer } from './Viewer/DiagramLineViewer';
+import { DiagramViewer } from './Viewer/DiagramViewer';
+import { TreeViewer } from './Viewer/TreeViewer';
+import useGlobalState from './globalState/useGlobalState';
+import { OpenFile, SaveFile } from './commands/FileIO';
+import './App.css';
 
 export function App() {
   const globalState = useGlobalState();
   const factory = (node: TabNode) => {
     const component = node.getComponent();
 
-    if (component === "stations") {
+    if (component === 'stations') {
       return <StationTableViewer />;
     }
-    if (component === "lines") {
+    if (component === 'lines') {
       return <LinesViewer />;
     }
-    if (component === "line") {
+    if (component === 'line') {
       const lineId = node.getConfig()?.lineId;
       return <LineViewer lineId={lineId} />;
     }
-    if (component === "train-types") {
+    if (component === 'train-types') {
       return <TrainTypeViewer />;
     }
-    if (component === "timetables") {
+    if (component === 'timetables') {
       return <TimetableViewer />;
     }
-    if (component === "trains") {
+    if (component === 'trains') {
       const timetableId = node.getConfig()?.timetableId;
       return <TrainsViewer timetableId={timetableId} />;
     }
-    if (component === "train") {
+    if (component === 'train') {
       const timetableId = node.getConfig()?.timetableId;
       const trainId = node.getConfig()?.trainId;
       return <TrainViewer timetableId={timetableId} trainId={trainId} />;
     }
-    if (component === "diagram-lines") {
+    if (component === 'diagram-lines') {
       return <DiagramLinesViewer />;
     }
-    if (component === "diagram-line") {
+    if (component === 'diagram-line') {
       const diagramLineId = node.getConfig()?.diagramLineId;
       return <DiagramLineViewer diagramLineId={diagramLineId} />;
     }
-    if (component === "diagram") {
+    if (component === 'diagram') {
       const timetableId = node.getConfig()?.timetableId;
       const diagramLineId = node.getConfig()?.diagramLineId;
       return (
@@ -62,7 +62,7 @@ export function App() {
         />
       );
     }
-    if (component === "tree") {
+    if (component === 'tree') {
       return <TreeViewer />;
     }
 

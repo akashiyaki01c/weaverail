@@ -1,13 +1,13 @@
-import useGlobalState from "../globalState/useGlobalState";
-import { TimetableService } from "../globalState/TimetableService";
-import { TrainService } from "../globalState/TrainService";
-import { useRef, useState } from "react";
-import { TrainSegment } from "../sharpdia-model/Train";
-import { TableViewer } from "../TableViewer/TableViewer";
-import { SegmentService } from "../globalState/SegmentService";
-import { StationService } from "../globalState/StationService";
-import { TrainSegmentService } from "../globalState/TrainSegmentService";
-import { parseTime, toTimeString } from "../sharpdia-model/TimeParser";
+import useGlobalState from '../globalState/useGlobalState';
+import { TimetableService } from '../globalState/TimetableService';
+import { TrainService } from '../globalState/TrainService';
+import { useRef, useState } from 'react';
+import { TrainSegment } from '../sharpdia-model/Train';
+import { TableViewer } from '../TableViewer/TableViewer';
+import { SegmentService } from '../globalState/SegmentService';
+import { StationService } from '../globalState/StationService';
+import { TrainSegmentService } from '../globalState/TrainSegmentService';
+import { parseTime, toTimeString } from '../sharpdia-model/TimeParser';
 
 export function TrainViewer({
   timetableId,
@@ -18,31 +18,31 @@ export function TrainViewer({
 }) {
   const globalState = useGlobalState();
   if (!timetableId) {
-    throw new Error("timetable id null");
+    throw new Error('timetable id null');
   }
   const timetable = TimetableService.findById(globalState.root, timetableId);
   const timetableIndex = TimetableService.findIndexById(
     globalState.root,
-    timetableId
+    timetableId,
   );
   if (!timetable) {
-    throw new Error("timetable is null");
+    throw new Error('timetable is null');
   }
   if (!trainId) {
-    throw new Error("train id null");
+    throw new Error('train id null');
   }
   const trainIndex = TrainService.findIndexById(
     globalState.root,
     timetableIndex,
-    trainId
+    trainId,
   );
   const train = TrainService.findById(
     globalState.root,
     timetableIndex,
-    trainId
+    trainId,
   );
   if (!train) {
-    throw new Error("train is null");
+    throw new Error('train is null');
   }
 
   const maxX = 2;
@@ -57,17 +57,17 @@ export function TrainViewer({
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(TrainSegment.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
       setEditData(TrainSegment.default());
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(train.segments[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -76,43 +76,43 @@ export function TrainViewer({
       return;
     }
     globalState.setRoot((prev) =>
-      TrainSegmentService.delete(prev, timetableIndex, trainIndex, y)
+      TrainSegmentService.delete(prev, timetableIndex, trainIndex, y),
     );
   };
   const insertData = (_: number) => {
     setEditData(TrainSegment.default());
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
+    if (editState === 'edit') {
       globalState.setRoot((prev) =>
         TrainSegmentService.update(
           prev,
           timetableIndex,
           trainIndex,
           selectedCellY,
-          editData
-        )
+          editData,
+        ),
       );
-    } else if (editState === "insert") {
+    } else if (editState === 'insert') {
       globalState.setRoot((prev) =>
         TrainSegmentService.insert(
           prev,
           timetableIndex,
           trainIndex,
           selectedCellY,
-          editData
-        )
+          editData,
+        ),
       );
-    } else if (editState === "new") {
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
       globalState.setRoot((prev) =>
-        TrainSegmentService.append(prev, timetableIndex, trainIndex, editData)
+        TrainSegmentService.append(prev, timetableIndex, trainIndex, editData),
       );
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -131,48 +131,48 @@ export function TrainViewer({
         data={train.segments}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "区間",
+            headerText: '区間',
             widthIc: 10.4,
             cellText(value, _) {
               return `${
                 value?.segments
                   ?.map((v) =>
-                    SegmentService.findByIdAll(globalState.root, v?.id)
+                    SegmentService.findByIdAll(globalState.root, v?.id),
                   )
                   .map(
                     (v) =>
                       `${
                         StationService.findById(
                           globalState.root,
-                          v?.startId || ""
+                          v?.startId || '',
                         )?.name
                       }→${
                         StationService.findById(
                           globalState.root,
-                          v?.endId || ""
+                          v?.endId || '',
                         )?.name
-                      }`
+                      }`,
                   )
-                  .join("/") || ""
+                  .join('/') || ''
               }`;
             },
           },
           {
-            headerText: "発車時刻",
+            headerText: '発車時刻',
             widthIc: 5.4,
             cellText(value, _) {
               return toTimeString(value.departureTime);
             },
           },
           {
-            headerText: "到着時刻",
+            headerText: '到着時刻',
             widthIc: 5.4,
             cellText(value, _) {
               return toTimeString(value.arrivalTime);
@@ -195,14 +195,14 @@ export function TrainViewer({
               <div className="flex flex-col">
                 {[
                   ...(editData?.segments || []),
-                  { id: "", isReversed: false },
+                  { id: '', isReversed: false },
                 ].map((v, i) => (
                   <select
                     value={v.id}
                     key={v.id}
                     onChange={(e) => {
                       if (i >= editData?.segments?.length) {
-                        editData?.segments?.push({ id: "", isReversed: false });
+                        editData?.segments?.push({ id: '', isReversed: false });
                       }
                       editData.segments[i].id = e.target.value;
                       setEditData({ ...editData });
@@ -212,22 +212,22 @@ export function TrainViewer({
                     {globalState?.root?.lines?.map((l) =>
                       l.segments?.map((segment) => (
                         <option value={segment.id}>
-                          {l.name}{" "}
+                          {l.name}{' '}
                           {
                             StationService.findById(
                               globalState.root,
-                              segment.startId
+                              segment.startId,
                             )?.name
                           }
                           -
                           {
                             StationService.findById(
                               globalState.root,
-                              segment.endId
+                              segment.endId,
                             )?.name
                           }
                         </option>
-                      ))
+                      )),
                     )}
                   </select>
                 ))}
@@ -271,7 +271,7 @@ export function TrainViewer({
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

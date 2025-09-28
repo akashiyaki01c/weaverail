@@ -1,7 +1,7 @@
-import { Link, Outlet } from "react-router-dom";
-import useGlobalState from "./globalState/useGlobalState";
-import { OpenFile, SaveFile } from "./commands/FileIO";
-import "./Layout.css";
+import { Link, Outlet } from 'react-router-dom';
+import useGlobalState from './globalState/useGlobalState';
+import { OpenFile, SaveFile } from './commands/FileIO';
+import './Layout.css';
 
 export function Layout() {
   const globalState = useGlobalState();

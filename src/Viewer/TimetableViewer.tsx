@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { TableViewer } from "../TableViewer/TableViewer";
-import useGlobalState from "../globalState/useGlobalState";
-import { Timetable } from "../sharpdia-model/Timetable";
-import { TimetableService } from "../globalState/TimetableService";
+import { useRef, useState } from 'react';
+import { TableViewer } from '../TableViewer/TableViewer';
+import useGlobalState from '../globalState/useGlobalState';
+import { Timetable } from '../sharpdia-model/Timetable';
+import { TimetableService } from '../globalState/TimetableService';
 
 export function TimetableViewer() {
   const globalState = useGlobalState();
@@ -19,17 +19,17 @@ export function TimetableViewer() {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(Timetable.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
       setEditData(Timetable.default());
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(globalState.root.timetables[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -37,24 +37,28 @@ export function TimetableViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => TimetableService.delete(prev, y));
+    globalState.setRoot((prev) => TimetableService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(Timetable.default());
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
-      globalState.setRoot(prev => TimetableService.update(prev, selectedCellY, editData));
-    } else if (editState === "insert") {
-      globalState.setRoot(prev => TimetableService.insert(prev, selectedCellY, editData));
-    } else if (editState === "new") {
+    if (editState === 'edit') {
+      globalState.setRoot((prev) =>
+        TimetableService.update(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'insert') {
+      globalState.setRoot((prev) =>
+        TimetableService.insert(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => TimetableService.append(prev, editData));
+      globalState.setRoot((prev) => TimetableService.append(prev, editData));
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -73,14 +77,14 @@ export function TimetableViewer() {
         data={globalState.root.timetables}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "時刻表名",
+            headerText: '時刻表名',
             widthIc: 6.4,
             cellText(value, _) {
               return value.name;
@@ -115,7 +119,7 @@ export function TimetableViewer() {
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

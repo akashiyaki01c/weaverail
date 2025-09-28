@@ -1,14 +1,14 @@
 export class TrainType {
-	id: string;
+  id: string;
 
-	constructor(
-		public name: string,
-		public color: string,
-	) {
-		this.id = crypto.randomUUID();
-	}
+  constructor(
+    public name: string,
+    public color: string,
+  ) {
+    this.id = crypto.randomUUID();
+  }
 
-	static default() {
-		return new TrainType("", "#000000");
-	}
+  static default() {
+    return new TrainType('', '#000000');
+  }
 }

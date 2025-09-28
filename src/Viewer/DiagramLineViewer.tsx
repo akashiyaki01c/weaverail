@@ -1,10 +1,10 @@
-import useGlobalState from "../globalState/useGlobalState";
-import { useRef, useState } from "react";
-import { DiagramLineSegment } from "../sharpdia-model/DiagramLine";
-import { DiagramLineSegmentService } from "../globalState/DiagramLineSegmentService";
-import { TableViewer } from "../TableViewer/TableViewer";
-import { StationService } from "../globalState/StationService";
-import { SegmentService } from "../globalState/SegmentService";
+import useGlobalState from '../globalState/useGlobalState';
+import { useRef, useState } from 'react';
+import { DiagramLineSegment } from '../sharpdia-model/DiagramLine';
+import { DiagramLineSegmentService } from '../globalState/DiagramLineSegmentService';
+import { TableViewer } from '../TableViewer/TableViewer';
+import { StationService } from '../globalState/StationService';
+import { SegmentService } from '../globalState/SegmentService';
 
 export function DiagramLineViewer({
   diagramLineId,
@@ -14,14 +14,14 @@ export function DiagramLineViewer({
   const globalState = useGlobalState();
 
   if (!diagramLineId) {
-    throw new Error("diagram line id null");
+    throw new Error('diagram line id null');
   }
   const diagramLineIndex = globalState.root.diagramLines.findIndex(
-    (v) => v.id === diagramLineId
+    (v) => v.id === diagramLineId,
   );
   const diagramLine = globalState.root.diagramLines[diagramLineIndex];
   if (!diagramLine) {
-    throw new Error("diagram line is null");
+    throw new Error('diagram line is null');
   }
 
   const maxY = diagramLine.segments.length + 1;
@@ -34,7 +34,7 @@ export function DiagramLineViewer({
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(DiagramLineSegment.default());
 
@@ -42,10 +42,10 @@ export function DiagramLineViewer({
     if (y === maxY - 1) {
       const value = DiagramLineSegment.default();
       setEditData(value);
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(diagramLine.segments[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -54,42 +54,42 @@ export function DiagramLineViewer({
       return;
     }
     globalState.setRoot((prev) =>
-      DiagramLineSegmentService.delete(prev, diagramLineIndex, selectedCellY)
+      DiagramLineSegmentService.delete(prev, diagramLineIndex, selectedCellY),
     );
   };
   const insertData = (_: number) => {
     const value = DiagramLineSegment.default();
     setEditData(value);
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
+    if (editState === 'edit') {
       globalState.setRoot((prev) =>
         DiagramLineSegmentService.update(
           prev,
           diagramLineIndex,
           selectedCellY,
-          editData
-        )
+          editData,
+        ),
       );
-    } else if (editState === "insert") {
+    } else if (editState === 'insert') {
       globalState.setRoot((prev) =>
         DiagramLineSegmentService.insert(
           prev,
           diagramLineIndex,
           selectedCellY,
-          editData
-        )
+          editData,
+        ),
       );
-    } else if (editState === "new") {
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
       globalState.setRoot((prev) =>
-        DiagramLineSegmentService.append(prev, diagramLineIndex, editData)
+        DiagramLineSegmentService.append(prev, diagramLineIndex, editData),
       );
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -108,27 +108,27 @@ export function DiagramLineViewer({
         data={diagramLine.segments}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "区間",
+            headerText: '区間',
             widthIc: 10.4,
             cellText(value, _) {
               const segment = SegmentService.findByIdAll(
                 globalState.root,
-                value.id
+                value.id,
               );
               return `${
                 StationService.findById(
                   globalState.root,
-                  segment?.startId || ""
+                  segment?.startId || '',
                 )?.name
               }→${
-                StationService.findById(globalState.root, segment?.endId || "")
+                StationService.findById(globalState.root, segment?.endId || '')
                   ?.name
               }`;
             },
@@ -157,11 +157,11 @@ export function DiagramLineViewer({
                 {globalState?.root?.lines?.map((l) =>
                   l.segments?.map((segment, i) => (
                     <option value={segment.id}>
-                      {i}.{l.name}{" "}
+                      {i}.{l.name}{' '}
                       {
                         StationService.findById(
                           globalState.root,
-                          segment.startId
+                          segment.startId,
                         )?.name
                       }
                       -
@@ -170,7 +170,7 @@ export function DiagramLineViewer({
                           ?.name
                       }
                     </option>
-                  ))
+                  )),
                 )}
               </select>
             </label>
@@ -178,7 +178,7 @@ export function DiagramLineViewer({
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

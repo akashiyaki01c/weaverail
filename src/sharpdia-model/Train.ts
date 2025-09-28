@@ -1,33 +1,33 @@
 // 列車を表す
 export class Train {
-	id: string;
+  id: string;
 
-	constructor(
-		public number: string,
-		public trainTypeId: string,
-		public segments: TrainSegment[]
-	) {
-		this.id = crypto.randomUUID();
-	}
+  constructor(
+    public number: string,
+    public trainTypeId: string,
+    public segments: TrainSegment[],
+  ) {
+    this.id = crypto.randomUUID();
+  }
 
-	static default() {
-		return new Train("", "", []);
-	}
+  static default() {
+    return new Train('', '', []);
+  }
 }
 
 // 列車を表す
 export class TrainSegment {
-	id: string;
+  id: string;
 
-	constructor(
-		public segments: { id: string, isReversed: boolean }[],
-		public arrivalTime: number,
-		public departureTime: number,
-	) {
-		this.id = crypto.randomUUID();
-	}
+  constructor(
+    public segments: { id: string; isReversed: boolean }[],
+    public arrivalTime: number,
+    public departureTime: number,
+  ) {
+    this.id = crypto.randomUUID();
+  }
 
-	static default() {
-		return new TrainSegment([], 0, 0);
-	}
+  static default() {
+    return new TrainSegment([], 0, 0);
+  }
 }

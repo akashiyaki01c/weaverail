@@ -1,7 +1,7 @@
 a {
-	display: block;
-	width: 100%;
+  display: block;
+  width: 100%;
 }
 a:hover {
-	background-color: #eee;
+  background-color: #eee;
 }

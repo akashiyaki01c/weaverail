@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { TableViewer } from "../TableViewer/TableViewer";
-import useGlobalState from "../globalState/useGlobalState";
-import { DiagramLine } from "../sharpdia-model/DiagramLine";
-import { DiagramLineService } from "../globalState/DiagramLineService";
+import { useRef, useState } from 'react';
+import { TableViewer } from '../TableViewer/TableViewer';
+import useGlobalState from '../globalState/useGlobalState';
+import { DiagramLine } from '../sharpdia-model/DiagramLine';
+import { DiagramLineService } from '../globalState/DiagramLineService';
 
 export function DiagramLinesViewer() {
   const globalState = useGlobalState();
@@ -19,17 +19,17 @@ export function DiagramLinesViewer() {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(DiagramLine.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
       setEditData(DiagramLine.default());
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(globalState.root.diagramLines[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -37,24 +37,28 @@ export function DiagramLinesViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => DiagramLineService.delete(prev, y));
+    globalState.setRoot((prev) => DiagramLineService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(DiagramLine.default());
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
-      globalState.setRoot(prev => DiagramLineService.update(prev, selectedCellY, editData));
-    } else if (editState === "insert") {
-      globalState.setRoot(prev => DiagramLineService.insert(prev, selectedCellY, editData));
-    } else if (editState === "new") {
+    if (editState === 'edit') {
+      globalState.setRoot((prev) =>
+        DiagramLineService.update(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'insert') {
+      globalState.setRoot((prev) =>
+        DiagramLineService.insert(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => DiagramLineService.append(prev, editData));
+      globalState.setRoot((prev) => DiagramLineService.append(prev, editData));
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -73,14 +77,14 @@ export function DiagramLinesViewer() {
         data={globalState.root.diagramLines}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "ダイヤ設定名",
+            headerText: 'ダイヤ設定名',
             widthIc: 6.4,
             cellText(value, _) {
               return value.name;
@@ -115,7 +119,7 @@ export function DiagramLinesViewer() {
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { Station } from "../sharpdia-model/Station";
-import { TableViewer } from "../TableViewer/TableViewer";
-import useGlobalState from "../globalState/useGlobalState";
-import { StationService } from "../globalState/StationService";
+import { useRef, useState } from 'react';
+import { Station } from '../sharpdia-model/Station';
+import { TableViewer } from '../TableViewer/TableViewer';
+import useGlobalState from '../globalState/useGlobalState';
+import { StationService } from '../globalState/StationService';
 
 export function StationTableViewer() {
   const globalState = useGlobalState();
@@ -19,17 +19,17 @@ export function StationTableViewer() {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(Station.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
       setEditData(Station.default());
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(globalState.root.stations[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -37,24 +37,28 @@ export function StationTableViewer() {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => StationService.delete(prev, y));
+    globalState.setRoot((prev) => StationService.delete(prev, y));
   };
   const insertData = (_: number) => {
     setEditData(Station.default());
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
-      globalState.setRoot(prev => StationService.update(prev, selectedCellY, editData));
-    } else if (editState === "insert") {
-      globalState.setRoot(prev => StationService.insert(prev, selectedCellY, editData));
-    } else if (editState === "new") {
+    if (editState === 'edit') {
+      globalState.setRoot((prev) =>
+        StationService.update(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'insert') {
+      globalState.setRoot((prev) =>
+        StationService.insert(prev, selectedCellY, editData),
+      );
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => StationService.append(prev, editData));
+      globalState.setRoot((prev) => StationService.append(prev, editData));
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -73,28 +77,28 @@ export function StationTableViewer() {
         data={globalState.root.stations}
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "駅名",
+            headerText: '駅名',
             widthIc: 6.4,
             cellText(value, _) {
               return value.name;
             },
           },
           {
-            headerText: "駅時刻表示",
+            headerText: '駅時刻表示',
             widthIc: 4.4,
             cellText(value, _) {
               return value.displayType;
             },
           },
           {
-            headerText: "駅規模",
+            headerText: '駅規模',
             widthIc: 4.4,
             cellText(value, _) {
               return value.kibo;
@@ -129,7 +133,7 @@ export function StationTableViewer() {
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

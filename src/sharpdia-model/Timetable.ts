@@ -1,16 +1,16 @@
-import { Train } from "./Train";
+import { Train } from './Train';
 
 export class Timetable {
-	id: string;
+  id: string;
 
-	constructor(
-		public name: string,
-		public trains: Train[],
-	) {
-		this.id = crypto.randomUUID();
-	}
+  constructor(
+    public name: string,
+    public trains: Train[],
+  ) {
+    this.id = crypto.randomUUID();
+  }
 
-	static default() {
-		return new Timetable("", []);
-	}
+  static default() {
+    return new Timetable('', []);
+  }
 }

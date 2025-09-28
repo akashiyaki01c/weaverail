@@ -1,4 +1,4 @@
-import { KeyboardEvent, useRef } from "react";
+import { KeyboardEvent, useRef } from 'react';
 
 type Props<T> = {
   columnSettings: {
@@ -13,8 +13,8 @@ type Props<T> = {
   selectedCellY: number;
   setSelectedCellX: (x: number) => void;
   setSelectedCellY: (y: number) => void;
-  editState: "viewer" | "new" | "insert" | "edit";
-  setEditState: (value: "viewer" | "new" | "insert" | "edit") => void;
+  editState: 'viewer' | 'new' | 'insert' | 'edit';
+  setEditState: (value: 'viewer' | 'new' | 'insert' | 'edit') => void;
 
   startEdit: (x: number, y: number) => void;
   deleteData: (y: number) => void;
@@ -90,44 +90,44 @@ export function TableViewer<T>(props: Props<T>) {
     console.log(e.key);
     e.preventDefault();
     switch (e.key) {
-      case "ArrowRight":
+      case 'ArrowRight':
         moveRight();
         return;
-      case "ArrowLeft":
+      case 'ArrowLeft':
         moveLeft();
         return;
-      case "ArrowDown":
+      case 'ArrowDown':
         moveDown();
         return;
-      case "ArrowUp":
+      case 'ArrowUp':
         moveUp();
         return;
-      case "Enter":
+      case 'Enter':
         startEdit(props.selectedCellX, props.selectedCellY);
         return;
-      case "Delete":
+      case 'Delete':
         props.deleteData(props.selectedCellY);
         cellRefs.current.splice(props.selectedCellY, 1);
         console.log(props.data);
         return;
-      case "+":
+      case '+':
         props.insertData(props.selectedCellY);
         return;
     }
   };
 
   const cellDefaultClass = (width: number, x: number, y: number) => {
-    let borderSting = "";
+    let borderSting = '';
     if (y !== maxY - 1) {
-      borderSting += " border-b-[1px]";
+      borderSting += ' border-b-[1px]';
     }
     if (x !== maxX - 1) {
-      borderSting += " border-r-[1px]";
+      borderSting += ' border-r-[1px]';
     }
     return `${borderSting} pl-[0.2ic] pr-[0.2ic] border-solid border-gray-600 overflow-hidden w-[${width}ic] ${
       x === props.selectedCellX && y === props.selectedCellY
-        ? "bg-gray-200"
-        : ""
+        ? 'bg-gray-200'
+        : ''
     }`;
   };
   return (
@@ -152,7 +152,10 @@ export function TableViewer<T>(props: Props<T>) {
           </div>
           {props.data.map((d, i) => (
             <>
-              <div className="flex z-0 h-[1.5ic]" key={(d as any).key || undefined}>
+              <div
+                className="flex z-0 h-[1.5ic]"
+                key={(d as any).key || undefined}
+              >
                 {props.columnSettings.map((v, j) => (
                   <div
                     key={j}

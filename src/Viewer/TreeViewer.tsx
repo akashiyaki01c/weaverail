@@ -1,24 +1,24 @@
-import { Actions, DockLocation } from "flexlayout-react";
-import useGlobalState from "../globalState/useGlobalState";
-import "./TreeViewer.css";
+import { Actions, DockLocation } from 'flexlayout-react';
+import useGlobalState from '../globalState/useGlobalState';
+import './TreeViewer.css';
 
 export function TreeViewer() {
   const globalState = useGlobalState();
 
   const setCenter = () => {
-    const center = globalState.model?.getNodeById("center");
+    const center = globalState.model?.getNodeById('center');
     if (!center && globalState.model) {
       globalState.model.doAction(
         Actions.addNode(
           {
-            type: "tabset",
-            id: "center",
+            type: 'tabset',
+            id: 'center',
             weight: 100,
           },
           globalState.model.getRoot().getId(),
           DockLocation.CENTER,
-          -1
-        )
+          -1,
+        ),
       );
     }
   };
@@ -34,15 +34,15 @@ export function TreeViewer() {
               globalState.model.doAction(
                 Actions.addNode(
                   {
-                    type: "tab",
-                    name: "駅一覧",
-                    component: "stations",
+                    type: 'tab',
+                    name: '駅一覧',
+                    component: 'stations',
                     config: {},
                   },
-                  "center",
+                  'center',
                   DockLocation.CENTER,
-                  -1
-                )
+                  -1,
+                ),
               );
             }}
           >
@@ -56,15 +56,15 @@ export function TreeViewer() {
               globalState.model.doAction(
                 Actions.addNode(
                   {
-                    type: "tab",
-                    name: "列車種別一覧",
-                    component: "train-types",
+                    type: 'tab',
+                    name: '列車種別一覧',
+                    component: 'train-types',
                     config: {},
                   },
-                  "center",
+                  'center',
                   DockLocation.CENTER,
-                  -1
-                )
+                  -1,
+                ),
               );
             }}
           >
@@ -79,15 +79,15 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: "tab",
-                      name: "路線一覧",
-                      component: "lines",
+                      type: 'tab',
+                      name: '路線一覧',
+                      component: 'lines',
                       config: {},
                     },
-                    "center",
+                    'center',
                     DockLocation.CENTER,
-                    -1
-                  )
+                    -1,
+                  ),
                 );
               }}
             >
@@ -103,15 +103,15 @@ export function TreeViewer() {
                     globalState.model.doAction(
                       Actions.addNode(
                         {
-                          type: "tab",
+                          type: 'tab',
                           name: `路線 - ${v.name}`,
-                          component: "line",
+                          component: 'line',
                           config: { lineId: v.id },
                         },
-                        "center",
+                        'center',
                         DockLocation.CENTER,
-                        -1
-                      )
+                        -1,
+                      ),
                     );
                   }}
                 >
@@ -129,15 +129,15 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: "tab",
-                      name: "時刻表一覧",
-                      component: "timetables",
+                      type: 'tab',
+                      name: '時刻表一覧',
+                      component: 'timetables',
                       config: {},
                     },
-                    "center",
+                    'center',
                     DockLocation.CENTER,
-                    -1
-                  )
+                    -1,
+                  ),
                 );
               }}
             >
@@ -154,15 +154,15 @@ export function TreeViewer() {
                       globalState.model.doAction(
                         Actions.addNode(
                           {
-                            type: "tab",
+                            type: 'tab',
                             name: `時刻表 - ${v.name}`,
-                            component: "timetable",
+                            component: 'timetable',
                             config: { timetableId: v.id },
                           },
-                          "center",
+                          'center',
                           DockLocation.CENTER,
-                          -1
-                        )
+                          -1,
+                        ),
                       );
                     }}
                   >
@@ -178,15 +178,15 @@ export function TreeViewer() {
                           globalState.model.doAction(
                             Actions.addNode(
                               {
-                                type: "tab",
+                                type: 'tab',
                                 name: `列車 - ${k.number}`,
-                                component: "train",
+                                component: 'train',
                                 config: { timetableId: v.id, trainId: k.id },
                               },
-                              "center",
+                              'center',
                               DockLocation.CENTER,
-                              -1
-                            )
+                              -1,
+                            ),
                           );
                         }}
                       >
@@ -207,15 +207,15 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: "tab",
-                      name: "ダイヤ設定一覧",
-                      component: "diagram-lines",
+                      type: 'tab',
+                      name: 'ダイヤ設定一覧',
+                      component: 'diagram-lines',
                       config: {},
                     },
-                    "center",
+                    'center',
                     DockLocation.CENTER,
-                    -1
-                  )
+                    -1,
+                  ),
                 );
               }}
             >
@@ -231,15 +231,15 @@ export function TreeViewer() {
                     globalState.model.doAction(
                       Actions.addNode(
                         {
-                          type: "tab",
+                          type: 'tab',
                           name: `ダイヤ設定 - ${v.name}`,
-                          component: "diagram-line",
+                          component: 'diagram-line',
                           config: { diagramLineId: v.id },
                         },
-                        "center",
+                        'center',
                         DockLocation.CENTER,
-                        -1
-                      )
+                        -1,
+                      ),
                     );
                   }}
                 >
@@ -264,18 +264,18 @@ export function TreeViewer() {
                           globalState.model.doAction(
                             Actions.addNode(
                               {
-                                type: "tab",
+                                type: 'tab',
                                 name: `ダイヤグラム - ${lines.name} - ${timetable.name}`,
-                                component: "diagram",
+                                component: 'diagram',
                                 config: {
                                   diagramLineId: lines.id,
                                   timetableId: timetable.id,
                                 },
                               },
-                              "center",
+                              'center',
                               DockLocation.CENTER,
-                              -1
-                            )
+                              -1,
+                            ),
                           );
                         }}
                       >

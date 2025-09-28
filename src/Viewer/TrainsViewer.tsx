@@ -1,25 +1,25 @@
-import useGlobalState from "../globalState/useGlobalState";
-import { TimetableService } from "../globalState/TimetableService";
-import { TableViewer } from "../TableViewer/TableViewer";
-import { useRef, useState } from "react";
-import { Train } from "../sharpdia-model/Train";
-import { TrainService } from "../globalState/TrainService";
-import { StationService } from "../globalState/StationService";
-import { toTimeString } from "../sharpdia-model/TimeParser";
-import { TrainTypeService } from "../globalState/TrainTypeService";
+import useGlobalState from '../globalState/useGlobalState';
+import { TimetableService } from '../globalState/TimetableService';
+import { TableViewer } from '../TableViewer/TableViewer';
+import { useRef, useState } from 'react';
+import { Train } from '../sharpdia-model/Train';
+import { TrainService } from '../globalState/TrainService';
+import { StationService } from '../globalState/StationService';
+import { toTimeString } from '../sharpdia-model/TimeParser';
+import { TrainTypeService } from '../globalState/TrainTypeService';
 
 export function TrainsViewer({ timetableId }: { timetableId: string }) {
   const globalState = useGlobalState();
   if (!timetableId) {
-    throw new Error("timetable id null");
+    throw new Error('timetable id null');
   }
   const timetable = TimetableService.findById(globalState.root, timetableId);
   const timetableIndex = TimetableService.findIndexById(
     globalState.root,
-    timetableId
+    timetableId,
   );
   if (!timetable) {
-    throw new Error("timetable is null");
+    throw new Error('timetable is null');
   }
   const maxX = 4;
   const maxY = timetable.trains.length + 1;
@@ -33,17 +33,17 @@ export function TrainsViewer({ timetableId }: { timetableId: string }) {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(Train.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
       setEditData(Train.default());
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(timetable.trains[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -55,26 +55,26 @@ export function TrainsViewer({ timetableId }: { timetableId: string }) {
   };
   const insertData = (_: number) => {
     setEditData(Train.default());
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
+    if (editState === 'edit') {
       globalState.setRoot((prev) =>
-        TrainService.update(prev, timetableIndex, selectedCellY, editData)
+        TrainService.update(prev, timetableIndex, selectedCellY, editData),
       );
-    } else if (editState === "insert") {
+    } else if (editState === 'insert') {
       globalState.setRoot((prev) =>
-        TrainService.insert(prev, timetableIndex, selectedCellY, editData)
+        TrainService.insert(prev, timetableIndex, selectedCellY, editData),
       );
-    } else if (editState === "new") {
+    } else if (editState === 'new') {
       globalState.setRoot((prev) =>
-        TrainService.append(prev, timetableIndex, editData)
+        TrainService.append(prev, timetableIndex, editData),
       );
       setSelectedCellY(selectedCellY + 1);
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -93,68 +93,68 @@ export function TrainsViewer({ timetableId }: { timetableId: string }) {
         data={timetable.trains}
         columnSettings={[
           {
-            headerText: "#",
+            headerText: '#',
             widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
           },
           {
-            headerText: "列番",
+            headerText: '列番',
             widthIc: 4.4,
             cellText(value, _) {
               return value.number;
             },
           },
           {
-            headerText: "列車種別",
+            headerText: '列車種別',
             widthIc: 6.4,
             cellText(value, _) {
               return (
                 TrainTypeService.findById(globalState.root, value.trainTypeId)
-                  ?.name || ""
+                  ?.name || ''
               );
             },
           },
           {
-            headerText: "始発駅",
+            headerText: '始発駅',
             widthIc: 6.4,
             cellText(value, _) {
               return (
                 StationService.findById(
                   globalState.root,
                   TrainService.getStartingStation(globalState.root, value)
-                    ?.startId || ""
-                )?.name || ""
+                    ?.startId || '',
+                )?.name || ''
               );
             },
           },
           {
-            headerText: "始発時刻",
+            headerText: '始発時刻',
             widthIc: 4.9,
             cellText(value, _) {
               return toTimeString(value.segments[0]?.departureTime);
             },
           },
           {
-            headerText: "終着時刻",
+            headerText: '終着時刻',
             widthIc: 4.9,
             cellText(value, _) {
               return toTimeString(
-                value.segments[value.segments.length - 1]?.arrivalTime
+                value.segments[value.segments.length - 1]?.arrivalTime,
               );
             },
           },
           {
-            headerText: "終着駅",
+            headerText: '終着駅',
             widthIc: 6.4,
             cellText(value, _) {
               return (
                 StationService.findById(
                   globalState.root,
                   TrainService.getDestinationStation(globalState.root, value)
-                    ?.endId || ""
-                )?.name || ""
+                    ?.endId || '',
+                )?.name || ''
               );
             },
           },
@@ -187,7 +187,7 @@ export function TrainsViewer({ timetableId }: { timetableId: string }) {
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"

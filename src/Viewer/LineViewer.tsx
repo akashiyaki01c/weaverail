@@ -1,18 +1,18 @@
-import useGlobalState from "../globalState/useGlobalState";
-import { useRef, useState } from "react";
-import { TableViewer } from "../TableViewer/TableViewer";
-import { Segment } from "../sharpdia-model/Line";
-import { SegmentService } from "../globalState/SegmentService";
+import useGlobalState from '../globalState/useGlobalState';
+import { useRef, useState } from 'react';
+import { TableViewer } from '../TableViewer/TableViewer';
+import { Segment } from '../sharpdia-model/Line';
+import { SegmentService } from '../globalState/SegmentService';
 
-export function LineViewer({lineId}: {lineId: string}) {
+export function LineViewer({ lineId }: { lineId: string }) {
   const globalState = useGlobalState();
   if (!lineId) {
-    throw new Error("line id null");
+    throw new Error('line id null');
   }
   const lineIndex = globalState.root.lines.findIndex((v) => v.id === lineId);
   const line = globalState.root.lines[lineIndex];
   if (!line) {
-    throw new Error("line is null");
+    throw new Error('line is null');
   }
 
   const maxY = line.segments.length + 1;
@@ -25,7 +25,7 @@ export function LineViewer({lineId}: {lineId: string}) {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    "viwer" as "viewer" | "new" | "insert" | "edit"
+    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
   );
   const [editData, setEditData] = useState(Segment.default());
 
@@ -38,10 +38,10 @@ export function LineViewer({lineId}: {lineId: string}) {
         value.startId = beforeSegment.endId;
       }
       setEditData(value);
-      setEditState("new");
+      setEditState('new');
     } else {
       setEditData(line.segments[y]);
-      setEditState("edit");
+      setEditState('edit');
     }
     dialogRef.current?.showModal();
   };
@@ -49,7 +49,9 @@ export function LineViewer({lineId}: {lineId: string}) {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot(prev => SegmentService.delete(prev, lineIndex, selectedCellY));
+    globalState.setRoot((prev) =>
+      SegmentService.delete(prev, lineIndex, selectedCellY),
+    );
   };
   const insertData = (_: number) => {
     const value = Segment.default();
@@ -59,20 +61,26 @@ export function LineViewer({lineId}: {lineId: string}) {
       value.startId = beforeSegment.endId;
     }
     setEditData(value);
-    setEditState("insert");
+    setEditState('insert');
     dialogRef.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === "edit") {
-      globalState.setRoot(prev => SegmentService.update(prev, lineIndex, selectedCellY, editData));
-    } else if (editState === "insert") {
-      globalState.setRoot(prev => SegmentService.insert(prev, lineIndex, selectedCellY, editData));
-    } else if (editState === "new") {
+    if (editState === 'edit') {
+      globalState.setRoot((prev) =>
+        SegmentService.update(prev, lineIndex, selectedCellY, editData),
+      );
+    } else if (editState === 'insert') {
+      globalState.setRoot((prev) =>
+        SegmentService.insert(prev, lineIndex, selectedCellY, editData),
+      );
+    } else if (editState === 'new') {
       setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot(prev => SegmentService.append(prev, lineIndex, editData));
+      globalState.setRoot((prev) =>
+        SegmentService.append(prev, lineIndex, editData),
+      );
     }
-    setEditState("viewer");
+    setEditState('viewer');
     dialogRef.current?.close();
   };
 
@@ -81,28 +89,28 @@ export function LineViewer({lineId}: {lineId: string}) {
       <TableViewer
         columnSettings={[
           {
-            headerText: "番号",
+            headerText: '番号',
             widthIc: 2,
             cellText: function (_: Segment, index: number): string {
               return String(index);
             },
           },
           {
-            headerText: "開始駅",
+            headerText: '開始駅',
             widthIc: 6,
             cellText: function (segment: Segment, _: number): string {
               const station = globalState.root.stations.find(
-                (v) => v.id === segment.startId
+                (v) => v.id === segment.startId,
               )!;
               return station?.name;
             },
           },
           {
-            headerText: "終了駅",
+            headerText: '終了駅',
             widthIc: 6,
             cellText: function (segment: Segment, _: number): string {
               const station = globalState.root.stations.find(
-                (v) => v.id === segment.endId
+                (v) => v.id === segment.endId,
               )!;
               return station?.name;
             },
@@ -165,7 +173,7 @@ export function LineViewer({lineId}: {lineId: string}) {
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={(_) => {
-                  setEditState("viewer");
+                  setEditState('viewer');
                   dialogRef.current?.close();
                 }}
                 type="button"
