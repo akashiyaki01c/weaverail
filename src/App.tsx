@@ -1,5 +1,5 @@
 import { Layout, TabNode } from "flexlayout-react";
-import "flexlayout-react/style/light.css";
+import "flexlayout-react/style/rounded.css";
 import { StationTableViewer } from "./Viewer/StationTableViewer";
 import { LinesViewer } from "./Viewer/LinesViewer";
 import { LineViewer } from "./Viewer/LineViewer";
