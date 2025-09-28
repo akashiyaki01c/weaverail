@@ -25,13 +25,13 @@ export function TreeViewer() {
 
   return (
     <div className="tree-view-outer bg-gray-100 p-2">
-      <summary>摂播電鉄各線</summary>
+      <summary>プロジェクトファイル</summary>
       <ul>
         <li>
           <div
             onClick={() => {
-              setCenter()
-globalState.model.doAction(
+              setCenter();
+              globalState.model.doAction(
                 Actions.addNode(
                   {
                     type: "tab",
@@ -52,8 +52,8 @@ globalState.model.doAction(
         <li>
           <div
             onClick={() => {
-              setCenter()
-globalState.model.doAction(
+              setCenter();
+              globalState.model.doAction(
                 Actions.addNode(
                   {
                     type: "tab",
@@ -75,8 +75,8 @@ globalState.model.doAction(
           <summary>
             <div
               onClick={() => {
-                setCenter()
-globalState.model.doAction(
+                setCenter();
+                globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -99,8 +99,8 @@ globalState.model.doAction(
               <li className="h-6" key={v.id}>
                 <div
                   onClick={() => {
-                    setCenter()
-globalState.model.doAction(
+                    setCenter();
+                    globalState.model.doAction(
                       Actions.addNode(
                         {
                           type: "tab",
@@ -125,8 +125,8 @@ globalState.model.doAction(
           <summary>
             <div
               onClick={() => {
-                setCenter()
-globalState.model.doAction(
+                setCenter();
+                globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -150,8 +150,8 @@ globalState.model.doAction(
                 <summary>
                   <div
                     onClick={() => {
-                      setCenter()
-globalState.model.doAction(
+                      setCenter();
+                      globalState.model.doAction(
                         Actions.addNode(
                           {
                             type: "tab",
@@ -174,8 +174,8 @@ globalState.model.doAction(
                     <li key={k.id}>
                       <div
                         onClick={() => {
-                          setCenter()
-globalState.model.doAction(
+                          setCenter();
+                          globalState.model.doAction(
                             Actions.addNode(
                               {
                                 type: "tab",
@@ -203,8 +203,8 @@ globalState.model.doAction(
           <summary>
             <div
               onClick={() => {
-                setCenter()
-globalState.model.doAction(
+                setCenter();
+                globalState.model.doAction(
                   Actions.addNode(
                     {
                       type: "tab",
@@ -227,8 +227,8 @@ globalState.model.doAction(
               <li>
                 <div
                   onClick={() => {
-                    setCenter()
-globalState.model.doAction(
+                    setCenter();
+                    globalState.model.doAction(
                       Actions.addNode(
                         {
                           type: "tab",
@@ -260,8 +260,8 @@ globalState.model.doAction(
                     <li>
                       <div
                         onClick={() => {
-                          setCenter()
-globalState.model.doAction(
+                          setCenter();
+                          globalState.model.doAction(
                             Actions.addNode(
                               {
                                 type: "tab",

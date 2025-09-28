@@ -9,7 +9,13 @@ import { StationService } from "../globalState/StationService";
 import { TrainSegmentService } from "../globalState/TrainSegmentService";
 import { parseTime, toTimeString } from "../sharpdia-model/TimeParser";
 
-export function TrainViewer({timetableId, trainId}: {timetableId: string, trainId: string}) {
+export function TrainViewer({
+  timetableId,
+  trainId,
+}: {
+  timetableId: string;
+  trainId: string;
+}) {
   const globalState = useGlobalState();
   if (!timetableId) {
     throw new Error("timetable id null");
@@ -178,6 +184,7 @@ export function TrainViewer({timetableId, trainId}: {timetableId: string, trainI
       <div className="fixed">
         <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
           <form
+            className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
               onEndStationEnd();
@@ -185,44 +192,46 @@ export function TrainViewer({timetableId, trainId}: {timetableId: string, trainI
           >
             <label>
               区間
-              {[
-                ...(editData?.segments || []),
-                { id: "", isReversed: false },
-              ].map((v, i) => (
-                <select
-                  value={v.id}
-                  key={v.id}
-                  onChange={(e) => {
-                    if (i >= editData?.segments?.length) {
-                      editData?.segments?.push({ id: "", isReversed: false });
-                    }
-                    editData.segments[i].id = e.target.value;
-                    setEditData({ ...editData });
-                  }}
-                >
-                  <option value="">選択してください……</option>
-                  {globalState?.root?.lines?.map((l) =>
-                    l.segments?.map((segment) => (
-                      <option value={segment.id}>
-                        {l.name}{" "}
-                        {
-                          StationService.findById(
-                            globalState.root,
-                            segment.startId
-                          )?.name
-                        }
-                         - 
-                        {
-                          StationService.findById(
-                            globalState.root,
-                            segment.endId
-                          )?.name
-                        }
-                      </option>
-                    ))
-                  )}
-                </select>
-              ))}
+              <div className="flex flex-col">
+                {[
+                  ...(editData?.segments || []),
+                  { id: "", isReversed: false },
+                ].map((v, i) => (
+                  <select
+                    value={v.id}
+                    key={v.id}
+                    onChange={(e) => {
+                      if (i >= editData?.segments?.length) {
+                        editData?.segments?.push({ id: "", isReversed: false });
+                      }
+                      editData.segments[i].id = e.target.value;
+                      setEditData({ ...editData });
+                    }}
+                  >
+                    <option value="">選択してください……</option>
+                    {globalState?.root?.lines?.map((l) =>
+                      l.segments?.map((segment) => (
+                        <option value={segment.id}>
+                          {l.name}{" "}
+                          {
+                            StationService.findById(
+                              globalState.root,
+                              segment.startId
+                            )?.name
+                          }
+                          -
+                          {
+                            StationService.findById(
+                              globalState.root,
+                              segment.endId
+                            )?.name
+                          }
+                        </option>
+                      ))
+                    )}
+                  </select>
+                ))}
+              </div>
             </label>
             <label>
               発時刻
