@@ -1,5 +1,5 @@
 .tree-view-outer {
-  height: 100dvh;
+  height: 100%;
   overflow-y: scroll;
   ul {
     padding-left: 1ic;
