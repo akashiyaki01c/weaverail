@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import { TableViewer } from '../TableViewer/TableViewer';
+
+import { TrainTypeService } from '../globalState/TrainTypeService';
 import useGlobalState from '../globalState/useGlobalState';
 import { TrainType } from '../sharpdia-model/TrainType';
-import { TrainTypeService } from '../globalState/TrainTypeService';
+import { TableViewer } from '../TableViewer/TableViewer';
 
 export function TrainTypeViewer() {
   const globalState = useGlobalState();
@@ -10,8 +11,10 @@ export function TrainTypeViewer() {
   const maxX = 2;
   const maxY = globalState.root.trainTypes.length + 1;
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
+  const dialogReference = useRef<HTMLDialogElement>(null);
+  const inputReferences = useRef<(HTMLInputElement | null)[]>(
+    Array.from({ length: maxX }, () => Object.create(null)),
+  );
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);
@@ -19,7 +22,7 @@ export function TrainTypeViewer() {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
+    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
   );
   const [editData, setEditData] = useState(TrainType.default());
 
@@ -31,73 +34,89 @@ export function TrainTypeViewer() {
       setEditData(globalState.root.trainTypes[y]);
       setEditState('edit');
     }
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
   const deleteData = (y: number) => {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot((prev) => TrainTypeService.delete(prev, y));
+    globalState.setRoot((previous) => TrainTypeService.delete(previous, y));
   };
-  const insertData = (_: number) => {
+  const insertData = () => {
     setEditData(TrainType.default());
     setEditState('insert');
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === 'edit') {
-      globalState.setRoot((prev) =>
-        TrainTypeService.update(prev, selectedCellY, editData),
-      );
-    } else if (editState === 'insert') {
-      globalState.setRoot((prev) =>
-        TrainTypeService.insert(prev, selectedCellY, editData),
-      );
-    } else if (editState === 'new') {
-      setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot((prev) => TrainTypeService.append(prev, editData));
+    switch (editState) {
+      case 'edit': {
+        globalState.setRoot((previous) =>
+          TrainTypeService.update(previous, selectedCellY, editData),
+        );
+
+        break;
+      }
+      case 'insert': {
+        globalState.setRoot((previous) =>
+          TrainTypeService.insert(previous, selectedCellY, editData),
+        );
+
+        break;
+      }
+      case 'new': {
+        setSelectedCellY(selectedCellY + 1);
+        globalState.setRoot((previous) =>
+          TrainTypeService.append(previous, editData),
+        );
+
+        break;
+      }
+      // No default
     }
     setEditState('viewer');
-    dialogRef.current?.close();
+    dialogReference.current?.close();
   };
 
   return (
     <>
       <TableViewer
-        selectedCellX={selectedCellX}
-        selectedCellY={selectedCellY}
-        setSelectedCellX={setSelectedCellX}
-        setSelectedCellY={setSelectedCellY}
-        editState={editState}
-        setEditState={setEditState}
-        startEdit={startEdit}
-        deleteData={deleteData}
-        insertData={insertData}
-        data={globalState.root.trainTypes}
         columnSettings={[
           {
-            headerText: '番号',
-            widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
+            headerText: '番号',
+            widthIc: 2.4,
           },
           {
-            headerText: '列車種別名',
-            widthIc: 6.4,
-            cellText(value, _) {
+            cellText(value) {
               return value.name;
             },
+            headerText: '列車種別名',
+            widthIc: 6.4,
           },
         ]}
+        data={globalState.root.trainTypes}
         defaultValue={TrainType.default()}
+        deleteData={deleteData}
+        editState={editState}
+        insertData={insertData}
+        selectedCellX={selectedCellX}
+        selectedCellY={selectedCellY}
+        setEditState={setEditState}
+        setSelectedCellX={setSelectedCellX}
+        setSelectedCellY={setSelectedCellY}
+        startEdit={startEdit}
       />
       <div className="fixed">
-        <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
+        <dialog
+          className="m-auto p-[1ic] rounded  shadow-xl"
+          ref={dialogReference}
+        >
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
               onEndStationEnd();
             }}
           >
@@ -105,36 +124,36 @@ export function TrainTypeViewer() {
               列車種別名
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
+                onChange={(event) =>
+                  setEditData({ ...editData, name: event.target.value })
+                }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
                 type="text"
                 value={editData.name}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
-                  setEditData({ ...editData, name: e.target.value })
-                }
               />
             </label>
             <label>
               種別色
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
+                onChange={(event) =>
+                  setEditData({ ...editData, color: event.target.value })
+                }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
                 type="text"
                 value={editData.color}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
-                  setEditData({ ...editData, color: e.target.value })
-                }
               />
             </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
-                onClick={(_) => {
+                onClick={() => {
                   setEditState('viewer');
-                  dialogRef.current?.close();
+                  dialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -142,7 +161,7 @@ export function TrainTypeViewer() {
               </button>
               <button
                 className="bg-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] text-gray-50 rounded"
-                onClick={(_) => {
+                onClick={() => {
                   onEndStationEnd();
                 }}
               >

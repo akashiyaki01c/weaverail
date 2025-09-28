@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import { TableViewer } from '../TableViewer/TableViewer';
+
+import { TimetableService } from '../globalState/TimetableService';
 import useGlobalState from '../globalState/useGlobalState';
 import { Timetable } from '../sharpdia-model/Timetable';
-import { TimetableService } from '../globalState/TimetableService';
+import { TableViewer } from '../TableViewer/TableViewer';
 
 export function TimetableViewer() {
   const globalState = useGlobalState();
@@ -10,8 +11,10 @@ export function TimetableViewer() {
   const maxX = 2;
   const maxY = globalState.root.timetables.length + 1;
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
+  const dialogReference = useRef<HTMLDialogElement>(null);
+  const inputReferences = useRef<(HTMLInputElement | null)[]>(
+    Array.from({ length: maxX }, () => Object.create(null)),
+  );
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);
@@ -19,7 +22,7 @@ export function TimetableViewer() {
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
+    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
   );
   const [editData, setEditData] = useState(Timetable.default());
 
@@ -31,73 +34,89 @@ export function TimetableViewer() {
       setEditData(globalState.root.timetables[y]);
       setEditState('edit');
     }
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
   const deleteData = (y: number) => {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot((prev) => TimetableService.delete(prev, y));
+    globalState.setRoot((previous) => TimetableService.delete(previous, y));
   };
-  const insertData = (_: number) => {
+  const insertData = () => {
     setEditData(Timetable.default());
     setEditState('insert');
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === 'edit') {
-      globalState.setRoot((prev) =>
-        TimetableService.update(prev, selectedCellY, editData),
-      );
-    } else if (editState === 'insert') {
-      globalState.setRoot((prev) =>
-        TimetableService.insert(prev, selectedCellY, editData),
-      );
-    } else if (editState === 'new') {
-      setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot((prev) => TimetableService.append(prev, editData));
+    switch (editState) {
+      case 'edit': {
+        globalState.setRoot((previous) =>
+          TimetableService.update(previous, selectedCellY, editData),
+        );
+
+        break;
+      }
+      case 'insert': {
+        globalState.setRoot((previous) =>
+          TimetableService.insert(previous, selectedCellY, editData),
+        );
+
+        break;
+      }
+      case 'new': {
+        setSelectedCellY(selectedCellY + 1);
+        globalState.setRoot((previous) =>
+          TimetableService.append(previous, editData),
+        );
+
+        break;
+      }
+      // No default
     }
     setEditState('viewer');
-    dialogRef.current?.close();
+    dialogReference.current?.close();
   };
 
   return (
     <>
       <TableViewer
-        selectedCellX={selectedCellX}
-        selectedCellY={selectedCellY}
-        setSelectedCellX={setSelectedCellX}
-        setSelectedCellY={setSelectedCellY}
-        editState={editState}
-        setEditState={setEditState}
-        startEdit={startEdit}
-        deleteData={deleteData}
-        insertData={insertData}
-        data={globalState.root.timetables}
         columnSettings={[
           {
-            headerText: '番号',
-            widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
+            headerText: '番号',
+            widthIc: 2.4,
           },
           {
-            headerText: '時刻表名',
-            widthIc: 6.4,
-            cellText(value, _) {
+            cellText(value) {
               return value.name;
             },
+            headerText: '時刻表名',
+            widthIc: 6.4,
           },
         ]}
+        data={globalState.root.timetables}
         defaultValue={Timetable.default()}
+        deleteData={deleteData}
+        editState={editState}
+        insertData={insertData}
+        selectedCellX={selectedCellX}
+        selectedCellY={selectedCellY}
+        setEditState={setEditState}
+        setSelectedCellX={setSelectedCellX}
+        setSelectedCellY={setSelectedCellY}
+        startEdit={startEdit}
       />
       <div className="fixed">
-        <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
+        <dialog
+          className="m-auto p-[1ic] rounded  shadow-xl"
+          ref={dialogReference}
+        >
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
               onEndStationEnd();
             }}
           >
@@ -105,22 +124,22 @@ export function TimetableViewer() {
               時刻表名
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
+                onChange={(event) =>
+                  setEditData({ ...editData, name: event.target.value })
+                }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
                 type="text"
                 value={editData.name}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
-                  setEditData({ ...editData, name: e.target.value })
-                }
               />
             </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
-                onClick={(_) => {
+                onClick={() => {
                   setEditState('viewer');
-                  dialogRef.current?.close();
+                  dialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -128,7 +147,7 @@ export function TimetableViewer() {
               </button>
               <button
                 className="bg-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] text-gray-50 rounded"
-                onClick={(_) => {
+                onClick={() => {
                   onEndStationEnd();
                 }}
               >

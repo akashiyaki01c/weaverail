@@ -1,15 +1,15 @@
 import { Class } from '../oudia-model';
 
 export class OuDia_Ressyasyubetsu {
-  syubetsumei: string;
-  ryakusyou: string;
-  jikokuhyouMojiColor: string;
-  jikokuhyouFontIndex: string;
-  jikokuhyouBackColor: string;
   diagramSenColor: string;
-  diagramSenStyle: string;
   diagramSenIsBold: string;
+  diagramSenStyle: string;
+  jikokuhyouBackColor: string;
+  jikokuhyouFontIndex: string;
+  jikokuhyouMojiColor: string;
+  ryakusyou: string;
   stopMarkDrawType: string;
+  syubetsumei: string;
 
   constructor(value: Class) {
     this.syubetsumei = value.fields.getValue('Syubetsumei');

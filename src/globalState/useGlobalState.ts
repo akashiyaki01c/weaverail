@@ -1,60 +1,61 @@
+import { Model } from 'flexlayout-react';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+
 import { Root } from '../sharpdia-model/Root';
-import { Model } from 'flexlayout-react';
 
 export interface Store {
-  root: Root;
-  setRoot: (fn: (prev: Root) => Root) => void;
   model: Model;
-  setModel: (fn: (prev: Model) => Model) => void;
+  root: Root;
+  setModel: (function_: (previous: Model) => Model) => void;
+  setRoot: (function_: (previous: Root) => Root) => void;
 }
 
 const useGlobalState = create(
   immer<Store>((set) => ({
-    root: new Root(),
-    setRoot: (data: (prev: Root) => Root) =>
-      set((state) => {
-        state.root = data(state.root);
-      }),
     model: Model.fromJson({
-      global: {},
       borders: [],
+      global: {},
       layout: {
-        type: 'row',
-        weight: 100,
         children: [
           {
+            children: [
+              {
+                component: 'tree',
+                name: 'TreeView',
+                type: 'tab',
+              },
+            ],
             id: 'left',
             type: 'tabset',
             weight: 50,
-            children: [
-              {
-                type: 'tab',
-                name: 'TreeView',
-                component: 'tree',
-              },
-            ],
           },
           {
+            children: [
+              {
+                component: '',
+                name: '新規タブ',
+                type: 'tab',
+              },
+            ],
             id: 'center',
             type: 'tabset',
             weight: 200,
-            children: [
-              {
-                type: 'tab',
-                name: '新規タブ',
-                component: '',
-              },
-            ],
           },
         ],
+        type: 'row',
+        weight: 100,
       },
     }),
-    setModel: (data: (prev: Model) => Model) =>
+    root: new Root(),
+    setModel: (data: (previous: Model) => Model) =>
       set((state) => {
         const newModel = data(state.model as Model);
         state.model = newModel;
+      }),
+    setRoot: (data: (previous: Root) => Root) =>
+      set((state) => {
+        state.root = data(state.root);
       }),
   })),
 );

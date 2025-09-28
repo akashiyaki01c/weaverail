@@ -1,3 +1,10 @@
+export class Class {
+  constructor(
+    public name: string,
+    public fields: Fields,
+    public classes: Class[],
+  ) {}
+}
 export class Field {
   constructor(
     public name: string,
@@ -16,13 +23,6 @@ export class Fields {
   getValueDefault(key: string, defaultValue: string) {
     return this.data.find((v) => v.name === key)?.value || defaultValue;
   }
-}
-export class Class {
-  constructor(
-    public name: string,
-    public fields: Fields,
-    public classes: Class[],
-  ) {}
 }
 export class LexerRootClass {
   constructor(

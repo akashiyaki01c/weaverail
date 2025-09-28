@@ -17,17 +17,17 @@ export class Station {
     this.id = crypto.randomUUID();
   }
 
+  static default() {
+    return new Station('', 'Hatsu', 'Ippan', []);
+  }
   static fromOuDia(value: OuDia_Eki) {
-    const obj = new Station(
+    const object = new Station(
       value.ekimei,
       value.ekijikokukeisiki,
       value.ekikibo,
       value.track.value.map((v) => Track.fromOuDia(v)),
     );
-    return obj;
-  }
-  static default() {
-    return new Station('', 'Hatsu', 'Ippan', []);
+    return object;
   }
 }
 
@@ -39,7 +39,7 @@ export class Track {
   }
 
   static fromOuDia(value: OuDia_EkiTrack2) {
-    const obj = new Track(value.trackName);
-    return obj;
+    const object = new Track(value.trackName);
+    return object;
   }
 }

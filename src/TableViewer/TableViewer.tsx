@@ -1,118 +1,132 @@
 import { KeyboardEvent, useRef } from 'react';
 
-type Props<T> = {
+interface Keyable {
+  key: string;
+}
+
+type Properties<T> = {
   columnSettings: {
+    cellText: (value: T, index: number) => string;
     headerText: string;
     widthIc: number;
-    cellText: (value: T, index: number) => string;
   }[];
   data: T[];
   defaultValue: T;
 
+  deleteData: (y: number) => void;
+  editState: 'edit' | 'insert' | 'new' | 'viewer';
+  insertData: (y: number) => void;
   selectedCellX: number;
   selectedCellY: number;
+  setEditState: (value: 'edit' | 'insert' | 'new' | 'viewer') => void;
+
   setSelectedCellX: (x: number) => void;
   setSelectedCellY: (y: number) => void;
-  editState: 'viewer' | 'new' | 'insert' | 'edit';
-  setEditState: (value: 'viewer' | 'new' | 'insert' | 'edit') => void;
-
   startEdit: (x: number, y: number) => void;
-  deleteData: (y: number) => void;
-  insertData: (y: number) => void;
 };
 
-export function TableViewer<T>(props: Props<T>) {
-  const maxX = props.columnSettings.length;
-  const maxY = props.data.length + 1;
+export function TableViewer<T>(properties: Properties<T>) {
+  const maxX = properties.columnSettings.length;
+  const maxY = properties.data.length + 1;
 
   // refs
-  const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
-  if (cellRefs.current.length !== props.data.length + 1) {
-    cellRefs.current = Array(props.data.length + 1)
-      .fill(null)
-      .map(() => Array(maxX).fill(null));
+  const cellReferences = useRef<(HTMLTableCellElement | null)[][]>([]);
+  if (cellReferences.current.length !== properties.data.length + 1) {
+    cellReferences.current = Array.from({ length: properties.data.length + 1 })
+      .fill(Object.create(null))
+      .map(() => Array.from({ length: maxX }, () => Object.create(null)));
   }
-  const tableRef = useRef<HTMLDivElement>(null);
+  const tableReference = useRef<HTMLDivElement>(null);
 
   const selectCell = (x: number, y: number) => {
-    props.setSelectedCellX(x);
-    props.setSelectedCellY(y);
+    properties.setSelectedCellX(x);
+    properties.setSelectedCellY(y);
   };
   const startEdit = (x: number, y: number) => {
-    props.startEdit(x, y);
+    properties.startEdit(x, y);
   };
 
   const scrollcell = () => {
-    const cell = cellRefs?.current[props.selectedCellY]?.[props.selectedCellX];
+    const cell =
+      cellReferences?.current[properties.selectedCellY]?.[
+        properties.selectedCellX
+      ];
     if (cell) {
       const rect = cell.getBoundingClientRect();
       const padding = 40;
       if (rect.top < padding * 2) {
         // 上方向スクロール
-        if (!tableRef.current) return;
-        console.log(tableRef.current.scrollTop, rect.top - padding);
-        tableRef.current.scrollTop -= padding * 2 - rect.top;
-      } else if (rect.bottom > tableRef.current!.clientHeight - padding) {
+        if (!tableReference.current) return;
+        console.log(tableReference.current.scrollTop, rect.top - padding);
+        tableReference.current.scrollTop -= padding * 2 - rect.top;
+      } else if (rect.bottom > tableReference.current!.clientHeight - padding) {
         // 下方向スクロール
-        if (!tableRef.current) return;
-        tableRef.current.scrollTop +=
-          rect.bottom - tableRef.current!.clientHeight + padding;
+        if (!tableReference.current) return;
+        tableReference.current.scrollTop +=
+          rect.bottom - tableReference.current!.clientHeight + padding;
       }
     }
   };
   // 選択を右移動
   const moveRight = () => {
-    if (props.selectedCellX < maxX - 1) {
-      props.setSelectedCellX(props.selectedCellX + 1);
+    if (properties.selectedCellX < maxX - 1) {
+      properties.setSelectedCellX(properties.selectedCellX + 1);
     }
   };
   // 選択を右移動
   const moveLeft = () => {
-    if (props.selectedCellX > 0) {
-      props.setSelectedCellX(props.selectedCellX - 1);
+    if (properties.selectedCellX > 0) {
+      properties.setSelectedCellX(properties.selectedCellX - 1);
     }
   };
   // 選択を下移動
   const moveDown = () => {
-    if (props.selectedCellY < maxY - 1) {
-      props.setSelectedCellY(props.selectedCellY + 1);
+    if (properties.selectedCellY < maxY - 1) {
+      properties.setSelectedCellY(properties.selectedCellY + 1);
       scrollcell();
     }
   };
   // 選択を上移動
   const moveUp = () => {
-    if (props.selectedCellY > 0) {
-      props.setSelectedCellY(props.selectedCellY - 1);
+    if (properties.selectedCellY > 0) {
+      properties.setSelectedCellY(properties.selectedCellY - 1);
       scrollcell();
     }
   };
-  const onKeyDown = (e: KeyboardEvent) => {
-    console.log(e.key);
-    e.preventDefault();
-    switch (e.key) {
-      case 'ArrowRight':
-        moveRight();
+  const onKeyDown = (event: KeyboardEvent) => {
+    console.log(event.key);
+    event.preventDefault();
+    switch (event.key) {
+      case '+': {
+        properties.insertData(properties.selectedCellY);
         return;
-      case 'ArrowLeft':
-        moveLeft();
-        return;
-      case 'ArrowDown':
+      }
+      case 'ArrowDown': {
         moveDown();
         return;
-      case 'ArrowUp':
+      }
+      case 'ArrowLeft': {
+        moveLeft();
+        return;
+      }
+      case 'ArrowRight': {
+        moveRight();
+        return;
+      }
+      case 'ArrowUp': {
         moveUp();
         return;
-      case 'Enter':
-        startEdit(props.selectedCellX, props.selectedCellY);
+      }
+      case 'Delete': {
+        properties.deleteData(properties.selectedCellY);
+        cellReferences.current.splice(properties.selectedCellY, 1);
+        console.log(properties.data);
         return;
-      case 'Delete':
-        props.deleteData(props.selectedCellY);
-        cellRefs.current.splice(props.selectedCellY, 1);
-        console.log(props.data);
+      }
+      case 'Enter': {
+        startEdit(properties.selectedCellX, properties.selectedCellY);
         return;
-      case '+':
-        props.insertData(props.selectedCellY);
-        return;
+      }
     }
   };
 
@@ -125,7 +139,7 @@ export function TableViewer<T>(props: Props<T>) {
       borderSting += ' border-r-[1px]';
     }
     return `${borderSting} pl-[0.2ic] pr-[0.2ic] border-solid border-gray-600 overflow-hidden w-[${width}ic] ${
-      x === props.selectedCellX && y === props.selectedCellY
+      x === properties.selectedCellX && y === properties.selectedCellY
         ? 'bg-gray-200'
         : ''
     }`;
@@ -136,58 +150,67 @@ export function TableViewer<T>(props: Props<T>) {
         <div
           className="border-[2px] border-solid border-gray-600 w-fit outline-none max-h-[90dvh] overflow-scroll"
           onKeyDown={onKeyDown}
+          ref={tableReference}
           tabIndex={-1}
-          ref={tableRef}
         >
           <div className="sticky top-0 flex bg-gray-50 z-10 h-[1.5ic]">
-            {props.columnSettings.map((v, i) => (
+            {properties.columnSettings.map((v, index) => (
               <div
-                key={i}
-                className={cellDefaultClass(v.widthIc, i, -1)}
+                className={cellDefaultClass(v.widthIc, index, -1)}
+                key={index}
                 style={{ width: `${v.widthIc}ic` }}
               >
                 {v.headerText}
               </div>
             ))}
           </div>
-          {props.data.map((d, i) => (
+          {properties.data.map((d, index) => (
             <>
               <div
                 className="flex z-0 h-[1.5ic]"
-                key={(d as any).key || undefined}
+                key={(d as Keyable).key || undefined}
               >
-                {props.columnSettings.map((v, j) => (
+                {properties.columnSettings.map((v, index_) => (
                   <div
-                    key={j}
-                    className={cellDefaultClass(v.widthIc, j, i)}
-                    onClick={() => selectCell(j, i)}
-                    onDoubleClick={() => startEdit(j, i)}
-                    ref={(el: HTMLTableCellElement | null) => {
-                      if (!cellRefs.current[i])
-                        cellRefs.current[i] = Array(maxX).fill(null);
-                      if (!cellRefs.current[maxY - 1])
-                        cellRefs.current[maxY - 1] = [null, null, null, null];
-                      cellRefs.current[i][j] = el;
+                    className={cellDefaultClass(v.widthIc, index_, index)}
+                    key={index_}
+                    onClick={() => selectCell(index_, index)}
+                    onDoubleClick={() => startEdit(index_, index)}
+                    ref={(element: HTMLTableCellElement | null) => {
+                      if (!cellReferences.current[index])
+                        cellReferences.current[index] = Array.from(
+                          { length: maxX },
+                          () => Object.create(null),
+                        );
+                      if (!cellReferences.current[maxY - 1])
+                        cellReferences.current[maxY - 1] = Array.from(
+                          { length: maxX },
+                          () => Object.create(null),
+                        );
+                      cellReferences.current[index][index_] = element;
                     }}
                     style={{ width: `${v.widthIc}ic` }}
                   >
-                    {v.cellText(d, i)}
+                    {v.cellText(d, index)}
                   </div>
                 ))}
               </div>
             </>
           ))}
           <div className="sticky top-0 flex z-0 h-[1.5ic]">
-            {props.columnSettings.map((v, j) => (
+            {properties.columnSettings.map((v, index) => (
               <div
-                key={j}
-                className={cellDefaultClass(v.widthIc, j, maxY - 1)}
-                onClick={() => selectCell(j, maxY - 1)}
-                onDoubleClick={() => startEdit(j, maxY - 1)}
-                ref={(el: HTMLTableCellElement | null) => {
-                  if (!cellRefs.current[maxY - 1])
-                    cellRefs.current[maxY - 1] = [null, null, null, null];
-                  cellRefs.current[maxY - 1][j] = el;
+                className={cellDefaultClass(v.widthIc, index, maxY - 1)}
+                key={index}
+                onClick={() => selectCell(index, maxY - 1)}
+                onDoubleClick={() => startEdit(index, maxY - 1)}
+                ref={(element: HTMLTableCellElement | null) => {
+                  if (!cellReferences.current[maxY - 1])
+                    cellReferences.current[maxY - 1] = Array.from(
+                      { length: maxX },
+                      () => Object.create(null),
+                    );
+                  cellReferences.current[maxY - 1][index] = element;
                 }}
                 style={{ width: `${v.widthIc}ic` }}
               ></div>

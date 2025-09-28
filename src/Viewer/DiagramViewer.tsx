@@ -1,60 +1,38 @@
 import { useState } from 'react';
+
+import { SegmentService } from '../globalState/SegmentService';
+import { StationService } from '../globalState/StationService';
 import useGlobalState from '../globalState/useGlobalState';
 import { DiagramLine } from '../sharpdia-model/DiagramLine';
 import { Root } from '../sharpdia-model/Root';
-import { SegmentService } from '../globalState/SegmentService';
-import { StationService } from '../globalState/StationService';
 
 interface StationChoord {
+  // ダイヤグラム上での下側の駅ID
+  lowerStationId: string;
+  // ダイヤグラム上での下側の駅のY座標
+  lowerStationYChoord: number;
   // 駅間ID
   segmentId: string;
   // ダイヤグラム上での上側の駅ID
   upperStationId: string;
   // ダイヤグラム上での上側の駅のY座標
   upperStationYChoord: number;
-  // ダイヤグラム上での下側の駅ID
-  lowerStationId: string;
-  // ダイヤグラム上での下側の駅のY座標
-  lowerStationYChoord: number;
 }
-function getYChoords(root: Root, diagramLine: DiagramLine) {
-  const result = [] as StationChoord[];
-  let currentYChoord = 0;
-
-  for (const lineSegment of diagramLine.segments) {
-    const segment = SegmentService.findByIdAll(root, lineSegment.id);
-    if (segment == null) {
-      throw new Error('Error');
-    }
-    const addSeconds = lineSegment.displaySeconds || 5;
-    if (lineSegment.isReversed) {
-      result.push({
-        segmentId: segment.id,
-        lowerStationId: segment.startId,
-        lowerStationYChoord: currentYChoord,
-        upperStationId: segment.endId,
-        upperStationYChoord: currentYChoord + addSeconds,
-      } satisfies StationChoord);
-    } else {
-      result.push({
-        segmentId: segment.id,
-        upperStationId: segment.startId,
-        upperStationYChoord: currentYChoord,
-        lowerStationId: segment.endId,
-        lowerStationYChoord: currentYChoord + addSeconds,
-      } satisfies StationChoord);
-    }
-    currentYChoord += addSeconds;
-  }
-  return result;
+export class DiagramViewerOption {
+  constructor(
+    public xScale: number,
+    public yScale: number,
+    public xOffset: number,
+    public yOffset: number,
+  ) {}
 }
 
 export function DiagramViewer({
-  timetableId,
   diagramLineId,
+  timetableId,
 }: {
-  timetableId: string;
   diagramLineId: string;
+  timetableId: string;
 }) {
   const globalState = useGlobalState();
   if (!diagramLineId) {
@@ -79,15 +57,12 @@ export function DiagramViewer({
   }
   const yChoords = getYChoords(globalState.root, diagramLine);
 
-  const [option, _setOption] = useState(
-    new DiagramViewerOption(0.1, 0.3, 0, 0),
-  );
+  const [option] = useState(new DiagramViewerOption(0.1, 0.3, 0, 0));
 
   const yPadding = 50;
   const viewBoxWidth = option.xScale * 60 * 60 * 24;
   const viewBoxHeight =
-    option.yScale * yChoords[yChoords.length - 1]?.lowerStationYChoord +
-    yPadding * 2;
+    option.yScale * (yChoords.at(-1)?.lowerStationYChoord || 0) + yPadding * 2;
 
   return (
     <>
@@ -95,16 +70,16 @@ export function DiagramViewer({
         <div className="sticky top-[0] w-[max-content]">
           <svg
             className="x-axis-svg overflow-scroll sticky top-[0] left-[auto] block"
-            width={viewBoxWidth}
             height={50}
             viewBox={`0 0 ${viewBoxWidth} ${50}`}
+            width={viewBoxWidth}
           >
             <rect
+              className="fill-gray-100"
+              height={50}
+              width={viewBoxWidth}
               x={0}
               y={0}
-              width={viewBoxWidth}
-              height={50}
-              className="fill-gray-100"
             ></rect>
           </svg>
         </div>
@@ -112,17 +87,19 @@ export function DiagramViewer({
           <div className="h-0">
             <svg
               className="diagram-main-svg overflow-x-scroll overflow-y-hidden relative top-0 left-[120px] block"
+              height={viewBoxHeight}
               viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
               width={viewBoxWidth}
-              height={viewBoxHeight}
             >
               <g className="axis">
                 <g className="y-axis">
                   {yChoords.map((v) => (
                     <>
                       <line
-                        key={`${v.segmentId}-upper`}
                         id={`${v.segmentId}-upper`}
+                        key={`${v.segmentId}-upper`}
+                        stroke="#000"
+                        strokeWidth="0.5"
                         x1={0}
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
@@ -135,12 +112,12 @@ export function DiagramViewer({
                             option.yScale +
                           yPadding
                         }
-                        stroke="#000"
-                        strokeWidth="0.5"
                       />
                       <line
-                        key={`${v.segmentId}-lower`}
                         id={`${v.segmentId}-lower`}
+                        key={`${v.segmentId}-lower`}
+                        stroke="#000"
+                        strokeWidth="0.5"
                         x1={0}
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
@@ -153,54 +130,52 @@ export function DiagramViewer({
                             option.yScale +
                           yPadding
                         }
-                        stroke="#000"
-                        strokeWidth="0.5"
                       />
                     </>
                   ))}
                 </g>
                 <g className="x-axis">
-                  {[...Array(24 * 60)]
-                    .map((_, i) => i)
+                  {Array.from({ length: 24 * 60 })
+                    .map((_, index) => index)
                     .filter((v) => v % 2 === 0)
                     .map((v) => (
                       <line
                         key={v}
+                        stroke="#000"
+                        strokeDasharray="1 1"
+                        strokeWidth="0.5"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
                         y1={yPadding}
                         y2={viewBoxHeight + yPadding}
-                        stroke="#000"
-                        strokeWidth="0.5"
-                        strokeDasharray="1 1"
                       />
                     ))}
-                  {[...Array(24 * 60)]
-                    .map((_, i) => i)
+                  {Array.from({ length: 24 * 60 })
+                    .map((_, index) => index)
                     .filter((v) => v % 10 === 0)
                     .map((v) => (
                       <line
                         id={`${v}-1`}
+                        stroke="#000"
+                        strokeWidth="1"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
                         y1={yPadding}
                         y2={viewBoxHeight + yPadding}
-                        stroke="#000"
-                        strokeWidth="1"
                       />
                     ))}
-                  {[...Array(24 * 60)]
-                    .map((_, i) => i)
+                  {Array.from({ length: 24 * 60 })
+                    .map((_, index) => index)
                     .filter((v) => v % 30 === 0)
                     .map((v) => (
                       <line
                         id={`${v}-1`}
+                        stroke="#000"
+                        strokeWidth="2"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
                         y1={yPadding}
                         y2={viewBoxHeight + yPadding}
-                        stroke="#000"
-                        strokeWidth="2"
                       />
                     ))}
                 </g>
@@ -217,57 +192,49 @@ export function DiagramViewer({
                       if (arrivalTime < 0) {
                         arrivalTime += 24 * 60 * 60;
                       }
-                      if (segment.segments[0].isReversed) {
-                        return (
-                          <line
-                            x1={
-                              (departureTime + option.xOffset) * option.xScale
-                            }
-                            x2={(arrivalTime + option.xOffset) * option.xScale}
-                            y2={
-                              (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id,
-                              )?.upperStationYChoord || 0 + option.yOffset) *
-                                option.yScale +
-                              yPadding
-                            }
-                            y1={
-                              (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id,
-                              )?.lowerStationYChoord || 0 + option.yOffset) *
-                                option.yScale +
-                              yPadding
-                            }
-                            stroke="#000"
-                            strokeWidth="1"
-                          />
-                        );
-                      } else {
-                        return (
-                          <line
-                            x1={
-                              (departureTime + option.xOffset) * option.xScale
-                            }
-                            x2={(arrivalTime + option.xOffset) * option.xScale}
-                            y1={
-                              (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id,
-                              )?.upperStationYChoord || 0 + option.yOffset) *
-                                option.yScale +
-                              yPadding
-                            }
-                            y2={
-                              (yChoords.find(
-                                (v) => v.segmentId === segment.segments[0].id,
-                              )?.lowerStationYChoord || 0 + option.yOffset) *
-                                option.yScale +
-                              yPadding
-                            }
-                            stroke="#000"
-                            strokeWidth="1"
-                          />
-                        );
-                      }
+                      return segment.segments[0].isReversed ? (
+                        <line
+                          stroke="#000"
+                          strokeWidth="1"
+                          x1={(departureTime + option.xOffset) * option.xScale}
+                          x2={(arrivalTime + option.xOffset) * option.xScale}
+                          y1={
+                            (yChoords.find(
+                              (v) => v.segmentId === segment.segments[0].id,
+                            )?.lowerStationYChoord || 0 + option.yOffset) *
+                              option.yScale +
+                            yPadding
+                          }
+                          y2={
+                            (yChoords.find(
+                              (v) => v.segmentId === segment.segments[0].id,
+                            )?.upperStationYChoord || 0 + option.yOffset) *
+                              option.yScale +
+                            yPadding
+                          }
+                        />
+                      ) : (
+                        <line
+                          stroke="#000"
+                          strokeWidth="1"
+                          x1={(departureTime + option.xOffset) * option.xScale}
+                          x2={(arrivalTime + option.xOffset) * option.xScale}
+                          y1={
+                            (yChoords.find(
+                              (v) => v.segmentId === segment.segments[0].id,
+                            )?.upperStationYChoord || 0 + option.yOffset) *
+                              option.yScale +
+                            yPadding
+                          }
+                          y2={
+                            (yChoords.find(
+                              (v) => v.segmentId === segment.segments[0].id,
+                            )?.lowerStationYChoord || 0 + option.yOffset) *
+                              option.yScale +
+                            yPadding
+                          }
+                        />
+                      );
                     })}
                   </g>
                 ))}
@@ -277,28 +244,28 @@ export function DiagramViewer({
           <div className="sticky left-[0]">
             <svg
               className="y-axis-svg overflow-scroll sticky left-[0] top-[auto] block"
-              width={120}
               height={viewBoxHeight}
               viewBox={`0 0 ${120} ${viewBoxHeight}`}
+              width={120}
             >
               <rect
+                className="fill-gray-100"
+                height={viewBoxHeight}
+                width={120}
                 x={0}
                 y={0}
-                width={120}
-                height={viewBoxHeight}
-                className="fill-gray-100"
               ></rect>
               {yChoords.map((v) => (
                 <>
                   <text
+                    dominantBaseline="text-before-edge"
                     key={`${v.segmentId}-upper-text`}
+                    textAnchor="middle"
                     x={60}
                     y={
                       (v.upperStationYChoord + option.yOffset) * option.yScale +
                       yPadding
                     }
-                    textAnchor="middle"
-                    dominantBaseline="text-before-edge"
                   >
                     {
                       StationService.findById(
@@ -308,8 +275,10 @@ export function DiagramViewer({
                     }
                   </text>
                   <line
-                    key={`${v.segmentId}-upper`}
                     id={`${v.segmentId}-upper`}
+                    key={`${v.segmentId}-upper`}
+                    stroke="#000"
+                    strokeWidth="1"
                     x1={0}
                     x2={60 * 60 * 24 * option.xScale}
                     y1={
@@ -320,18 +289,16 @@ export function DiagramViewer({
                       (v.upperStationYChoord + option.yOffset) * option.yScale +
                       yPadding
                     }
-                    stroke="#000"
-                    strokeWidth="1"
                   />
                   <text
+                    dominantBaseline="text-before-edge"
                     key={`${v.segmentId}-lower-text`}
+                    textAnchor="middle"
                     x={60}
                     y={
                       (v.lowerStationYChoord + option.yOffset) * option.yScale +
                       yPadding
                     }
-                    textAnchor="middle"
-                    dominantBaseline="text-before-edge"
                   >
                     {
                       StationService.findById(
@@ -341,8 +308,10 @@ export function DiagramViewer({
                     }
                   </text>
                   <line
-                    key={`${v.segmentId}-lower`}
                     id={`${v.segmentId}-lower`}
+                    key={`${v.segmentId}-lower`}
+                    stroke="#000"
+                    strokeWidth="1"
                     x1={0}
                     x2={60 * 24 * option.xScale}
                     y1={
@@ -353,8 +322,6 @@ export function DiagramViewer({
                       (v.lowerStationYChoord + option.yOffset) * option.yScale +
                       yPadding
                     }
-                    stroke="#000"
-                    strokeWidth="1"
                   />
                 </>
               ))}
@@ -366,11 +333,34 @@ export function DiagramViewer({
   );
 }
 
-export class DiagramViewerOption {
-  constructor(
-    public xScale: number,
-    public yScale: number,
-    public xOffset: number,
-    public yOffset: number,
-  ) {}
+function getYChoords(root: Root, diagramLine: DiagramLine) {
+  const result = [] as StationChoord[];
+  let currentYChoord = 0;
+
+  for (const lineSegment of diagramLine.segments) {
+    const segment = SegmentService.findByIdAll(root, lineSegment.id);
+    if (segment == undefined) {
+      throw new Error('Error');
+    }
+    const addSeconds = lineSegment.displaySeconds || 5;
+    if (lineSegment.isReversed) {
+      result.push({
+        lowerStationId: segment.startId,
+        lowerStationYChoord: currentYChoord,
+        segmentId: segment.id,
+        upperStationId: segment.endId,
+        upperStationYChoord: currentYChoord + addSeconds,
+      } satisfies StationChoord);
+    } else {
+      result.push({
+        lowerStationId: segment.endId,
+        lowerStationYChoord: currentYChoord + addSeconds,
+        segmentId: segment.id,
+        upperStationId: segment.startId,
+        upperStationYChoord: currentYChoord,
+      } satisfies StationChoord);
+    }
+    currentYChoord += addSeconds;
+  }
+  return result;
 }

@@ -9,14 +9,14 @@ import { Root } from '../sharpdia-model/Root';
 
 export async function OpenFile(store: Store) {
   const filePath = await openDialog({
-    multiple: false,
     directory: false,
     filters: [
       {
-        name: 'diagram project file',
         extensions: ['dproj'],
+        name: 'diagram project file',
       },
     ],
+    multiple: false,
   });
   if (!filePath) {
     return;
@@ -32,8 +32,8 @@ export async function SaveFile(store: Store) {
   const filePath = await saveDialog({
     filters: [
       {
-        name: 'diagram project file',
         extensions: ['dproj'],
+        name: 'diagram project file',
       },
     ],
   });

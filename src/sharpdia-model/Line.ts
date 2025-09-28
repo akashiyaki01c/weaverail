@@ -1,3 +1,18 @@
+/** 路線を表す */
+export class Line {
+  id: string;
+
+  constructor(
+    public name: string,
+    public segments: Segment[],
+  ) {
+    this.id = crypto.randomUUID();
+  }
+  static default() {
+    return new Line('', []);
+  }
+}
+
 /** 駅間を表す */
 export class Segment {
   id: string;
@@ -13,20 +28,5 @@ export class Segment {
 
   static default() {
     return new Segment('', '');
-  }
-}
-
-/** 路線を表す */
-export class Line {
-  id: string;
-
-  constructor(
-    public name: string,
-    public segments: Segment[],
-  ) {
-    this.id = crypto.randomUUID();
-  }
-  static default() {
-    return new Line('', []);
   }
 }

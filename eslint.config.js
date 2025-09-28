@@ -31,6 +31,8 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...unicorn.configs.recommended.rules,
       ...perfectionist.configs['recommended-natural-legacy'].rules,
+
+      'unicorn/filename-case': 'off',
     },
     settings: {
       'import/resolver': {

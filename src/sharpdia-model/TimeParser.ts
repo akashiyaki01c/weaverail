@@ -1,29 +1,30 @@
 export function parseTime(text: string) {
   switch (text.length) {
     case 3: {
-      const hour = Number.parseInt(text.substring(0, 1));
-      const minute = Number.parseInt(text.substring(1, 3));
+      const hour = Number.parseInt(text.slice(0, 1));
+      const minute = Number.parseInt(text.slice(1, 3));
       return hour * 3600 + minute * 60;
     }
     case 4: {
-      const hour = Number.parseInt(text.substring(0, 2));
-      const minute = Number.parseInt(text.substring(2, 4));
+      const hour = Number.parseInt(text.slice(0, 2));
+      const minute = Number.parseInt(text.slice(2, 4));
       return hour * 3600 + minute * 60;
     }
     case 5: {
-      const hour = Number.parseInt(text.substring(0, 1));
-      const minute = Number.parseInt(text.substring(1, 3));
-      const second = Number.parseInt(text.substring(3, 5));
+      const hour = Number.parseInt(text.slice(0, 1));
+      const minute = Number.parseInt(text.slice(1, 3));
+      const second = Number.parseInt(text.slice(3, 5));
       return hour * 3600 + minute * 60 + second;
     }
     case 6: {
-      const hour = Number.parseInt(text.substring(0, 2));
-      const minute = Number.parseInt(text.substring(2, 4));
-      const second = Number.parseInt(text.substring(4, 6));
+      const hour = Number.parseInt(text.slice(0, 2));
+      const minute = Number.parseInt(text.slice(2, 4));
+      const second = Number.parseInt(text.slice(4, 6));
       return hour * 3600 + minute * 60 + second;
     }
-    default:
+    default: {
       return Number.parseInt(text);
+    }
   }
 }
 

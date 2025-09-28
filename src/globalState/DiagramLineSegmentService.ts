@@ -1,12 +1,19 @@
-import { Root } from '../sharpdia-model/Root';
 import { DiagramLine, DiagramLineSegment } from '../sharpdia-model/DiagramLine';
+import { Root } from '../sharpdia-model/Root';
 
-export class DiagramLineSegmentService {
-  static update(
+export const DiagramLineSegmentService = {
+  append(root: Root, diagramLineIndex: number, data: DiagramLineSegment): Root {
+    return this.insert(
+      root,
+      diagramLineIndex,
+      root.diagramLines[diagramLineIndex].segments.length,
+      data,
+    );
+  },
+  delete(
     root: Root,
     diagramLineIndex: number,
     diagramLineSegmentIndex: number,
-    data: DiagramLineSegment,
   ): Root {
     if (diagramLineIndex < 0 || root.diagramLines.length <= diagramLineIndex) {
       throw new RangeError('存在しないインデックス');
@@ -21,7 +28,7 @@ export class DiagramLineSegmentService {
     const diagramLineSegments = [
       ...root.diagramLines[diagramLineIndex].segments,
     ];
-    diagramLineSegments[diagramLineSegmentIndex] = data;
+    diagramLineSegments.splice(diagramLineSegmentIndex, 1);
     const newDiagramLine = {
       ...root.diagramLines[diagramLineIndex],
       segments: diagramLineSegments,
@@ -29,8 +36,22 @@ export class DiagramLineSegmentService {
     const diagramLines = [...root.diagramLines];
     diagramLines[diagramLineIndex] = newDiagramLine;
     return { ...root, diagramLines };
-  }
-  static insert(
+  },
+  findById(
+    root: Root,
+    diagramLineIndex: number,
+    id: string,
+  ): DiagramLineSegment | undefined {
+    return root.diagramLines[diagramLineIndex].segments.find(
+      (s) => s.id === id,
+    );
+  },
+  findIndexById(root: Root, diagramLineIndex: number, id: string): number {
+    return root.diagramLines[diagramLineIndex].segments.findIndex(
+      (s) => s.id === id,
+    );
+  },
+  insert(
     root: Root,
     diagramLineIndex: number,
     diagramLineSegmentIndex: number,
@@ -57,23 +78,12 @@ export class DiagramLineSegmentService {
     const diagramLines = [...root.diagramLines];
     diagramLines[diagramLineIndex] = newDiagramLine;
     return { ...root, diagramLines };
-  }
-  static append(
-    root: Root,
-    diagramLineIndex: number,
-    data: DiagramLineSegment,
-  ): Root {
-    return this.insert(
-      root,
-      diagramLineIndex,
-      root.diagramLines[diagramLineIndex].segments.length,
-      data,
-    );
-  }
-  static delete(
+  },
+  update(
     root: Root,
     diagramLineIndex: number,
     diagramLineSegmentIndex: number,
+    data: DiagramLineSegment,
   ): Root {
     if (diagramLineIndex < 0 || root.diagramLines.length <= diagramLineIndex) {
       throw new RangeError('存在しないインデックス');
@@ -88,7 +98,7 @@ export class DiagramLineSegmentService {
     const diagramLineSegments = [
       ...root.diagramLines[diagramLineIndex].segments,
     ];
-    diagramLineSegments.splice(diagramLineSegmentIndex, 1);
+    diagramLineSegments[diagramLineSegmentIndex] = data;
     const newDiagramLine = {
       ...root.diagramLines[diagramLineIndex],
       segments: diagramLineSegments,
@@ -96,23 +106,5 @@ export class DiagramLineSegmentService {
     const diagramLines = [...root.diagramLines];
     diagramLines[diagramLineIndex] = newDiagramLine;
     return { ...root, diagramLines };
-  }
-  static findById(
-    root: Root,
-    diagramLineIndex: number,
-    id: string,
-  ): DiagramLineSegment | undefined {
-    return root.diagramLines[diagramLineIndex].segments.find(
-      (s) => s.id === id,
-    );
-  }
-  static findIndexById(
-    root: Root,
-    diagramLineIndex: number,
-    id: string,
-  ): number {
-    return root.diagramLines[diagramLineIndex].segments.findIndex(
-      (s) => s.id === id,
-    );
-  }
-}
+  },
+};

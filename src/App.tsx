@@ -1,18 +1,19 @@
 import { Layout, TabNode } from 'flexlayout-react';
 import 'flexlayout-react/style/rounded.css';
-import { StationTableViewer } from './Viewer/StationTableViewer';
-import { LinesViewer } from './Viewer/LinesViewer';
-import { LineViewer } from './Viewer/LineViewer';
-import { TrainTypeViewer } from './Viewer/TrainTypeViewer';
-import { TimetableViewer } from './Viewer/TimetableViewer';
-import { TrainsViewer } from './Viewer/TrainsViewer';
-import { TrainViewer } from './Viewer/TrainViewer';
+
+import { OpenFile, SaveFile } from './commands/FileIO';
+import useGlobalState from './globalState/useGlobalState';
 import { DiagramLinesViewer } from './Viewer/DiagramLinesViewer';
 import { DiagramLineViewer } from './Viewer/DiagramLineViewer';
 import { DiagramViewer } from './Viewer/DiagramViewer';
+import { LinesViewer } from './Viewer/LinesViewer';
+import { LineViewer } from './Viewer/LineViewer';
+import { StationTableViewer } from './Viewer/StationTableViewer';
+import { TimetableViewer } from './Viewer/TimetableViewer';
+import { TrainsViewer } from './Viewer/TrainsViewer';
+import { TrainTypeViewer } from './Viewer/TrainTypeViewer';
+import { TrainViewer } from './Viewer/TrainViewer';
 import { TreeViewer } from './Viewer/TreeViewer';
-import useGlobalState from './globalState/useGlobalState';
-import { OpenFile, SaveFile } from './commands/FileIO';
 import './App.css';
 
 export function App() {
@@ -57,8 +58,8 @@ export function App() {
       const diagramLineId = node.getConfig()?.diagramLineId;
       return (
         <DiagramViewer
-          timetableId={timetableId}
           diagramLineId={diagramLineId}
+          timetableId={timetableId}
         />
       );
     }
@@ -89,8 +90,8 @@ export function App() {
         </div>
         <div className="flex-1 relative">
           <Layout
-            model={globalState.model}
             factory={factory}
+            model={globalState.model}
             realtimeResize={true}
           />
         </div>

@@ -4,19 +4,19 @@ import { OuDia_Eki } from './Eki';
 import { OuDia_Ressyasyubetsu } from './Ressyasyubetsu';
 
 export class OuDia_Rosen {
-  rosenmei: string;
+  comment: string;
+  dia: OuDia_Dia[];
+  diagramDgrYZahyouKyoriDefault: string;
+  eki: OuDia_Eki[];
+  enableOperation: string;
+  kijunDiaIndex: string;
+  kitenJikoku: string;
   kudariDiaAlias: string;
   noboriDiaAlias: string;
-  kitenJikoku: string;
-  diagramDgrYZahyouKyoriDefault: string;
-  enableOperation: string;
-  operationCrossKitenJikoku: string;
-  kijunDiaIndex: string;
-  comment: string;
 
-  eki: OuDia_Eki[];
+  operationCrossKitenJikoku: string;
   ressyasyubetsu: OuDia_Ressyasyubetsu[];
-  dia: OuDia_Dia[];
+  rosenmei: string;
 
   constructor(value: Class) {
     this.rosenmei = value.fields.getValue('Rosenmei');

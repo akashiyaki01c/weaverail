@@ -1,4 +1,5 @@
 import { Actions, DockLocation } from 'flexlayout-react';
+
 import useGlobalState from '../globalState/useGlobalState';
 import './TreeViewer.css';
 
@@ -11,8 +12,8 @@ export function TreeViewer() {
       globalState.model.doAction(
         Actions.addNode(
           {
-            type: 'tabset',
             id: 'center',
+            type: 'tabset',
             weight: 100,
           },
           globalState.model.getRoot().getId(),
@@ -34,10 +35,10 @@ export function TreeViewer() {
               globalState.model.doAction(
                 Actions.addNode(
                   {
-                    type: 'tab',
-                    name: '駅一覧',
                     component: 'stations',
                     config: {},
+                    name: '駅一覧',
+                    type: 'tab',
                   },
                   'center',
                   DockLocation.CENTER,
@@ -56,10 +57,10 @@ export function TreeViewer() {
               globalState.model.doAction(
                 Actions.addNode(
                   {
-                    type: 'tab',
-                    name: '列車種別一覧',
                     component: 'train-types',
                     config: {},
+                    name: '列車種別一覧',
+                    type: 'tab',
                   },
                   'center',
                   DockLocation.CENTER,
@@ -79,10 +80,10 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: 'tab',
-                      name: '路線一覧',
                       component: 'lines',
                       config: {},
+                      name: '路線一覧',
+                      type: 'tab',
                     },
                     'center',
                     DockLocation.CENTER,
@@ -103,10 +104,10 @@ export function TreeViewer() {
                     globalState.model.doAction(
                       Actions.addNode(
                         {
-                          type: 'tab',
-                          name: `路線 - ${v.name}`,
                           component: 'line',
                           config: { lineId: v.id },
+                          name: `路線 - ${v.name}`,
+                          type: 'tab',
                         },
                         'center',
                         DockLocation.CENTER,
@@ -129,10 +130,10 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: 'tab',
-                      name: '時刻表一覧',
                       component: 'timetables',
                       config: {},
+                      name: '時刻表一覧',
+                      type: 'tab',
                     },
                     'center',
                     DockLocation.CENTER,
@@ -154,10 +155,10 @@ export function TreeViewer() {
                       globalState.model.doAction(
                         Actions.addNode(
                           {
-                            type: 'tab',
-                            name: `時刻表 - ${v.name}`,
                             component: 'timetable',
                             config: { timetableId: v.id },
+                            name: `時刻表 - ${v.name}`,
+                            type: 'tab',
                           },
                           'center',
                           DockLocation.CENTER,
@@ -178,10 +179,10 @@ export function TreeViewer() {
                           globalState.model.doAction(
                             Actions.addNode(
                               {
-                                type: 'tab',
-                                name: `列車 - ${k.number}`,
                                 component: 'train',
                                 config: { timetableId: v.id, trainId: k.id },
+                                name: `列車 - ${k.number}`,
+                                type: 'tab',
                               },
                               'center',
                               DockLocation.CENTER,
@@ -207,10 +208,10 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
-                      type: 'tab',
-                      name: 'ダイヤ設定一覧',
                       component: 'diagram-lines',
                       config: {},
+                      name: 'ダイヤ設定一覧',
+                      type: 'tab',
                     },
                     'center',
                     DockLocation.CENTER,
@@ -231,10 +232,10 @@ export function TreeViewer() {
                     globalState.model.doAction(
                       Actions.addNode(
                         {
-                          type: 'tab',
-                          name: `ダイヤ設定 - ${v.name}`,
                           component: 'diagram-line',
                           config: { diagramLineId: v.id },
+                          name: `ダイヤ設定 - ${v.name}`,
+                          type: 'tab',
                         },
                         'center',
                         DockLocation.CENTER,
@@ -264,13 +265,13 @@ export function TreeViewer() {
                           globalState.model.doAction(
                             Actions.addNode(
                               {
-                                type: 'tab',
-                                name: `ダイヤグラム - ${lines.name} - ${timetable.name}`,
                                 component: 'diagram',
                                 config: {
                                   diagramLineId: lines.id,
                                   timetableId: timetable.id,
                                 },
+                                name: `ダイヤグラム - ${lines.name} - ${timetable.name}`,
+                                type: 'tab',
                               },
                               'center',
                               DockLocation.CENTER,

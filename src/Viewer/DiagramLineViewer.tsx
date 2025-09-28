@@ -1,10 +1,11 @@
-import useGlobalState from '../globalState/useGlobalState';
 import { useRef, useState } from 'react';
-import { DiagramLineSegment } from '../sharpdia-model/DiagramLine';
+
 import { DiagramLineSegmentService } from '../globalState/DiagramLineSegmentService';
-import { TableViewer } from '../TableViewer/TableViewer';
-import { StationService } from '../globalState/StationService';
 import { SegmentService } from '../globalState/SegmentService';
+import { StationService } from '../globalState/StationService';
+import useGlobalState from '../globalState/useGlobalState';
+import { DiagramLineSegment } from '../sharpdia-model/DiagramLine';
+import { TableViewer } from '../TableViewer/TableViewer';
 
 export function DiagramLineViewer({
   diagramLineId,
@@ -26,7 +27,7 @@ export function DiagramLineViewer({
 
   const maxY = diagramLine.segments.length + 1;
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const dialogReference = useRef<HTMLDialogElement>(null);
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);
@@ -34,7 +35,7 @@ export function DiagramLineViewer({
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
+    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
   );
   const [editData, setEditData] = useState(DiagramLineSegment.default());
 
@@ -47,77 +48,84 @@ export function DiagramLineViewer({
       setEditData(diagramLine.segments[y]);
       setEditState('edit');
     }
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
   const deleteData = (y: number) => {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot((prev) =>
-      DiagramLineSegmentService.delete(prev, diagramLineIndex, selectedCellY),
+    globalState.setRoot((previous) =>
+      DiagramLineSegmentService.delete(
+        previous,
+        diagramLineIndex,
+        selectedCellY,
+      ),
     );
   };
-  const insertData = (_: number) => {
+  const insertData = () => {
     const value = DiagramLineSegment.default();
     setEditData(value);
     setEditState('insert');
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === 'edit') {
-      globalState.setRoot((prev) =>
-        DiagramLineSegmentService.update(
-          prev,
-          diagramLineIndex,
-          selectedCellY,
-          editData,
-        ),
-      );
-    } else if (editState === 'insert') {
-      globalState.setRoot((prev) =>
-        DiagramLineSegmentService.insert(
-          prev,
-          diagramLineIndex,
-          selectedCellY,
-          editData,
-        ),
-      );
-    } else if (editState === 'new') {
-      setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot((prev) =>
-        DiagramLineSegmentService.append(prev, diagramLineIndex, editData),
-      );
+    switch (editState) {
+      case 'edit': {
+        globalState.setRoot((previous) =>
+          DiagramLineSegmentService.update(
+            previous,
+            diagramLineIndex,
+            selectedCellY,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      case 'insert': {
+        globalState.setRoot((previous) =>
+          DiagramLineSegmentService.insert(
+            previous,
+            diagramLineIndex,
+            selectedCellY,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      case 'new': {
+        setSelectedCellY(selectedCellY + 1);
+        globalState.setRoot((previous) =>
+          DiagramLineSegmentService.append(
+            previous,
+            diagramLineIndex,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      // No default
     }
     setEditState('viewer');
-    dialogRef.current?.close();
+    dialogReference.current?.close();
   };
 
   return (
     <>
       <TableViewer
-        selectedCellX={selectedCellX}
-        selectedCellY={selectedCellY}
-        setSelectedCellX={setSelectedCellX}
-        setSelectedCellY={setSelectedCellY}
-        editState={editState}
-        setEditState={setEditState}
-        startEdit={startEdit}
-        deleteData={deleteData}
-        insertData={insertData}
-        data={diagramLine.segments}
         columnSettings={[
           {
-            headerText: '番号',
-            widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
+            headerText: '番号',
+            widthIc: 2.4,
           },
           {
-            headerText: '区間',
-            widthIc: 10.4,
-            cellText(value, _) {
+            cellText(value) {
               const segment = SegmentService.findByIdAll(
                 globalState.root,
                 value.id,
@@ -132,32 +140,47 @@ export function DiagramLineViewer({
                   ?.name
               }`;
             },
+            headerText: '区間',
+            widthIc: 10.4,
           },
         ]}
+        data={diagramLine.segments}
         defaultValue={DiagramLineSegment.default()}
+        deleteData={deleteData}
+        editState={editState}
+        insertData={insertData}
+        selectedCellX={selectedCellX}
+        selectedCellY={selectedCellY}
+        setEditState={setEditState}
+        setSelectedCellX={setSelectedCellX}
+        setSelectedCellY={setSelectedCellY}
+        startEdit={startEdit}
       />
       <div className="fixed">
-        <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
+        <dialog
+          className="m-auto p-[1ic] rounded  shadow-xl"
+          ref={dialogReference}
+        >
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
               onEndStationEnd();
             }}
           >
             <label>
               区間
               <select
-                value={editData.id}
-                onChange={(e) => {
-                  editData.id = e.target.value;
+                onChange={(event) => {
+                  editData.id = event.target.value;
                   setEditData({ ...editData });
                 }}
+                value={editData.id}
               >
                 <option value="">選択してください……</option>
                 {globalState?.root?.lines?.map((l) =>
-                  l.segments?.map((segment, i) => (
+                  l.segments?.map((segment, index) => (
                     <option value={segment.id}>
-                      {i}.{l.name}{' '}
+                      {index}.{l.name}{' '}
                       {
                         StationService.findById(
                           globalState.root,
@@ -177,9 +200,9 @@ export function DiagramLineViewer({
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
-                onClick={(_) => {
+                onClick={() => {
                   setEditState('viewer');
-                  dialogRef.current?.close();
+                  dialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -187,7 +210,7 @@ export function DiagramLineViewer({
               </button>
               <button
                 className="bg-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] text-gray-50 rounded"
-                onClick={(_) => {
+                onClick={() => {
                   onEndStationEnd();
                 }}
               >

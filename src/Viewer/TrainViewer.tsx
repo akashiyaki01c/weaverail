@@ -1,13 +1,14 @@
-import useGlobalState from '../globalState/useGlobalState';
-import { TimetableService } from '../globalState/TimetableService';
-import { TrainService } from '../globalState/TrainService';
 import { useRef, useState } from 'react';
-import { TrainSegment } from '../sharpdia-model/Train';
-import { TableViewer } from '../TableViewer/TableViewer';
+
 import { SegmentService } from '../globalState/SegmentService';
 import { StationService } from '../globalState/StationService';
+import { TimetableService } from '../globalState/TimetableService';
 import { TrainSegmentService } from '../globalState/TrainSegmentService';
+import { TrainService } from '../globalState/TrainService';
+import useGlobalState from '../globalState/useGlobalState';
 import { parseTime, toTimeString } from '../sharpdia-model/TimeParser';
+import { TrainSegment } from '../sharpdia-model/Train';
+import { TableViewer } from '../TableViewer/TableViewer';
 
 export function TrainViewer({
   timetableId,
@@ -48,8 +49,10 @@ export function TrainViewer({
   const maxX = 2;
   const maxY = train.segments.length + 1;
 
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>(Array(maxX).fill(null));
+  const dialogReference = useRef<HTMLDialogElement>(null);
+  const inputReferences = useRef<(HTMLInputElement | null)[]>(
+    Array.from({ length: maxX }, () => Object.create(null)),
+  );
 
   // ユーザが選択しているセルのX座標
   const [selectedCellX, setSelectedCellX] = useState(0);
@@ -57,7 +60,7 @@ export function TrainViewer({
   const [selectedCellY, setSelectedCellY] = useState(0);
   // 現在のウィンドウの状態
   const [editState, setEditState] = useState(
-    'viwer' as 'viewer' | 'new' | 'insert' | 'edit',
+    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
   );
   const [editData, setEditData] = useState(TrainSegment.default());
 
@@ -69,78 +72,82 @@ export function TrainViewer({
       setEditData(train.segments[y]);
       setEditState('edit');
     }
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
   const deleteData = (y: number) => {
     if (y === maxY - 1) {
       return;
     }
-    globalState.setRoot((prev) =>
-      TrainSegmentService.delete(prev, timetableIndex, trainIndex, y),
+    globalState.setRoot((previous) =>
+      TrainSegmentService.delete(previous, timetableIndex, trainIndex, y),
     );
   };
-  const insertData = (_: number) => {
+  const insertData = () => {
     setEditData(TrainSegment.default());
     setEditState('insert');
-    dialogRef.current?.showModal();
+    dialogReference.current?.showModal();
   };
 
   const onEndStationEnd = () => {
-    if (editState === 'edit') {
-      globalState.setRoot((prev) =>
-        TrainSegmentService.update(
-          prev,
-          timetableIndex,
-          trainIndex,
-          selectedCellY,
-          editData,
-        ),
-      );
-    } else if (editState === 'insert') {
-      globalState.setRoot((prev) =>
-        TrainSegmentService.insert(
-          prev,
-          timetableIndex,
-          trainIndex,
-          selectedCellY,
-          editData,
-        ),
-      );
-    } else if (editState === 'new') {
-      setSelectedCellY(selectedCellY + 1);
-      globalState.setRoot((prev) =>
-        TrainSegmentService.append(prev, timetableIndex, trainIndex, editData),
-      );
+    switch (editState) {
+      case 'edit': {
+        globalState.setRoot((previous) =>
+          TrainSegmentService.update(
+            previous,
+            timetableIndex,
+            trainIndex,
+            selectedCellY,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      case 'insert': {
+        globalState.setRoot((previous) =>
+          TrainSegmentService.insert(
+            previous,
+            timetableIndex,
+            trainIndex,
+            selectedCellY,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      case 'new': {
+        setSelectedCellY(selectedCellY + 1);
+        globalState.setRoot((previous) =>
+          TrainSegmentService.append(
+            previous,
+            timetableIndex,
+            trainIndex,
+            editData,
+          ),
+        );
+
+        break;
+      }
+      // No default
     }
     setEditState('viewer');
-    dialogRef.current?.close();
+    dialogReference.current?.close();
   };
 
   return (
     <>
       <TableViewer
-        selectedCellX={selectedCellX}
-        selectedCellY={selectedCellY}
-        setSelectedCellX={setSelectedCellX}
-        setSelectedCellY={setSelectedCellY}
-        editState={editState}
-        setEditState={setEditState}
-        startEdit={startEdit}
-        deleteData={deleteData}
-        insertData={insertData}
-        data={train.segments}
         columnSettings={[
           {
-            headerText: '番号',
-            widthIc: 2.4,
             cellText(_, index) {
               return String(index);
             },
+            headerText: '番号',
+            widthIc: 2.4,
           },
           {
-            headerText: '区間',
-            widthIc: 10.4,
-            cellText(value, _) {
+            cellText(value) {
               return `${
                 value?.segments
                   ?.map((v) =>
@@ -163,30 +170,45 @@ export function TrainViewer({
                   .join('/') || ''
               }`;
             },
+            headerText: '区間',
+            widthIc: 10.4,
           },
           {
-            headerText: '発車時刻',
-            widthIc: 5.4,
-            cellText(value, _) {
+            cellText(value) {
               return toTimeString(value.departureTime);
             },
+            headerText: '発車時刻',
+            widthIc: 5.4,
           },
           {
-            headerText: '到着時刻',
-            widthIc: 5.4,
-            cellText(value, _) {
+            cellText(value) {
               return toTimeString(value.arrivalTime);
             },
+            headerText: '到着時刻',
+            widthIc: 5.4,
           },
         ]}
+        data={train.segments}
         defaultValue={TrainSegment.default()}
+        deleteData={deleteData}
+        editState={editState}
+        insertData={insertData}
+        selectedCellX={selectedCellX}
+        selectedCellY={selectedCellY}
+        setEditState={setEditState}
+        setSelectedCellX={setSelectedCellX}
+        setSelectedCellY={setSelectedCellY}
+        startEdit={startEdit}
       />
       <div className="fixed">
-        <dialog ref={dialogRef} className="m-auto p-[1ic] rounded  shadow-xl">
+        <dialog
+          className="m-auto p-[1ic] rounded  shadow-xl"
+          ref={dialogReference}
+        >
           <form
             className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
+            onSubmit={(event) => {
+              event.preventDefault();
               onEndStationEnd();
             }}
           >
@@ -196,17 +218,17 @@ export function TrainViewer({
                 {[
                   ...(editData?.segments || []),
                   { id: '', isReversed: false },
-                ].map((v, i) => (
+                ].map((v, index) => (
                   <select
-                    value={v.id}
                     key={v.id}
-                    onChange={(e) => {
-                      if (i >= editData?.segments?.length) {
+                    onChange={(event) => {
+                      if (index >= editData?.segments?.length) {
                         editData?.segments?.push({ id: '', isReversed: false });
                       }
-                      editData.segments[i].id = e.target.value;
+                      editData.segments[index].id = event.target.value;
                       setEditData({ ...editData });
                     }}
+                    value={v.id}
                   >
                     <option value="">選択してください……</option>
                     {globalState?.root?.lines?.map((l) =>
@@ -237,42 +259,42 @@ export function TrainViewer({
               発時刻
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
-                type="text"
-                value={editData?.departureTime}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
+                onChange={(event) =>
                   setEditData({
                     ...editData,
-                    departureTime: parseTime(e.target.value),
+                    departureTime: parseTime(event.target.value),
                   })
                 }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
+                type="text"
+                value={editData?.departureTime}
               />
             </label>
             <label>
               着時刻
               <input
                 className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
-                type="text"
-                value={editData?.arrivalTime}
-                ref={(el) => {
-                  inputRefs.current[0] = el;
-                }}
-                onChange={(e) =>
+                onChange={(event) =>
                   setEditData({
                     ...editData,
-                    arrivalTime: parseTime(e.target.value),
+                    arrivalTime: parseTime(event.target.value),
                   })
                 }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
+                type="text"
+                value={editData?.arrivalTime}
               />
             </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
-                onClick={(_) => {
+                onClick={() => {
                   setEditState('viewer');
-                  dialogRef.current?.close();
+                  dialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -280,7 +302,7 @@ export function TrainViewer({
               </button>
               <button
                 className="bg-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] text-gray-50 rounded"
-                onClick={(_) => {
+                onClick={() => {
                   onEndStationEnd();
                 }}
               >

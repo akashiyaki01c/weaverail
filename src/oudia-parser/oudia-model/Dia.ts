@@ -3,12 +3,12 @@ import { OuDia_Ressya } from './Ressya';
 
 /** 一つの時刻表を表す */
 export class OuDia_Dia {
-  diaName: string;
-  mainBackColorIndex: string;
-  subBackColorIndex: string;
   backPatternIndex: string;
+  diaName: string;
   kudari: OuDia_Kudari;
+  mainBackColorIndex: string;
   nobori: OuDia_Kudari;
+  subBackColorIndex: string;
 
   constructor(value: Class) {
     this.diaName = value.fields.getValue('DiaName');
