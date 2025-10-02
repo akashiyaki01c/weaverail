@@ -38,11 +38,14 @@ export const TrainService = {
     if (data.segments.length === 0) {
       return;
     }
-    if (data.segments.at(-1).segments.length === 0) {
+    if (data.segments.at(-1) === undefined) {
+      return;
+    }
+    if (data.segments.at(-1)!.segments.length === 0) {
       return;
     }
     const lastSegment =
-      data.segments.at(-1).segments[data.segments.at(-1).segments.length - 1];
+      data.segments.at(-1)!.segments[data.segments.at(-1)!.segments.length - 1];
     return lastSegment.isReversed
       ? SegmentService.findByIdAll(root, lastSegment.id)
       : SegmentService.findByIdAll(root, lastSegment.id);
