@@ -67,23 +67,40 @@ export function DiagramViewer({
   return (
     <>
       <div className="max-w-[100cqw] max-h-[100cqh] w-[100%] h-[100%] overflow-scroll">
-        <div className="sticky top-[0] w-[max-content]">
-          <svg
-            className="x-axis-svg overflow-scroll sticky top-[0] left-[auto] block"
-            height={50}
-            viewBox={`0 0 ${viewBoxWidth} ${50}`}
-            width={viewBoxWidth}
-          >
-            <rect
-              className="fill-gray-100"
+        <div className=" sticky top-[0] w-[max-content] z-10 bg-gray-100">
+          <div className="left-[120px] relative">
+            <svg
+              className="x-axis-svg overflow-scroll sticky top-[0] block"
               height={50}
+              viewBox={`0 0 ${viewBoxWidth} ${50}`}
               width={viewBoxWidth}
-              x={0}
-              y={0}
-            ></rect>
-          </svg>
+            >
+              {Array.from({ length: 24 * 60 + 1 })
+                .map((_, index) => index)
+                .filter((v) => v % 60 === 0)
+                .map((v) => {
+                  let time = v + 4 * 60;
+                  if (time < 0) {
+                    time += 24 * 60;
+                  }
+                  return (
+                    <text
+                      dominantBaseline="middle"
+                      fill="#000"
+                      fontSize={32}
+                      id={`${v}-1`}
+                      textAnchor="middle"
+                      x={(option.xOffset + v * 60) * option.xScale}
+                      y={yPadding / 2}
+                    >
+                      {(time / 60) % 24}
+                    </text>
+                  );
+                })}
+            </svg>
+          </div>
         </div>
-        <div className="w-[max-content]">
+        <div className="w-[max-content] z-0">
           <div className="h-0">
             <svg
               className="diagram-main-svg overflow-x-scroll overflow-y-hidden relative top-0 left-[120px] block"
