@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { SegmentService } from '../globalState/SegmentService';
 import { StationService } from '../globalState/StationService';
+import { TrainTypeService } from '../globalState/TrainTypeService';
 import useGlobalState from '../globalState/useGlobalState';
 import { DiagramLine } from '../sharpdia-model/DiagramLine';
 import { Root } from '../sharpdia-model/Root';
@@ -201,6 +202,10 @@ export function DiagramViewer({
                 {timetable.trains.map((train) => (
                   <g id={`train-${train.id}`}>
                     {train.segments.map((segment) => {
+                      const trainType = TrainTypeService.findById(
+                        globalState.root,
+                        train.trainTypeId,
+                      )!;
                       let departureTime = segment.departureTime - 4 * 60 * 60;
                       if (departureTime < 0) {
                         departureTime += 24 * 60 * 60;
@@ -209,49 +214,84 @@ export function DiagramViewer({
                       if (arrivalTime < 0) {
                         arrivalTime += 24 * 60 * 60;
                       }
-                      return segment.segments[0].isReversed ? (
-                        <line
-                          stroke="#000"
-                          strokeWidth="1"
-                          x1={(departureTime + option.xOffset) * option.xScale}
-                          x2={(arrivalTime + option.xOffset) * option.xScale}
-                          y1={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id,
-                            )?.lowerStationYChoord || 0 + option.yOffset) *
-                              option.yScale +
-                            yPadding
+                      const result = [];
+                      const totalTime = segment.segments
+                        .map((v) => {
+                          const yChoord = yChoords.find(
+                            (c) => c.segmentId === v.id,
+                          );
+                          if (yChoord == undefined) {
+                            return 0;
                           }
-                          y2={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id,
-                            )?.upperStationYChoord || 0 + option.yOffset) *
-                              option.yScale +
-                            yPadding
-                          }
-                        />
-                      ) : (
-                        <line
-                          stroke="#000"
-                          strokeWidth="1"
-                          x1={(departureTime + option.xOffset) * option.xScale}
-                          x2={(arrivalTime + option.xOffset) * option.xScale}
-                          y1={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id,
-                            )?.upperStationYChoord || 0 + option.yOffset) *
-                              option.yScale +
-                            yPadding
-                          }
-                          y2={
-                            (yChoords.find(
-                              (v) => v.segmentId === segment.segments[0].id,
-                            )?.lowerStationYChoord || 0 + option.yOffset) *
-                              option.yScale +
-                            yPadding
-                          }
-                        />
-                      );
+                          return (
+                            yChoord.lowerStationYChoord -
+                            yChoord.upperStationYChoord
+                          );
+                        })
+                        .reduce((p, c) => p + c, 0);
+                      let startTime = 0;
+                      for (const sg of segment.segments) {
+                        const yChoord = yChoords.find(
+                          (v) => v.segmentId === sg.id,
+                        );
+                        if (yChoord == undefined) {
+                          continue;
+                        }
+                        const currentTime =
+                          yChoord.lowerStationYChoord -
+                          yChoord.upperStationYChoord;
+                        const startRatio = startTime / totalTime;
+                        const lastRatio = (currentTime + startTime) / totalTime;
+                        startTime += currentTime;
+                        const departure =
+                          departureTime +
+                          (arrivalTime - departureTime) * startRatio;
+                        const arrival =
+                          departureTime +
+                          (arrivalTime - departureTime) * lastRatio;
+                        result.push(
+                          segment.segments[0].isReversed ? (
+                            <line
+                              stroke={trainType.color}
+                              strokeWidth="1"
+                              x1={(departure + option.xOffset) * option.xScale}
+                              x2={(arrival + option.xOffset) * option.xScale}
+                              y1={
+                                (yChoords.find((v) => v.segmentId === sg.id)
+                                  ?.lowerStationYChoord || 0 + option.yOffset) *
+                                  option.yScale +
+                                yPadding
+                              }
+                              y2={
+                                (yChoords.find((v) => v.segmentId === sg.id)
+                                  ?.upperStationYChoord || 0 + option.yOffset) *
+                                  option.yScale +
+                                yPadding
+                              }
+                            />
+                          ) : (
+                            <line
+                              stroke={trainType.color}
+                              strokeWidth="1"
+                              x1={(departure + option.xOffset) * option.xScale}
+                              x2={(arrival + option.xOffset) * option.xScale}
+                              y1={
+                                (yChoords.find((v) => v.segmentId === sg.id)
+                                  ?.upperStationYChoord || 0 + option.yOffset) *
+                                  option.yScale +
+                                yPadding
+                              }
+                              y2={
+                                (yChoords.find((v) => v.segmentId === sg.id)
+                                  ?.lowerStationYChoord || 0 + option.yOffset) *
+                                  option.yScale +
+                                yPadding
+                              }
+                            />
+                          ),
+                        );
+                      }
+                      return result;
                     })}
                   </g>
                 ))}

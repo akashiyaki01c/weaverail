@@ -155,7 +155,7 @@ export function TreeViewer() {
                       globalState.model.doAction(
                         Actions.addNode(
                           {
-                            component: 'timetable',
+                            component: 'trains',
                             config: { timetableId: v.id },
                             name: `時刻表 - ${v.name}`,
                             type: 'tab',
