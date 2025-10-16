@@ -7,24 +7,21 @@
 ![GitHub release](https://img.shields.io/github/v/release/akashiyaki01c/weaverail)
 ![License](https://img.shields.io/github/license/akashiyaki01c/weaverail)
 
-
 Weaverail は直感的で強力な次世代の鉄道ダイヤグラムエディタです。
 複数路線を跨ぐ列車の定義、スクリプトによるデータ変換、拡張機能プラグインに対応します。
 
 ## 特徴
 
-* 複数の路線を跨いだ列車が直感的に設定可能
-* スクリプト機能によるデータの自動加工
-* 拡張機能による機能追加が可能
-* Windows, macOS, Linuxに対応
+- 複数の路線を跨いだ列車が直感的に設定可能
+- スクリプト機能によるデータの自動加工
+- 拡張機能による機能追加が可能
+- Windows, macOS, Linuxに対応
 
 ![window image](./docs/image/window-image.png)
 
 ## インストール方法
 
 ### リリースページからダウンロード (推奨)
-
-*現在リリースページから実行ファイルをダウンロードすることはできません。*
 
 1. [リリースページ](https://github.com/akashiyaki01c/weaverail/releases) から対応するOSの最新バージョンをダウンロードします。
 2. 解凍し、実行ファイルを実行します。
