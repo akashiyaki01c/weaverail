@@ -102,7 +102,7 @@ export function DiagramViewer({
           </div>
         </div>
         <div className="w-[max-content] z-0">
-          <div className="h-0">
+          <div className="z-10">
             <svg
               className="diagram-main-svg overflow-x-scroll overflow-y-hidden relative top-0 left-[120px] block"
               height={viewBoxHeight}
@@ -113,6 +113,32 @@ export function DiagramViewer({
                 <g className="y-axis">
                   {yChoords.map((v) => (
                     <>
+                      <rect
+                        className="fill-gray-100"
+                        height={10}
+                        id={`${v.segmentId}-upper-toucher`}
+                        key={`${v.segmentId}-upper-toucher`}
+                        onClick={(event) => {
+                          const svg = (event.target as SVGRectElement)
+                            .ownerSVGElement;
+                          if (!svg) return;
+
+                          const pt = new DOMPoint(event.clientX, event.clientY);
+                          const svgPoint = pt.matrixTransform(
+                            svg.getScreenCTM()?.inverse(),
+                          );
+                          const svgX =
+                            svgPoint.x / option.xScale - option.xOffset;
+                          console.log(svgX);
+                        }}
+                        width={60 * 60 * 24 * option.xScale}
+                        x={0}
+                        y={
+                          (v.upperStationYChoord + option.yOffset) *
+                            option.yScale +
+                          yPadding
+                        }
+                      />
                       <line
                         id={`${v.segmentId}-upper`}
                         key={`${v.segmentId}-upper`}
@@ -129,6 +155,33 @@ export function DiagramViewer({
                           (v.upperStationYChoord + option.yOffset) *
                             option.yScale +
                           yPadding
+                        }
+                      />
+                      <rect
+                        className="fill-gray-100"
+                        height={10}
+                        id={`${v.segmentId}-lower-toucher`}
+                        key={`${v.segmentId}-lower-toucher`}
+                        onClick={(event) => {
+                          const svg = (event.target as SVGRectElement)
+                            .ownerSVGElement;
+                          if (!svg) return;
+
+                          const pt = new DOMPoint(event.clientX, event.clientY);
+                          const svgPoint = pt.matrixTransform(
+                            svg.getScreenCTM()?.inverse(),
+                          );
+                          const svgX =
+                            svgPoint.x / option.xScale - option.xOffset;
+                          console.log(svgX);
+                        }}
+                        width={60 * 60 * 24 * option.xScale}
+                        x={0}
+                        y={
+                          (v.lowerStationYChoord + option.yOffset) *
+                            option.yScale +
+                          yPadding -
+                          10
                         }
                       />
                       <line
@@ -298,7 +351,7 @@ export function DiagramViewer({
               </g>
             </svg>
           </div>
-          <div className="sticky left-[0]">
+          <div className="absolute left-[0] top-[50px] z-0">
             <svg
               className="y-axis-svg overflow-scroll sticky left-[0] top-[auto] block"
               height={viewBoxHeight}
