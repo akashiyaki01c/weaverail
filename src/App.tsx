@@ -9,6 +9,8 @@ import { DiagramViewer } from './Viewer/DiagramViewer';
 import { LinesViewer } from './Viewer/LinesViewer';
 import { LineViewer } from './Viewer/LineViewer';
 import { StationTableViewer } from './Viewer/StationTableViewer';
+import { TemplatesViewer } from './Viewer/TemplatesViewer';
+import { TemplateViewer } from './Viewer/TemplateViewer';
 import { TimetableViewer } from './Viewer/TimetableViewer';
 import { TrainsViewer } from './Viewer/TrainsViewer';
 import { TrainTypeViewer } from './Viewer/TrainTypeViewer';
@@ -33,6 +35,13 @@ export function App() {
     }
     if (component === 'train-types') {
       return <TrainTypeViewer />;
+    }
+    if (component === 'templates') {
+      return <TemplatesViewer />;
+    }
+    if (component === 'template') {
+      const templateId = node.getConfig()?.templateId;
+      return <TemplateViewer templateId={templateId} />;
     }
     if (component === 'timetables') {
       return <TimetableViewer />;

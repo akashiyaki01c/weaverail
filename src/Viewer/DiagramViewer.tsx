@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { SegmentService } from '../globalState/SegmentService';
 import { StationService } from '../globalState/StationService';
+import { TrainService } from '../globalState/TrainService';
+import { TemplateTrainService } from '../globalState/TrainTemplateService';
 import { TrainTypeService } from '../globalState/TrainTypeService';
 import useGlobalState from '../globalState/useGlobalState';
 import { DiagramLine } from '../sharpdia-model/DiagramLine';
 import { Root } from '../sharpdia-model/Root';
+import { TemplateTrain } from '../sharpdia-model/TemplateTrain';
 
 interface StationChoord {
   // ダイヤグラム上での下側の駅ID
@@ -36,6 +39,7 @@ export function DiagramViewer({
   timetableId: string;
 }) {
   const globalState = useGlobalState();
+  const dialogReference = useRef<HTMLDialogElement>(null);
   if (!diagramLineId) {
     throw new Error('diagram line id null');
   }
@@ -65,10 +69,17 @@ export function DiagramViewer({
   const viewBoxHeight =
     option.yScale * (yChoords.at(-1)?.lowerStationYChoord || 0) + yPadding * 2;
 
+  const [targetTemplates, setTargetTemplates] = useState<TemplateTrain[]>([]);
+  const [clickStation, setCliCkStation] = useState('');
+  const [clickTime, setClickTime] = useState(0);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateTrain>(
+    TemplateTrain.default(),
+  );
+
   return (
     <>
-      <div className="max-w-[100cqw] max-h-[100cqh] w-[100%] h-[100%] overflow-scroll">
-        <div className=" sticky top-[0] w-[max-content] z-10 bg-gray-100">
+      <div className="max-w-[100cqw] max-h-[100cqh] w-[100%] h-[100%] overflow-scroll z-0">
+        <div className="sticky top-[0] w-[max-content] z-10 bg-gray-100">
           <div className="left-[120px] relative">
             <svg
               className="x-axis-svg overflow-scroll sticky top-[0] block"
@@ -129,7 +140,19 @@ export function DiagramViewer({
                           );
                           const svgX =
                             svgPoint.x / option.xScale - option.xOffset;
-                          console.log(svgX);
+                          // 下り追加
+                          setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
+                          setCliCkStation(v.upperStationId);
+                          setTargetTemplates(
+                            globalState.root.templateTrains.filter((template) =>
+                              template.segments.some(
+                                (segment) =>
+                                  segment.segments[0]?.id === v.segmentId,
+                              ),
+                            ),
+                          );
+                          console.log(targetTemplates);
+                          dialogReference.current?.show();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}
@@ -438,6 +461,69 @@ export function DiagramViewer({
             </svg>
           </div>
         </div>
+      </div>
+      <div className="fixed z-50 top-0 left-0">
+        <dialog
+          className="m-auto p-[1ic] rounded shadow-xl"
+          ref={dialogReference}
+        >
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <label>
+              列車テンプレート
+              <select
+                onChange={(event) => {
+                  setSelectedTemplate(
+                    TemplateTrainService.findById(
+                      globalState.root,
+                      event.target.value,
+                    ) || TemplateTrain.default(),
+                  );
+                }}
+                value={selectedTemplate?.id}
+              >
+                <option value=""></option>
+                {targetTemplates.map((v) => (
+                  <option value={v.id}>{v.name}</option>
+                ))}
+              </select>
+            </label>
+            <div className="mt-[1ic] flex justify-end gap-2">
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  dialogReference.current?.close();
+                }}
+                type="button"
+              >
+                キャンセル
+              </button>
+              <button
+                className="bg-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] text-gray-50 rounded"
+                onClick={() => {
+                  const train = TemplateTrainService.generateTrain(
+                    globalState.root,
+                    selectedTemplate,
+                    clickStation,
+                    clickTime,
+                  );
+                  console.log(train);
+                  console.log('generated!');
+                  globalState.setRoot((root) =>
+                    TrainService.append(root, timetableIndex, train),
+                  );
+                  dialogReference.current?.close();
+                }}
+              >
+                適用
+              </button>
+            </div>
+          </form>
+        </dialog>
       </div>
     </>
   );

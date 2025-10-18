@@ -5,8 +5,13 @@ export class TemplateTrain {
   constructor(
     public name: string,
     public trainTypeId: string,
+    public segments: TemplateTrainSegment[],
   ) {
     this.id = crypto.randomUUID();
+  }
+
+  static default() {
+    return new TemplateTrain('', '', []);
   }
 }
 
@@ -19,5 +24,9 @@ export class TemplateTrainSegment {
     public time: number,
   ) {
     this.id = crypto.randomUUID();
+  }
+
+  static default() {
+    return new TemplateTrainSegment([], 0);
   }
 }

@@ -130,6 +130,56 @@ export function TreeViewer() {
                 globalState.model.doAction(
                   Actions.addNode(
                     {
+                      component: 'templates',
+                      config: {},
+                      name: '列車テンプレート一覧',
+                      type: 'tab',
+                    },
+                    'center',
+                    DockLocation.CENTER,
+                    -1,
+                  ),
+                );
+              }}
+            >
+              列車テンプレート一覧
+            </div>
+          </summary>
+          <ul>
+            {globalState.root.templateTrains.map((v) => (
+              <li className="h-6" key={v.id}>
+                <div
+                  onClick={() => {
+                    setCenter();
+                    globalState.model.doAction(
+                      Actions.addNode(
+                        {
+                          component: 'template',
+                          config: { templateId: v.id },
+                          name: `列車テンプレート - ${v.name}`,
+                          type: 'tab',
+                        },
+                        'center',
+                        DockLocation.CENTER,
+                        -1,
+                      ),
+                    );
+                  }}
+                >
+                  {v.name}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </li>
+        <li>
+          <summary>
+            <div
+              onClick={() => {
+                setCenter();
+                globalState.model.doAction(
+                  Actions.addNode(
+                    {
                       component: 'timetables',
                       config: {},
                       name: '時刻表一覧',
