@@ -231,7 +231,7 @@ export function DiagramViewer({
                 <g className="x-axis">
                   {Array.from({ length: 24 * 60 })
                     .map((_, index) => index)
-                    .filter((v) => v % 2 === 0)
+                    .filter((v) => v % 1 === 0)
                     .map((v) => (
                       <line
                         key={v}
@@ -246,7 +246,7 @@ export function DiagramViewer({
                     ))}
                   {Array.from({ length: 24 * 60 })
                     .map((_, index) => index)
-                    .filter((v) => v % 10 === 0)
+                    .filter((v) => v % 5 === 0)
                     .map((v) => (
                       <line
                         id={`${v}-1`}
@@ -328,7 +328,7 @@ export function DiagramViewer({
                         result.push(
                           segment.segments[0].isReversed ? (
                             <line
-                              stroke={trainType.color}
+                              stroke={trainType?.color || '#000'}
                               strokeWidth="1"
                               x1={(departure + option.xOffset) * option.xScale}
                               x2={(arrival + option.xOffset) * option.xScale}
@@ -347,7 +347,7 @@ export function DiagramViewer({
                             />
                           ) : (
                             <line
-                              stroke={trainType.color}
+                              stroke={trainType?.color || '#000'}
                               strokeWidth="1"
                               x1={(departure + option.xOffset) * option.xScale}
                               x2={(arrival + option.xOffset) * option.xScale}
