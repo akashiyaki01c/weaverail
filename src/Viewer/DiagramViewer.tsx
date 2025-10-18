@@ -158,7 +158,7 @@ export function DiagramViewer({
                             ),
                           );
                           console.log(targetTemplates);
-                          dialogReference.current?.show();
+                          dialogReference.current?.showModal();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}
@@ -481,7 +481,7 @@ export function DiagramViewer({
           </div>
         </div>
       </div>
-      <div className="fixed z-50 top-0 left-0">
+      <div className="fixed z-100 top-0 left-0">
         <dialog
           className="m-auto p-[1ic] rounded shadow-xl"
           ref={dialogReference}
