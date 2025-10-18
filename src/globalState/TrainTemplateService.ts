@@ -26,12 +26,14 @@ export const TemplateTrainService = {
     template: TemplateTrain,
     stationId: string,
     departureTime: number,
+    startIndex: number,
+    endIndex: number,
   ): Train {
     const resultTrain = Train.default();
     resultTrain.trainTypeId = template.trainTypeId;
 
     let nowTime = 0;
-    for (const segment of template.segments) {
+    for (const segment of template.segments.slice(startIndex, endIndex + 1)) {
       const resultSegment = TrainSegment.default();
       for (const seg of segment.segments) {
         resultSegment.segments.push(seg);

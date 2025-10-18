@@ -75,6 +75,9 @@ export function DiagramViewer({
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateTrain>(
     TemplateTrain.default(),
   );
+  const [selectedDepartureStation, setSelectedDepartureStation] =
+    useState('-1');
+  const [selectedArrivalStation, setSelectedArrivalStation] = useState('-1');
 
   return (
     <>
@@ -506,6 +509,67 @@ export function DiagramViewer({
                 ))}
               </select>
             </label>
+            <label>
+              始発駅
+              <select
+                onChange={(event) =>
+                  setSelectedDepartureStation(event.target.value)
+                }
+                value={selectedDepartureStation}
+              >
+                <option value="-1"></option>
+                {selectedTemplate.segments.map((segment, index) => (
+                  <option value={index}>
+                    {
+                      StationService.findById(
+                        globalState.root,
+                        segment.segments[0]?.isReversed
+                          ? SegmentService.findByIdAll(
+                              globalState.root,
+                              segment.segments[0].id,
+                            )?.endId || ''
+                          : SegmentService.findByIdAll(
+                              globalState.root,
+                              segment.segments[0].id,
+                            )?.startId || '',
+                      )?.name
+                    }
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              終着駅
+              <select
+                onChange={(event) =>
+                  setSelectedArrivalStation(event.target.value)
+                }
+                value={selectedArrivalStation}
+              >
+                <option value="-1"></option>
+                {selectedTemplate.segments.map((segment, index) => (
+                  <option
+                    disabled={index < Number(selectedDepartureStation)}
+                    value={index}
+                  >
+                    {
+                      StationService.findById(
+                        globalState.root,
+                        segment.segments.at(-1)?.isReversed
+                          ? SegmentService.findByIdAll(
+                              globalState.root,
+                              segment.segments.at(-1)?.id || '',
+                            )?.startId || ''
+                          : SegmentService.findByIdAll(
+                              globalState.root,
+                              segment.segments.at(-1)?.id || '',
+                            )?.endId || '',
+                      )?.name
+                    }
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
@@ -524,6 +588,8 @@ export function DiagramViewer({
                     selectedTemplate,
                     clickStation,
                     clickTime,
+                    Number(selectedDepartureStation),
+                    Number(selectedArrivalStation),
                   );
                   console.log(train);
                   console.log('generated!');
