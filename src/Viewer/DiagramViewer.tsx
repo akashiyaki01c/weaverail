@@ -215,7 +215,7 @@ export function DiagramViewer({
                             ),
                           );
                           console.log(targetTemplates);
-                          dialogReference.current?.show();
+                          dialogReference.current?.showModal();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}
