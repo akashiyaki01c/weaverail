@@ -62,7 +62,7 @@ export function DiagramViewer({
   }
   const yChoords = getYChoords(globalState.root, diagramLine);
 
-  const [option] = useState(new DiagramViewerOption(0.1, 0.3, 0, 0));
+  const [option] = useState(new DiagramViewerOption(0.15, 0.3, 0, 0));
 
   const yPadding = 50;
   const viewBoxWidth = option.xScale * 60 * 60 * 24;
