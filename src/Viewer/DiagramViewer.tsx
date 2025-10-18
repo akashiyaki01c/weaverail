@@ -9,6 +9,7 @@ import useGlobalState from '../globalState/useGlobalState';
 import { DiagramLine } from '../sharpdia-model/DiagramLine';
 import { Root } from '../sharpdia-model/Root';
 import { TemplateTrain } from '../sharpdia-model/TemplateTrain';
+import { TrainViewer } from './TrainViewer';
 
 interface StationChoord {
   // 駅間が逆転しているか
@@ -41,7 +42,8 @@ export function DiagramViewer({
   timetableId: string;
 }) {
   const globalState = useGlobalState();
-  const dialogReference = useRef<HTMLDialogElement>(null);
+  const trainGenerateDialogReference = useRef<HTMLDialogElement>(null);
+  const trainDetailDialogReference = useRef<HTMLDialogElement>(null);
   if (!diagramLineId) {
     throw new Error('diagram line id null');
   }
@@ -80,6 +82,8 @@ export function DiagramViewer({
   const [selectedDepartureStation, setSelectedDepartureStation] =
     useState('-1');
   const [selectedArrivalStation, setSelectedArrivalStation] = useState('-1');
+
+  const [clickTrainId, setClickTrainId] = useState('');
 
   return (
     <>
@@ -158,7 +162,7 @@ export function DiagramViewer({
                             ),
                           );
                           console.log(targetTemplates);
-                          dialogReference.current?.showModal();
+                          trainGenerateDialogReference.current?.showModal();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}
@@ -215,7 +219,7 @@ export function DiagramViewer({
                             ),
                           );
                           console.log(targetTemplates);
-                          dialogReference.current?.showModal();
+                          trainGenerateDialogReference.current?.showModal();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}
@@ -347,6 +351,10 @@ export function DiagramViewer({
                         result.push(
                           sg.isReversed ? (
                             <line
+                              onClick={() => {
+                                setClickTrainId(train.id);
+                                trainDetailDialogReference.current?.showModal();
+                              }}
                               stroke={trainType?.color || '#000'}
                               strokeWidth="1"
                               x1={(departure + option.xOffset) * option.xScale}
@@ -366,6 +374,10 @@ export function DiagramViewer({
                             />
                           ) : (
                             <line
+                              onClick={() => {
+                                setClickTrainId(train.id);
+                                trainDetailDialogReference.current?.showModal();
+                              }}
                               stroke={trainType?.color || '#000'}
                               strokeWidth="1"
                               x1={(departure + option.xOffset) * option.xScale}
@@ -484,7 +496,7 @@ export function DiagramViewer({
       <div className="fixed z-100 top-0 left-0">
         <dialog
           className="m-auto p-[1ic] rounded shadow-xl"
-          ref={dialogReference}
+          ref={trainGenerateDialogReference}
         >
           <form
             className="flex flex-col gap-4"
@@ -576,7 +588,7 @@ export function DiagramViewer({
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={() => {
-                  dialogReference.current?.close();
+                  trainGenerateDialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -598,10 +610,36 @@ export function DiagramViewer({
                   globalState.setRoot((root) =>
                     TrainService.append(root, timetableIndex, train),
                   );
-                  dialogReference.current?.close();
+                  trainGenerateDialogReference.current?.close();
                 }}
               >
                 適用
+              </button>
+            </div>
+          </form>
+        </dialog>
+      </div>
+      <div className="fixed z-100 top-0 left-0">
+        <dialog
+          className="m-auto p-[1ic] rounded shadow-xl"
+          ref={trainDetailDialogReference}
+        >
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+            }}
+          >
+            <TrainViewer timetableId={timetableId} trainId={clickTrainId} />
+            <div className="mt-[1ic] flex justify-end gap-2">
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  trainDetailDialogReference.current?.close();
+                }}
+                type="button"
+              >
+                閉じる
               </button>
             </div>
           </form>

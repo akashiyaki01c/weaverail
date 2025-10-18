@@ -17,9 +17,25 @@ export function TrainViewer({
   timetableId: string;
   trainId: string;
 }) {
+  const maxX = 2;
+  // ユーザが選択しているセルのX座標
+  const [selectedCellX, setSelectedCellX] = useState(0);
+  // ユーザが選択しているセルのY座標
+  const [selectedCellY, setSelectedCellY] = useState(0);
+  // 現在のウィンドウの状態
+  const [editState, setEditState] = useState(
+    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
+  );
+  const [editData, setEditData] = useState(TrainSegment.default());
+
+  const dialogReference = useRef<HTMLDialogElement>(null);
+  const inputReferences = useRef<(HTMLInputElement | null)[]>(
+    Array.from({ length: maxX }, () => Object.create(null)),
+  );
   const globalState = useGlobalState();
   if (!timetableId) {
-    throw new Error('timetable id null');
+    console.error('timetable id is null');
+    return <>timetable id is null</>;
   }
   const timetable = TimetableService.findById(globalState.root, timetableId);
   const timetableIndex = TimetableService.findIndexById(
@@ -27,10 +43,12 @@ export function TrainViewer({
     timetableId,
   );
   if (!timetable) {
-    throw new Error('timetable is null');
+    console.error('timetable is null');
+    return <>timetable is null</>;
   }
   if (!trainId) {
-    throw new Error('train id null');
+    console.error('train id is null');
+    return <>train id is null</>;
   }
   const trainIndex = TrainService.findIndexById(
     globalState.root,
@@ -43,26 +61,10 @@ export function TrainViewer({
     trainId,
   );
   if (!train) {
-    throw new Error('train is null');
+    console.error('train is null');
+    return <>train is null</>;
   }
-
-  const maxX = 2;
   const maxY = train.segments.length + 1;
-
-  const dialogReference = useRef<HTMLDialogElement>(null);
-  const inputReferences = useRef<(HTMLInputElement | null)[]>(
-    Array.from({ length: maxX }, () => Object.create(null)),
-  );
-
-  // ユーザが選択しているセルのX座標
-  const [selectedCellX, setSelectedCellX] = useState(0);
-  // ユーザが選択しているセルのY座標
-  const [selectedCellY, setSelectedCellY] = useState(0);
-  // 現在のウィンドウの状態
-  const [editState, setEditState] = useState(
-    'viwer' as 'edit' | 'insert' | 'new' | 'viewer',
-  );
-  const [editData, setEditData] = useState(TrainSegment.default());
 
   const startEdit = (_: number, y: number) => {
     if (y === maxY - 1) {
