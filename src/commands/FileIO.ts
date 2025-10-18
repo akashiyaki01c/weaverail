@@ -40,6 +40,6 @@ export async function SaveFile(store: Store) {
   if (!filePath) {
     return;
   }
-  const contents = JSON.stringify(store.root);
+  const contents = JSON.stringify(store.root, undefined, '\t');
   await writeTextFile(filePath, contents, {});
 }

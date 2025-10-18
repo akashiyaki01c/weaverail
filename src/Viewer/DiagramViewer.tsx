@@ -147,7 +147,8 @@ export function DiagramViewer({
                             globalState.root.templateTrains.filter((template) =>
                               template.segments.some(
                                 (segment) =>
-                                  segment.segments[0]?.id === v.segmentId,
+                                  segment.segments[0]?.id === v.segmentId &&
+                                  !segment.segments[0]?.isReversed,
                               ),
                             ),
                           );
@@ -196,7 +197,20 @@ export function DiagramViewer({
                           );
                           const svgX =
                             svgPoint.x / option.xScale - option.xOffset;
-                          console.log(svgX);
+                          // 上り追加
+                          setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
+                          setCliCkStation(v.lowerStationId);
+                          setTargetTemplates(
+                            globalState.root.templateTrains.filter((template) =>
+                              template.segments.some(
+                                (segment) =>
+                                  segment.segments[0]?.id === v.segmentId &&
+                                  segment.segments[0]?.isReversed,
+                              ),
+                            ),
+                          );
+                          console.log(targetTemplates);
+                          dialogReference.current?.show();
                         }}
                         width={60 * 60 * 24 * option.xScale}
                         x={0}

@@ -44,11 +44,23 @@ export const TrainService = {
     if (data.segments.at(-1)!.segments.length === 0) {
       return;
     }
-    const lastSegment =
-      data.segments.at(-1)!.segments[data.segments.at(-1)!.segments.length - 1];
-    return lastSegment.isReversed
-      ? SegmentService.findByIdAll(root, lastSegment.id)
-      : SegmentService.findByIdAll(root, lastSegment.id);
+    const lastSegment = SegmentService.findByIdAll(
+      root,
+      data.segments.at(-1)!.segments[data.segments.at(-1)!.segments.length - 1]
+        .id,
+    );
+    if (
+      data.segments.at(-1)!.segments[data.segments.at(-1)!.segments.length - 1]
+        .isReversed
+    ) {
+      const r = {
+        endId: lastSegment?.startId,
+        id: lastSegment?.id,
+        startId: lastSegment?.endId,
+      };
+      return r;
+    }
+    return lastSegment;
   },
   getStartingStation(root: Root, data: Train) {
     if (data.segments.length === 0) {
@@ -57,9 +69,19 @@ export const TrainService = {
     if (data.segments[0].segments.length === 0) {
       return;
     }
-    return data.segments[0].segments[0].isReversed
-      ? SegmentService.findByIdAll(root, data.segments[0].segments[0].id)
-      : SegmentService.findByIdAll(root, data.segments[0].segments[0].id);
+    const result = SegmentService.findByIdAll(
+      root,
+      data.segments[0].segments[0].id,
+    );
+    if (data.segments[0].segments[0].isReversed) {
+      const r = {
+        endId: result?.startId,
+        id: result?.id,
+        startId: result?.endId,
+      };
+      return r;
+    }
+    return result;
   },
 
   insert(

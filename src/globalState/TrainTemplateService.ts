@@ -43,11 +43,12 @@ export const TemplateTrainService = {
     }
 
     const temporaryDepTime =
-      resultTrain.segments.find(
-        (v) =>
-          SegmentService.findByIdAll(root, v.segments[0]?.id)?.startId ===
-          stationId,
-      )?.departureTime || 0;
+      resultTrain.segments.find((v) => {
+        const segment = SegmentService.findByIdAll(root, v.segments[0]?.id);
+        return v.segments[0]?.isReversed
+          ? segment?.endId === stationId
+          : segment?.startId === stationId;
+      })?.departureTime || 0;
     const diff = departureTime - temporaryDepTime;
     for (let index = 0; index < resultTrain.segments.length; index++) {
       resultTrain.segments[index].arrivalTime += diff;
