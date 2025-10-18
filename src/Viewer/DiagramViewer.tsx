@@ -11,6 +11,8 @@ import { Root } from '../sharpdia-model/Root';
 import { TemplateTrain } from '../sharpdia-model/TemplateTrain';
 
 interface StationChoord {
+  // 駅間が逆転しているか
+  isReversed: boolean;
   // ダイヤグラム上での下側の駅ID
   lowerStationId: string;
   // ダイヤグラム上での下側の駅のY座標
@@ -343,7 +345,7 @@ export function DiagramViewer({
                           departureTime +
                           (arrivalTime - departureTime) * lastRatio;
                         result.push(
-                          segment.segments[0].isReversed ? (
+                          sg.isReversed ? (
                             <line
                               stroke={trainType?.color || '#000'}
                               strokeWidth="1"
@@ -612,29 +614,40 @@ export function DiagramViewer({
 function getYChoords(root: Root, diagramLine: DiagramLine) {
   const result = [] as StationChoord[];
   let currentYChoord = 0;
+  let beforeLastStationId = '';
 
   for (const lineSegment of diagramLine.segments) {
     const segment = SegmentService.findByIdAll(root, lineSegment.id);
     if (segment == undefined) {
       throw new Error('Error');
     }
-    const addSeconds = lineSegment.displaySeconds || 5;
+    const addSeconds = lineSegment.displaySeconds || 60;
     if (lineSegment.isReversed) {
+      if (beforeLastStationId !== segment.endId) {
+        currentYChoord += 120;
+      }
       result.push({
-        lowerStationId: segment.startId,
+        isReversed: true,
+        lowerStationId: segment.endId,
         lowerStationYChoord: currentYChoord,
         segmentId: segment.id,
-        upperStationId: segment.endId,
+        upperStationId: segment.startId,
         upperStationYChoord: currentYChoord + addSeconds,
       } satisfies StationChoord);
+      beforeLastStationId = segment.startId;
     } else {
+      if (beforeLastStationId !== segment.startId) {
+        currentYChoord += 120;
+      }
       result.push({
+        isReversed: false,
         lowerStationId: segment.endId,
         lowerStationYChoord: currentYChoord + addSeconds,
         segmentId: segment.id,
         upperStationId: segment.startId,
         upperStationYChoord: currentYChoord,
       } satisfies StationChoord);
+      beforeLastStationId = segment.endId;
     }
     currentYChoord += addSeconds;
   }

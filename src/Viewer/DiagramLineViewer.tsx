@@ -143,6 +143,13 @@ export function DiagramLineViewer({
             headerText: '区間',
             widthIc: 10.4,
           },
+          {
+            cellText(value) {
+              return value.displaySeconds.toString();
+            },
+            headerText: '表示時分',
+            widthIc: 4.4,
+          },
         ]}
         data={diagramLine.segments}
         defaultValue={DiagramLineSegment.default()}
@@ -196,6 +203,29 @@ export function DiagramLineViewer({
                   )),
                 )}
               </select>
+            </label>
+            <label>
+              逆転
+              <input
+                checked={editData.isReversed}
+                onChange={(event) =>
+                  setEditData({ ...editData, isReversed: event.target.checked })
+                }
+                type="checkbox"
+              />
+            </label>
+            <label>
+              表示時秒
+              <input
+                onChange={(event) =>
+                  setEditData({
+                    ...editData,
+                    displaySeconds: Number.parseInt(event.target.value) || 0,
+                  })
+                }
+                type="number"
+                value={editData.displaySeconds}
+              />
             </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
