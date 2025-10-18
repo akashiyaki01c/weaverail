@@ -330,7 +330,7 @@ export function TreeViewer() {
                           );
                         }}
                       >
-                        ${lines.name}
+                        {lines.name}
                       </div>
                     </li>
                   ))}
