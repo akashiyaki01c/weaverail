@@ -357,6 +357,9 @@ export function DiagramViewer({
                               }}
                               stroke={trainType?.color || '#000'}
                               strokeWidth="1"
+                              style={{
+                                cursor: 'pointer',
+                              }}
                               x1={(departure + option.xOffset) * option.xScale}
                               x2={(arrival + option.xOffset) * option.xScale}
                               y1={
@@ -380,6 +383,9 @@ export function DiagramViewer({
                               }}
                               stroke={trainType?.color || '#000'}
                               strokeWidth="1"
+                              style={{
+                                cursor: 'pointer',
+                              }}
                               x1={(departure + option.xOffset) * option.xScale}
                               x2={(arrival + option.xOffset) * option.xScale}
                               y1={
