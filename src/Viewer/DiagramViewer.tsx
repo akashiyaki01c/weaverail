@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { SegmentService } from '../globalState/SegmentService';
 import { StationService } from '../globalState/StationService';
+import { TimetableService } from '../globalState/TimetableService';
+import { TrainSegmentService } from '../globalState/TrainSegmentService';
 import { TrainService } from '../globalState/TrainService';
 import { TemplateTrainService } from '../globalState/TrainTemplateService';
 import { TrainTypeService } from '../globalState/TrainTypeService';
@@ -9,10 +11,13 @@ import useGlobalState from '../globalState/useGlobalState';
 import { DiagramLine } from '../sharpdia-model/DiagramLine';
 import { Root } from '../sharpdia-model/Root';
 import { TemplateTrain } from '../sharpdia-model/TemplateTrain';
+import { toTimeString } from '../sharpdia-model/TimeParser';
+import { Passing, Timetable } from '../sharpdia-model/Timetable';
 import { Train, TrainSegment } from '../sharpdia-model/Train';
+import { XAxisSvg } from './DiagramViewer.XAxisSvg';
 import { TrainViewer } from './TrainViewer';
 
-interface StationChoord {
+export interface StationChoord {
   // 駅間が逆転しているか
   isReversed: boolean;
   // ダイヤグラム上での下側の駅ID
@@ -72,13 +77,12 @@ export function DiagramViewer({
 
   const [option] = useState(new DiagramViewerOption(0.15, 0.3, 0, 0));
 
-  const yPadding = 50;
   const viewBoxWidth = option.xScale * 60 * 60 * 24;
   const viewBoxHeight =
-    option.yScale * (yChoords.at(-1)?.lowerStationYChoord || 0) + yPadding * 2;
+    option.yScale * (yChoords.at(-1)?.lowerStationYChoord || 0);
 
   const [targetTemplates, setTargetTemplates] = useState<TemplateTrain[]>([]);
-  const [clickStation, setCliCkStation] = useState('');
+  const [clickStation, setClickStation] = useState('');
   const [clickTime, setClickTime] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateTrain>(
     TemplateTrain.default(),
@@ -89,42 +93,15 @@ export function DiagramViewer({
 
   const [clickTrainId, setClickTrainId] = useState('');
 
+  const [targetPassingTrainId, setTargetPassingTrainId] = useState('');
+  const [targetStoppingTrainId, setTargetStoppingTrainId] = useState('');
+
   return (
     <>
       <div className="max-w-[100cqw] max-h-[100cqh] w-[100%] h-[100%] overflow-scroll z-0">
         <div className="sticky top-[0] w-[max-content] z-10 bg-gray-100">
           <div className="left-[120px] relative">
-            <svg
-              className="x-axis-svg overflow-scroll sticky top-[0] block"
-              height={50}
-              viewBox={`0 0 ${viewBoxWidth} ${50}`}
-              width={viewBoxWidth}
-            >
-              {Array.from({ length: 24 * 60 + 1 })
-                .map((_, index) => index)
-                .filter((v) => v % 60 === 0)
-                .map((v) => {
-                  let time = v + 4 * 60;
-                  if (time < 0) {
-                    time += 24 * 60;
-                  }
-                  return (
-                    <text
-                      data-key={`xaxis-${time}-1`}
-                      dominantBaseline="middle"
-                      fill="#000"
-                      fontSize={32}
-                      id={`xaxis-${time}-1`}
-                      key={`xaxis-${time}-1`}
-                      textAnchor="middle"
-                      x={(option.xOffset + v * 60) * option.xScale}
-                      y={yPadding / 2}
-                    >
-                      {(time / 60) % 24}
-                    </text>
-                  );
-                })}
-            </svg>
+            <XAxisSvg option={option} />
           </div>
         </div>
         <div className="w-[max-content] z-0">
@@ -143,45 +120,53 @@ export function DiagramViewer({
                       id={`${v.segmentId}`}
                       key={`${v.segmentId}`}
                     >
-                      <rect
-                        className="fill-gray-100"
-                        data-key={`${v.segmentId}-upper-toucher`}
-                        height={10}
-                        id={`${v.segmentId}-upper-toucher`}
-                        key={`${v.segmentId}-upper-toucher`}
-                        onClick={(event) => {
-                          const svg = (event.target as SVGRectElement)
-                            .ownerSVGElement;
-                          if (!svg) return;
+                      {StationService.findById(
+                        globalState.root,
+                        v.upperStationId,
+                      )?.kibo === 'Syuyou' && (
+                        <rect
+                          className="fill-gray-100"
+                          data-key={`${v.segmentId}-upper-toucher`}
+                          height={10}
+                          id={`${v.segmentId}-upper-toucher`}
+                          key={`${v.segmentId}-upper-toucher`}
+                          onClick={(event) => {
+                            const svg = (event.target as SVGRectElement)
+                              .ownerSVGElement;
+                            if (!svg) return;
 
-                          const pt = new DOMPoint(event.clientX, event.clientY);
-                          const svgPoint = pt.matrixTransform(
-                            svg.getScreenCTM()?.inverse(),
-                          );
-                          const svgX =
-                            svgPoint.x / option.xScale - option.xOffset;
-                          // 下り追加
-                          setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
-                          setCliCkStation(v.upperStationId);
-                          setTargetTemplates(
-                            globalState.root.templateTrains.filter((template) =>
-                              template.segments.some(
-                                (segment) =>
-                                  segment.segments[0]?.id === v.segmentId &&
-                                  !segment.segments[0]?.isReversed,
+                            const pt = new DOMPoint(
+                              event.clientX,
+                              event.clientY,
+                            );
+                            const svgPoint = pt.matrixTransform(
+                              svg.getScreenCTM()?.inverse(),
+                            );
+                            const svgX =
+                              svgPoint.x / option.xScale - option.xOffset;
+                            // 下り追加
+                            setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
+                            setClickStation(v.upperStationId);
+                            setTargetTemplates(
+                              globalState.root.templateTrains.filter(
+                                (template) =>
+                                  template.segments.some(
+                                    (segment) =>
+                                      segment.segments[0]?.id === v.segmentId &&
+                                      !segment.segments[0]?.isReversed,
+                                  ),
                               ),
-                            ),
-                          );
-                          trainGenerateDialogReference.current?.showModal();
-                        }}
-                        width={60 * 60 * 24 * option.xScale}
-                        x={0}
-                        y={
-                          (v.upperStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding
-                        }
-                      />
+                            );
+                            trainGenerateDialogReference.current?.showModal();
+                          }}
+                          width={60 * 60 * 24 * option.xScale}
+                          x={0}
+                          y={
+                            (v.upperStationYChoord + option.yOffset) *
+                            option.yScale
+                          }
+                        />
+                      )}
                       <line
                         data-key={`${v.segmentId}-upper`}
                         id={`${v.segmentId}-upper`}
@@ -199,56 +184,62 @@ export function DiagramViewer({
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.upperStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding
+                          option.yScale
                         }
                         y2={
                           (v.upperStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding
+                          option.yScale
                         }
                       />
-                      <rect
-                        className="fill-gray-100"
-                        data-key={`yaxis-${v.segmentId}-lower-toucher`}
-                        height={10}
-                        id={`yaxis-${v.segmentId}-lower-toucher`}
-                        key={`yaxis-${v.segmentId}-lower-toucher`}
-                        onClick={(event) => {
-                          const svg = (event.target as SVGRectElement)
-                            .ownerSVGElement;
-                          if (!svg) return;
+                      {StationService.findById(
+                        globalState.root,
+                        v.lowerStationId,
+                      )?.kibo === 'Syuyou' && (
+                        <rect
+                          className="fill-gray-100"
+                          data-key={`yaxis-${v.segmentId}-lower-toucher`}
+                          height={10}
+                          id={`yaxis-${v.segmentId}-lower-toucher`}
+                          key={`yaxis-${v.segmentId}-lower-toucher`}
+                          onClick={(event) => {
+                            const svg = (event.target as SVGRectElement)
+                              .ownerSVGElement;
+                            if (!svg) return;
 
-                          const pt = new DOMPoint(event.clientX, event.clientY);
-                          const svgPoint = pt.matrixTransform(
-                            svg.getScreenCTM()?.inverse(),
-                          );
-                          const svgX =
-                            svgPoint.x / option.xScale - option.xOffset;
-                          // 上り追加
-                          setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
-                          setCliCkStation(v.lowerStationId);
-                          setTargetTemplates(
-                            globalState.root.templateTrains.filter((template) =>
-                              template.segments.some(
-                                (segment) =>
-                                  segment.segments[0]?.id === v.segmentId &&
-                                  segment.segments[0]?.isReversed,
+                            const pt = new DOMPoint(
+                              event.clientX,
+                              event.clientY,
+                            );
+                            const svgPoint = pt.matrixTransform(
+                              svg.getScreenCTM()?.inverse(),
+                            );
+                            const svgX =
+                              svgPoint.x / option.xScale - option.xOffset;
+                            // 上り追加
+                            setClickTime(svgX - (svgX % 10) + 60 * 60 * 4);
+                            setClickStation(v.lowerStationId);
+                            setTargetTemplates(
+                              globalState.root.templateTrains.filter(
+                                (template) =>
+                                  template.segments.some(
+                                    (segment) =>
+                                      segment.segments[0]?.id === v.segmentId &&
+                                      segment.segments[0]?.isReversed,
+                                  ),
                               ),
-                            ),
-                          );
-                          console.log(targetTemplates);
-                          trainGenerateDialogReference.current?.showModal();
-                        }}
-                        width={60 * 60 * 24 * option.xScale}
-                        x={0}
-                        y={
-                          (v.lowerStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding -
-                          10
-                        }
-                      />
+                            );
+                            console.log(targetTemplates);
+                            trainGenerateDialogReference.current?.showModal();
+                          }}
+                          width={60 * 60 * 24 * option.xScale}
+                          x={0}
+                          y={
+                            (v.lowerStationYChoord + option.yOffset) *
+                              option.yScale -
+                            10
+                          }
+                        />
+                      )}
                       <line
                         data-key={`yaxis-${v.segmentId}-lower`}
                         id={`yaxis-${v.segmentId}-lower`}
@@ -266,13 +257,11 @@ export function DiagramViewer({
                         x2={60 * 60 * 24 * option.xScale}
                         y1={
                           (v.lowerStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding
+                          option.yScale
                         }
                         y2={
                           (v.lowerStationYChoord + option.yOffset) *
-                            option.yScale +
-                          yPadding
+                          option.yScale
                         }
                       />
                     </g>
@@ -290,8 +279,8 @@ export function DiagramViewer({
                         strokeWidth="0.25"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
-                        y1={yPadding}
-                        y2={viewBoxHeight + yPadding}
+                        y1={0}
+                        y2={viewBoxHeight}
                       />
                     ))}
                   {Array.from({ length: 24 * 60 })
@@ -306,8 +295,8 @@ export function DiagramViewer({
                         strokeWidth="1"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
-                        y1={yPadding}
-                        y2={viewBoxHeight + yPadding}
+                        y1={0}
+                        y2={viewBoxHeight}
                       />
                     ))}
                   {Array.from({ length: 24 * 60 })
@@ -322,8 +311,8 @@ export function DiagramViewer({
                         strokeWidth="2"
                         x1={(option.xOffset + v * 60) * option.xScale}
                         x2={(option.xOffset + v * 60) * option.xScale}
-                        y1={yPadding}
-                        y2={viewBoxHeight + yPadding}
+                        y1={0}
+                        y2={viewBoxHeight}
                       />
                     ))}
                 </g>
@@ -402,22 +391,48 @@ export function DiagramViewer({
                                   y1={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.lowerStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                   y2={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.upperStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                 />
                                 <line
                                   data-key={`${train.id}-${segment.id}-2`}
                                   key={`${train.id}-${segment.id}-2`}
-                                  onClick={() => {
+                                  onClick={(event) => {
+                                    const svg = (event.target as SVGRectElement)
+                                      .ownerSVGElement;
+                                    if (!svg) return;
+
+                                    const pt = new DOMPoint(
+                                      event.clientX,
+                                      event.clientY,
+                                    );
+                                    const svgPoint = pt.matrixTransform(
+                                      svg.getScreenCTM()?.inverse(),
+                                    );
+                                    const svgY = svgPoint.y;
+                                    for (const choord of yChoords) {
+                                      const lower =
+                                        choord.lowerStationYChoord *
+                                          option.yScale +
+                                        option.yOffset;
+                                      const upper =
+                                        choord.upperStationYChoord *
+                                          option.yScale +
+                                        option.yOffset;
+                                      if (Math.abs(lower - svgY) < 10) {
+                                        setClickStation(choord.lowerStationId);
+                                        break;
+                                      }
+                                      if (Math.abs(upper - svgY) < 10) {
+                                        setClickStation(choord.upperStationId);
+                                        break;
+                                      }
+                                    }
                                     setClickTrainId(train.id);
                                     trainDetailDialogReference.current?.showModal();
                                   }}
@@ -435,16 +450,12 @@ export function DiagramViewer({
                                   y1={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.lowerStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                   y2={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.upperStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                 />
                               </>
@@ -464,22 +475,49 @@ export function DiagramViewer({
                                   y1={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.upperStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                   y2={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.lowerStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                 />
                                 <line
                                   data-key={`${train.id}-${segment.id}-4`}
                                   key={`${train.id}-${segment.id}-4`}
-                                  onClick={() => {
+                                  onClick={(event) => {
+                                    const svg = (event.target as SVGRectElement)
+                                      .ownerSVGElement;
+                                    if (!svg) return;
+
+                                    const pt = new DOMPoint(
+                                      event.clientX,
+                                      event.clientY,
+                                    );
+                                    const svgPoint = pt.matrixTransform(
+                                      svg.getScreenCTM()?.inverse(),
+                                    );
+                                    const svgY = svgPoint.y;
+                                    for (const choord of yChoords) {
+                                      const lower =
+                                        choord.lowerStationYChoord *
+                                          option.yScale +
+                                        option.yOffset;
+                                      const upper =
+                                        choord.upperStationYChoord *
+                                          option.yScale +
+                                        option.yOffset;
+                                      if (Math.abs(lower - svgY) < 10) {
+                                        setClickStation(choord.lowerStationId);
+                                        break;
+                                      }
+                                      if (Math.abs(upper - svgY) < 10) {
+                                        setClickStation(choord.upperStationId);
+                                        break;
+                                      }
+                                    }
+
                                     setClickTrainId(train.id);
                                     trainDetailDialogReference.current?.showModal();
                                   }}
@@ -497,16 +535,12 @@ export function DiagramViewer({
                                   y1={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.upperStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                   y2={
                                     (yChoords.find((v) => v.segmentId === sg.id)
                                       ?.lowerStationYChoord ||
-                                      0 + option.yOffset) *
-                                      option.yScale +
-                                    yPadding
+                                      0 + option.yOffset) * option.yScale
                                   }
                                 />
                               </>
@@ -543,10 +577,7 @@ export function DiagramViewer({
                     key={`yaxis2-${v.segmentId}-upper-text`}
                     textAnchor="middle"
                     x={60}
-                    y={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
-                    }
+                    y={(v.upperStationYChoord + option.yOffset) * option.yScale}
                   >
                     {
                       StationService.findById(
@@ -564,12 +595,10 @@ export function DiagramViewer({
                     x1={0}
                     x2={60 * 60 * 24 * option.xScale}
                     y1={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
+                      (v.upperStationYChoord + option.yOffset) * option.yScale
                     }
                     y2={
-                      (v.upperStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
+                      (v.upperStationYChoord + option.yOffset) * option.yScale
                     }
                   />
                   <text
@@ -578,10 +607,7 @@ export function DiagramViewer({
                     key={`yaxis2-${v.segmentId}-lower-text`}
                     textAnchor="middle"
                     x={60}
-                    y={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
-                    }
+                    y={(v.lowerStationYChoord + option.yOffset) * option.yScale}
                   >
                     {
                       StationService.findById(
@@ -599,12 +625,10 @@ export function DiagramViewer({
                     x1={0}
                     x2={60 * 24 * option.xScale}
                     y1={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale
                     }
                     y2={
-                      (v.lowerStationYChoord + option.yOffset) * option.yScale +
-                      yPadding
+                      (v.lowerStationYChoord + option.yOffset) * option.yScale
                     }
                   />
                 </>
@@ -750,6 +774,8 @@ export function DiagramViewer({
               event.preventDefault();
             }}
           >
+            選択駅:{' '}
+            {StationService.findById(globalState.root, clickStation)?.name}
             <TrainViewer timetableId={timetableId} trainId={clickTrainId} />
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
@@ -776,6 +802,82 @@ export function DiagramViewer({
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={() => {
                   trainDetailDialogReference.current?.close();
+                  setTargetStoppingTrainId(
+                    TrainService.findById(
+                      globalState.root,
+                      timetableIndex,
+                      clickTrainId,
+                    )?.id || '',
+                  );
+                  console.log(
+                    `通過側列車: ${timetable.trains.find((v) => v.id === targetPassingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0].departureTime || 0)}発`,
+                    `停車側列車: ${timetable.trains.find((v) => v.id === targetStoppingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0].departureTime || 0)}発`,
+                  );
+                }}
+                type="button"
+              >
+                待避列車に設定
+              </button>
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  trainDetailDialogReference.current?.close();
+                  setTargetPassingTrainId(
+                    TrainService.findById(
+                      globalState.root,
+                      timetableIndex,
+                      clickTrainId,
+                    )?.id || '',
+                  );
+                  console.log(
+                    `通過側列車: ${timetable.trains.find((v) => v.id === targetPassingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0].departureTime || 0)}発`,
+                    `停車側列車: ${timetable.trains.find((v) => v.id === targetStoppingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0].departureTime || 0)}発`,
+                  );
+                }}
+                type="button"
+              >
+                待避対象列車に設定
+              </button>
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  if (
+                    targetStoppingTrainId === '' ||
+                    targetPassingTrainId === ''
+                  ) {
+                    console.error('対象列車が存在しません。');
+                  }
+
+                  const passing = new Passing(
+                    clickStation,
+                    targetStoppingTrainId,
+                    targetPassingTrainId,
+                  );
+                  const newPassings = [...(timetable.passings || [])];
+                  newPassings.push(passing);
+                  const _timetable = applyPassing(
+                    globalState.root,
+                    timetable,
+                    passing,
+                  );
+                  globalState.setRoot((root) =>
+                    TimetableService.update(root, timetableIndex, {
+                      ..._timetable[1],
+                      passings: newPassings,
+                    }),
+                  );
+                  setTargetPassingTrainId('');
+                  setTargetStoppingTrainId('');
+                  setClickStation('');
+                }}
+                type="button"
+              >
+                待避設定
+              </button>
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  trainDetailDialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -789,7 +891,166 @@ export function DiagramViewer({
   );
 }
 
+/// 待避設定を適用させる関数
+function applyPassing(
+  root: Root,
+  _timetable: Timetable,
+  targetPassing: Passing,
+): [boolean, Timetable] {
+  let timetable = structuredClone(_timetable);
+  console.log(timetable.passings);
+  console.log(
+    `待避照査: ${StationService.findById(root, targetPassing.stationId)?.name}`,
+    `通過側列車: ${timetable.trains.find((v) => v.id === targetPassing.passingTrainId)?.number}列車 ${StationService.findById(root, TrainSegmentService.getStartingStationId(root, timetable.trains.find((v) => v.id === targetPassing.passingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassing.passingTrainId)?.segments[0].departureTime || 0)}発`,
+    `停車側列車: ${timetable.trains.find((v) => v.id === targetPassing.stoppingTrainId)?.number}列車 ${StationService.findById(root, TrainSegmentService.getStartingStationId(root, timetable.trains.find((v) => v.id === targetPassing.stoppingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassing.stoppingTrainId)?.segments[0].departureTime || 0)}発`,
+  );
+  // 通過列車
+  const passingTrain = timetable.trains.find(
+    (v) => v.id === targetPassing.passingTrainId,
+  );
+  // 待避列車
+  const stoppingTrain = timetable.trains.find(
+    (v) => v.id === targetPassing.stoppingTrainId,
+  );
+  if (!passingTrain || !stoppingTrain) {
+    // 継続必要なし
+    return [false, timetable];
+  }
+  // 待避列車到着時刻〜通過列車到着時刻の差が2分以内の場合
+  // 通過列車の到着時刻を待避列車到着時刻+2分に設定する
+  const passingArriveTime =
+    passingTrain?.segments.find(
+      (v) =>
+        TrainSegmentService.getTerminalStationId(root, v) ===
+        targetPassing.stationId,
+    )?.arrivalTime || 0;
+  const stoppingArriveTime =
+    stoppingTrain?.segments.find(
+      (v) =>
+        TrainSegmentService.getTerminalStationId(root, v) ===
+        targetPassing.stationId,
+    )?.arrivalTime || 0;
+  console.log(
+    `到着時刻 停車${toTimeString(stoppingArriveTime)} 通過${toTimeString(passingArriveTime)}`,
+  );
+  const arrivalShift = passingArriveTime < stoppingArriveTime + 120;
+  if (arrivalShift) {
+    // 通過列車のシフト動作
+    const shiftTime = stoppingArriveTime + 120 - passingArriveTime;
+    console.log(`通過列車シフト発生 ${shiftTime}秒`);
+    const startIndex = passingTrain?.segments.findIndex(
+      (v) =>
+        TrainSegmentService.getTerminalStationId(root, v) ===
+        targetPassing.stationId,
+    );
+    for (
+      let index = startIndex;
+      index < passingTrain.segments.length;
+      index++
+    ) {
+      if (index === startIndex) {
+        passingTrain.segments[index].arrivalTime += shiftTime;
+      } else {
+        passingTrain.segments[index].arrivalTime += shiftTime;
+        passingTrain.segments[index].departureTime += shiftTime;
+      }
+    }
+    console.log(`到着時隔: ${passingArriveTime - stoppingArriveTime}秒`);
+  }
+
+  // 通過列車発車時刻〜待避列車発車時刻の差が2分以内の場合
+  // 待避列車の発車時刻を通過列車発車時刻+2分に設定する
+  const passingDepartureTime =
+    passingTrain?.segments.find(
+      (v) =>
+        TrainSegmentService.getStartingStationId(root, v) ===
+        targetPassing.stationId,
+    )?.departureTime || 0;
+  const stoppingDepartureTime =
+    stoppingTrain?.segments.find(
+      (v) =>
+        TrainSegmentService.getStartingStationId(root, v) ===
+        targetPassing.stationId,
+    )?.departureTime || 0;
+  const departureShift = stoppingDepartureTime < passingDepartureTime + 120;
+  if (departureShift) {
+    // 待避列車のシフト動作
+    const shiftTime = passingDepartureTime + 120 - stoppingDepartureTime;
+    console.log(`待避列車シフト発生 ${shiftTime}秒`);
+    const startIndex = stoppingTrain.segments.findIndex(
+      (v) =>
+        TrainSegmentService.getStartingStationId(root, v) ===
+        targetPassing.stationId,
+    );
+    for (
+      let index = startIndex;
+      index < stoppingTrain.segments.length;
+      index++
+    ) {
+      stoppingTrain.segments[index].arrivalTime += shiftTime;
+      stoppingTrain.segments[index].departureTime += shiftTime;
+    }
+    console.log(`出発時隔: ${passingDepartureTime - stoppingDepartureTime}秒`);
+  }
+
+  if (arrivalShift) {
+    // 通過列車の当駅以降の待避についても確認
+    const startIndex = passingTrain?.segments.findIndex(
+      (v) =>
+        TrainSegmentService.getTerminalStationId(root, v) ===
+        targetPassing.stationId,
+    );
+    for (const segment of passingTrain.segments.slice(startIndex + 1)) {
+      const passing = timetable.passings.find(
+        (v) =>
+          v.stationId ===
+            TrainSegmentService.getTerminalStationId(root, segment) &&
+          (v.passingTrainId === passingTrain.id ||
+            v.stoppingTrainId === passingTrain.id),
+      );
+      if (!passing) {
+        continue;
+      }
+      const result = applyPassing(root, timetable, passing);
+      timetable = result[1];
+      if (!result[0]) {
+        // これ以上更新の必要なし
+        // break;
+      }
+    }
+  }
+  if (departureShift) {
+    // 待避列車の当駅以降の待避についても確認
+    const startIndex = stoppingTrain.segments.findIndex(
+      (v) =>
+        TrainSegmentService.getStartingStationId(root, v) ===
+        targetPassing.stationId,
+    );
+    for (const segment of stoppingTrain.segments.slice(startIndex + 1)) {
+      const passing = timetable.passings.find(
+        (v) =>
+          v.stationId ===
+            TrainSegmentService.getTerminalStationId(root, segment) &&
+          (v.passingTrainId === stoppingTrain.id ||
+            v.stoppingTrainId === stoppingTrain.id),
+      );
+      if (!passing) {
+        continue;
+      }
+      const result = applyPassing(root, timetable, passing);
+      timetable = result[1];
+      if (!result[0]) {
+        // これ以上更新の必要なし
+        // break;
+      }
+    }
+  }
+
+  return [true, timetable];
+}
+
 function getSimpleTrain(root: Root, train: Train) {
+  return train;
   const newTrain = structuredClone(train) satisfies Train;
   for (let index = train.segments.length - 2; index >= 0; index--) {
     const segment = train.segments[index];
@@ -799,7 +1060,7 @@ function getSimpleTrain(root: Root, train: Train) {
     if (endStationId == undefined) {
       return newTrain;
     }
-    const endStation = StationService.findById(root, endStationId);
+    const endStation = StationService.findById(root, endStationId!);
     if (endStation?.kibo === 'Ippan') {
       // 駅結合作業
       const newSegment = structuredClone(segment) satisfies TrainSegment;
@@ -816,7 +1077,9 @@ function getSimpleTrain(root: Root, train: Train) {
 function getYChoords(root: Root, diagramLine: DiagramLine) {
   const result = [] as StationChoord[];
   let currentYChoord = 0;
-  let beforeLastStationId = '';
+  let beforeLastStationId = diagramLine.segments[0].isReversed
+    ? SegmentService.findByIdAll(root, diagramLine.segments[0].id)?.endId
+    : SegmentService.findByIdAll(root, diagramLine.segments[0].id)?.startId;
 
   for (const lineSegment of diagramLine.segments) {
     const segment = SegmentService.findByIdAll(root, lineSegment.id);
