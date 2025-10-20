@@ -106,10 +106,12 @@ export function DiagramViewer({
                   }
                   return (
                     <text
+                      data-key={`xaxis-${time}-1`}
                       dominantBaseline="middle"
                       fill="#000"
                       fontSize={32}
-                      id={`${v}-1`}
+                      id={`xaxis-${time}-1`}
+                      key={`xaxis-${time}-1`}
                       textAnchor="middle"
                       x={(option.xOffset + v * 60) * option.xScale}
                       y={yPadding / 2}
@@ -132,9 +134,14 @@ export function DiagramViewer({
               <g className="axis">
                 <g className="y-axis">
                   {yChoords.map((v) => (
-                    <>
+                    <g
+                      data-key={`${v.segmentId}`}
+                      id={`${v.segmentId}`}
+                      key={`${v.segmentId}`}
+                    >
                       <rect
                         className="fill-gray-100"
+                        data-key={`${v.segmentId}-upper-toucher`}
                         height={10}
                         id={`${v.segmentId}-upper-toucher`}
                         key={`${v.segmentId}-upper-toucher`}
@@ -173,6 +180,7 @@ export function DiagramViewer({
                         }
                       />
                       <line
+                        data-key={`${v.segmentId}-upper`}
                         id={`${v.segmentId}-upper`}
                         key={`${v.segmentId}-upper`}
                         stroke="#000"
@@ -192,9 +200,10 @@ export function DiagramViewer({
                       />
                       <rect
                         className="fill-gray-100"
+                        data-key={`yaxis-${v.segmentId}-lower-toucher`}
                         height={10}
-                        id={`${v.segmentId}-lower-toucher`}
-                        key={`${v.segmentId}-lower-toucher`}
+                        id={`yaxis-${v.segmentId}-lower-toucher`}
+                        key={`yaxis-${v.segmentId}-lower-toucher`}
                         onClick={(event) => {
                           const svg = (event.target as SVGRectElement)
                             .ownerSVGElement;
@@ -231,8 +240,9 @@ export function DiagramViewer({
                         }
                       />
                       <line
-                        id={`${v.segmentId}-lower`}
-                        key={`${v.segmentId}-lower`}
+                        data-key={`yaxis-${v.segmentId}-lower`}
+                        id={`yaxis-${v.segmentId}-lower`}
+                        key={`yaxis-${v.segmentId}-lower`}
                         stroke="#000"
                         strokeWidth="0.5"
                         x1={0}
@@ -248,7 +258,7 @@ export function DiagramViewer({
                           yPadding
                         }
                       />
-                    </>
+                    </g>
                   ))}
                 </g>
                 <g className="x-axis">
@@ -257,6 +267,7 @@ export function DiagramViewer({
                     .filter((v) => v % 1 === 0)
                     .map((v) => (
                       <line
+                        data-key={v}
                         key={v}
                         stroke="#000"
                         strokeDasharray="1 1"
@@ -272,7 +283,9 @@ export function DiagramViewer({
                     .filter((v) => v % 5 === 0)
                     .map((v) => (
                       <line
+                        data-key={`${v}-1`}
                         id={`${v}-1`}
+                        key={`${v}-1`}
                         stroke="#000"
                         strokeWidth="1"
                         x1={(option.xOffset + v * 60) * option.xScale}
@@ -286,7 +299,9 @@ export function DiagramViewer({
                     .filter((v) => v % 30 === 0)
                     .map((v) => (
                       <line
-                        id={`${v}-1`}
+                        data-key={`${v}-2`}
+                        id={`${v}-2`}
+                        key={`${v}-2`}
                         stroke="#000"
                         strokeWidth="2"
                         x1={(option.xOffset + v * 60) * option.xScale}
@@ -299,7 +314,11 @@ export function DiagramViewer({
               </g>
               <g className="trains">
                 {timetable.trains.map((train) => (
-                  <g id={`train-${train.id}`}>
+                  <g
+                    data-key={`train-${train.id}`}
+                    id={`train-${train.id}`}
+                    key={`train-${train.id}`}
+                  >
                     {train.segments.map((segment) => {
                       const trainType = TrainTypeService.findById(
                         globalState.root,
@@ -352,6 +371,8 @@ export function DiagramViewer({
                           sg.isReversed ? (
                             <>
                               <line
+                                data-key={`${train.id}-${segment.id}-1`}
+                                key={`${train.id}-${segment.id}-1`}
                                 stroke={trainType?.color || '#000'}
                                 strokeWidth="1"
                                 x1={
@@ -374,6 +395,8 @@ export function DiagramViewer({
                                 }
                               />
                               <line
+                                data-key={`${train.id}-${segment.id}-2`}
+                                key={`${train.id}-${segment.id}-2`}
                                 onClick={() => {
                                   setClickTrainId(train.id);
                                   trainDetailDialogReference.current?.showModal();
@@ -406,6 +429,8 @@ export function DiagramViewer({
                           ) : (
                             <>
                               <line
+                                data-key={`${train.id}-${segment.id}-3`}
+                                key={`${train.id}-${segment.id}-3`}
                                 stroke={trainType?.color || '#000'}
                                 strokeWidth="1"
                                 x1={
@@ -428,6 +453,8 @@ export function DiagramViewer({
                                 }
                               />
                               <line
+                                data-key={`${train.id}-${segment.id}-4`}
+                                key={`${train.id}-${segment.id}-4`}
                                 onClick={() => {
                                   setClickTrainId(train.id);
                                   trainDetailDialogReference.current?.showModal();
@@ -484,8 +511,9 @@ export function DiagramViewer({
               {yChoords.map((v) => (
                 <>
                   <text
+                    data-key={`yaxis2-${v.segmentId}-upper-text`}
                     dominantBaseline="text-before-edge"
-                    key={`${v.segmentId}-upper-text`}
+                    key={`yaxis2-${v.segmentId}-upper-text`}
                     textAnchor="middle"
                     x={60}
                     y={
@@ -501,8 +529,9 @@ export function DiagramViewer({
                     }
                   </text>
                   <line
-                    id={`${v.segmentId}-upper`}
-                    key={`${v.segmentId}-upper`}
+                    data-key={`yaxis2-${v.segmentId}-upper`}
+                    id={`yaxis2-${v.segmentId}-upper`}
+                    key={`yaxis2-${v.segmentId}-upper`}
                     stroke="#000"
                     strokeWidth="1"
                     x1={0}
@@ -517,8 +546,9 @@ export function DiagramViewer({
                     }
                   />
                   <text
+                    data-key={`yaxis2-${v.segmentId}-lower-text`}
                     dominantBaseline="text-before-edge"
-                    key={`${v.segmentId}-lower-text`}
+                    key={`yaxis2-${v.segmentId}-lower-text`}
                     textAnchor="middle"
                     x={60}
                     y={
@@ -534,8 +564,9 @@ export function DiagramViewer({
                     }
                   </text>
                   <line
-                    id={`${v.segmentId}-lower`}
-                    key={`${v.segmentId}-lower`}
+                    data-key={`yaxis2-${v.segmentId}-lower`}
+                    id={`yaxis2-${v.segmentId}-lower`}
+                    key={`yaxis2-${v.segmentId}-lower`}
                     stroke="#000"
                     strokeWidth="1"
                     x1={0}
