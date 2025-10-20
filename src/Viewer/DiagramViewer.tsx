@@ -801,18 +801,18 @@ export function DiagramViewer({
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={() => {
-                  trainDetailDialogReference.current?.close();
-                  setTargetStoppingTrainId(
+                  const value =
                     TrainService.findById(
                       globalState.root,
                       timetableIndex,
                       clickTrainId,
-                    )?.id || '',
-                  );
+                    )?.id || '';
+                  setTargetStoppingTrainId(value);
                   console.log(
                     `通過側列車: ${timetable.trains.find((v) => v.id === targetPassingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0].departureTime || 0)}発`,
-                    `停車側列車: ${timetable.trains.find((v) => v.id === targetStoppingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0].departureTime || 0)}発`,
+                    `停車側列車: ${timetable.trains.find((v) => v.id === value)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === value)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === value)?.segments[0].departureTime || 0)}発`,
                   );
+                  trainDetailDialogReference.current?.close();
                 }}
                 type="button"
               >
@@ -821,18 +821,18 @@ export function DiagramViewer({
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={() => {
-                  trainDetailDialogReference.current?.close();
-                  setTargetPassingTrainId(
+                  const value =
                     TrainService.findById(
                       globalState.root,
                       timetableIndex,
                       clickTrainId,
-                    )?.id || '',
-                  );
+                    )?.id || '';
+                  setTargetPassingTrainId(value);
                   console.log(
-                    `通過側列車: ${timetable.trains.find((v) => v.id === targetPassingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetPassingTrainId)?.segments[0].departureTime || 0)}発`,
+                    `通過側列車: ${timetable.trains.find((v) => v.id === value)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === value)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === value)?.segments[0].departureTime || 0)}発`,
                     `停車側列車: ${timetable.trains.find((v) => v.id === targetStoppingTrainId)?.number}列車 ${StationService.findById(globalState.root, TrainSegmentService.getStartingStationId(globalState.root, timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0] || TrainSegment.default()) || '')?.name}${toTimeString(timetable.trains.find((v) => v.id === targetStoppingTrainId)?.segments[0].departureTime || 0)}発`,
                   );
+                  trainDetailDialogReference.current?.close();
                 }}
                 type="button"
               >
