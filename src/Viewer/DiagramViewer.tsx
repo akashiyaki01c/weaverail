@@ -350,57 +350,113 @@ export function DiagramViewer({
                           (arrivalTime - departureTime) * lastRatio;
                         result.push(
                           sg.isReversed ? (
-                            <line
-                              onClick={() => {
-                                setClickTrainId(train.id);
-                                trainDetailDialogReference.current?.showModal();
-                              }}
-                              stroke={trainType?.color || '#000'}
-                              strokeWidth="1"
-                              style={{
-                                cursor: 'pointer',
-                              }}
-                              x1={(departure + option.xOffset) * option.xScale}
-                              x2={(arrival + option.xOffset) * option.xScale}
-                              y1={
-                                (yChoords.find((v) => v.segmentId === sg.id)
-                                  ?.lowerStationYChoord || 0 + option.yOffset) *
-                                  option.yScale +
-                                yPadding
-                              }
-                              y2={
-                                (yChoords.find((v) => v.segmentId === sg.id)
-                                  ?.upperStationYChoord || 0 + option.yOffset) *
-                                  option.yScale +
-                                yPadding
-                              }
-                            />
+                            <>
+                              <line
+                                stroke={trainType?.color || '#000'}
+                                strokeWidth="1"
+                                x1={
+                                  (departure + option.xOffset) * option.xScale
+                                }
+                                x2={(arrival + option.xOffset) * option.xScale}
+                                y1={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.lowerStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                                y2={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.upperStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                              />
+                              <line
+                                onClick={() => {
+                                  setClickTrainId(train.id);
+                                  trainDetailDialogReference.current?.showModal();
+                                }}
+                                stroke="transparent"
+                                strokeWidth="5"
+                                style={{
+                                  cursor: 'pointer',
+                                }}
+                                x1={
+                                  (departure + option.xOffset) * option.xScale
+                                }
+                                x2={(arrival + option.xOffset) * option.xScale}
+                                y1={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.lowerStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                                y2={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.upperStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                              />
+                            </>
                           ) : (
-                            <line
-                              onClick={() => {
-                                setClickTrainId(train.id);
-                                trainDetailDialogReference.current?.showModal();
-                              }}
-                              stroke={trainType?.color || '#000'}
-                              strokeWidth="1"
-                              style={{
-                                cursor: 'pointer',
-                              }}
-                              x1={(departure + option.xOffset) * option.xScale}
-                              x2={(arrival + option.xOffset) * option.xScale}
-                              y1={
-                                (yChoords.find((v) => v.segmentId === sg.id)
-                                  ?.upperStationYChoord || 0 + option.yOffset) *
-                                  option.yScale +
-                                yPadding
-                              }
-                              y2={
-                                (yChoords.find((v) => v.segmentId === sg.id)
-                                  ?.lowerStationYChoord || 0 + option.yOffset) *
-                                  option.yScale +
-                                yPadding
-                              }
-                            />
+                            <>
+                              <line
+                                stroke={trainType?.color || '#000'}
+                                strokeWidth="1"
+                                x1={
+                                  (departure + option.xOffset) * option.xScale
+                                }
+                                x2={(arrival + option.xOffset) * option.xScale}
+                                y1={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.upperStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                                y2={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.lowerStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                              />
+                              <line
+                                onClick={() => {
+                                  setClickTrainId(train.id);
+                                  trainDetailDialogReference.current?.showModal();
+                                }}
+                                stroke="transparent"
+                                strokeWidth="5"
+                                style={{
+                                  cursor: 'pointer',
+                                }}
+                                x1={
+                                  (departure + option.xOffset) * option.xScale
+                                }
+                                x2={(arrival + option.xOffset) * option.xScale}
+                                y1={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.upperStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                                y2={
+                                  (yChoords.find((v) => v.segmentId === sg.id)
+                                    ?.lowerStationYChoord ||
+                                    0 + option.yOffset) *
+                                    option.yScale +
+                                  yPadding
+                                }
+                              />
+                            </>
                           ),
                         );
                       }
