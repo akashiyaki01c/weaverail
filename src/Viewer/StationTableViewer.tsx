@@ -148,6 +148,23 @@ export function StationTableViewer() {
                 value={editData.name}
               />
             </label>
+            <label>
+              主要駅
+              <input
+                checked={editData.kibo === 'Syuyou'}
+                className="ml-[1ic] border-1 border-solid border-gray-600 rounded focus:outline-1 outline-offset-1 outline-blue-200 pl-1"
+                onChange={(event) =>
+                  setEditData({
+                    ...editData,
+                    kibo: event.target.checked ? 'Syuyou' : 'Ippan',
+                  })
+                }
+                ref={(element) => {
+                  inputReferences.current[0] = element;
+                }}
+                type="checkbox"
+              />
+            </label>
             <div className="mt-[1ic] flex justify-end gap-2">
               <button
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
