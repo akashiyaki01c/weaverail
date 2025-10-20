@@ -756,6 +756,26 @@ export function DiagramViewer({
                 className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
                 onClick={() => {
                   trainDetailDialogReference.current?.close();
+                  globalState.setRoot((root) =>
+                    TrainService.delete(
+                      root,
+                      timetableIndex,
+                      TrainService.findIndexById(
+                        root,
+                        timetableIndex,
+                        clickTrainId,
+                      ),
+                    ),
+                  );
+                }}
+                type="button"
+              >
+                削除する
+              </button>
+              <button
+                className="border-1 text-blue-400 border-blue-400 p-[0.25ic] pl-[1ic] pr-[1ic] rounded"
+                onClick={() => {
+                  trainDetailDialogReference.current?.close();
                 }}
                 type="button"
               >
