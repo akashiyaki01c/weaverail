@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { SegmentService } from '../globalState/SegmentService';
 import { StationService } from '../globalState/StationService';
@@ -64,7 +64,10 @@ export function DiagramViewer({
   if (!timetable) {
     throw new Error('timetable is null');
   }
-  const yChoords = getYChoords(globalState.root, diagramLine);
+  const [yChoords, setYChoords] = useState<StationChoord[]>([]);
+  useEffect(() => {
+    setYChoords(getYChoords(globalState.root, diagramLine));
+  }, [diagramLine, globalState.root]);
 
   const [option] = useState(new DiagramViewerOption(0.15, 0.3, 0, 0));
 
