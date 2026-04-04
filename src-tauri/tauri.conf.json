@@ -1,20 +1,21 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "weaverail",
-  "version": "0.1.0",
-  "identifier": "weaverail",
+  "version": "0.1.7",
+  "identifier": "com.github.akashiyaki01c.weaverail",
   "build": {
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "weaverail",
+        "title": "Weaverail",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "dragDropEnabled": false
       }
     ],
     "security": {
