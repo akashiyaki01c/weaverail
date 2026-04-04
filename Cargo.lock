@@ -4593,7 +4593,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -4605,7 +4605,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-model"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "ron",
  "serde",
