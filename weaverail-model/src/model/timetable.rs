@@ -3,7 +3,7 @@ use std::collections::{HashMap, hash_map::Entry};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty, train::Train}};
+use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty, train::Train, train_adjustment::TrainsAdjustment}};
 
 /// 一つの時刻表を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -14,6 +14,8 @@ pub struct Timetable {
     pub name: String,
     /// 時刻表に含まれる列車
     pub trains: HashMap<Uuid, Train>,
+    /// 時間調整
+    pub adjustments: HashMap<Uuid, TrainsAdjustment>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }

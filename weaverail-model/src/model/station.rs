@@ -1,7 +1,27 @@
 use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty}};
 use serde::{Deserialize, Serialize};
-use std::collections::hash_map::Entry;
+use std::collections::{HashMap, hash_map::Entry};
 use uuid::Uuid;
+
+/// 一つの列車番線を表す
+#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+pub struct Track {
+    /// 識別ID
+    pub id: Uuid,
+    /// 番線名
+    pub name: String,
+    /// 拡張プロパティ
+    pub properties: ExtensionProperty,
+}
+impl Track {
+    pub fn new(name: &str) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            name: name.to_string(),
+            ..Default::default()
+        }
+    }
+}
 
 /// 一つの駅を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -10,6 +30,8 @@ pub struct Station {
     pub id: Uuid,
     /// 駅名
     pub name: String,
+    /// 列車番線一覧
+    pub tracks: HashMap<Uuid, Track>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }

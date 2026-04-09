@@ -98,12 +98,77 @@ impl TemplateTrain {
             .position(|station| station.station_id == station_id)
             .expect("Station ID not found in template train");
     }
+
+    /// 指定の駅間を抽出して返す関数
+    pub fn get_filtered_segment(
+        &self,
+        start_station_id: Uuid,
+        end_station_id: Uuid,
+    ) -> (
+        &TemplateTrainStation,
+        Vec<(&TemplateTrainSegment, &TemplateTrainStation)>,
+    ) {
+        // 対象駅がない場合
+        if !self.contains_station(start_station_id) || !self.contains_station(end_station_id) {
+            unreachable!();
+        }
+
+        let first_index = self.get_station_index(start_station_id);
+        let end_index = self.get_station_index(end_station_id);
+        let first_station = if first_index == 0 {
+            &self.start_station
+        } else {
+            &self.segments.get(first_index - 1).expect("index error").1
+        };
+
+        let mut segments: Vec<(&TemplateTrainSegment, &TemplateTrainStation)> = Vec::new();
+        for i in (first_index)..end_index {
+            let segment = self.segments.get(i).expect("index error");
+            segments.push((&segment.0, &segment.1));
+        }
+
+        (first_station, segments)
+    }
+    pub fn get_filtered_segment_iter(
+        &self,
+        start_station_id: Uuid,
+        end_station_id: Uuid,
+    ) -> Vec<(
+        &TemplateTrainStation,
+        &TemplateTrainSegment,
+        &TemplateTrainStation,
+    )> {
+        let segments = self.get_filtered_segment(start_station_id, end_station_id);
+        let mut result = Vec::new();
+
+        let get_station_by_index = |index: isize| {
+            if index < 0 {
+                segments.0
+            } else {
+                segments.1.get(index as usize).unwrap().1
+            }
+        };
+
+        for i in 0..segments.1.len() {
+            let start = get_station_by_index(i as isize - 1);
+            let segment = segments.1.get(i).unwrap().0;
+            let end = segments.1.get(i).unwrap().1;
+            if segment.is_reversed {
+                result.push((end, segment, start));
+            } else {
+                result.push((start, segment, end));
+            }
+        }
+        result
+    }
 }
 impl DiagramRoot {
     /// テンプレート列車名からテンプレート列車を検索する関数
     /// 見つからない場合は None を返す
     pub fn find_template_train_by_name(&self, template_train_name: &str) -> Option<&TemplateTrain> {
-        self.template_trains.values().find(|template_train| &template_train.name == template_train_name)
+        self.template_trains
+            .values()
+            .find(|template_train| &template_train.name == template_train_name)
     }
 }
 
@@ -127,6 +192,8 @@ pub struct TemplateTrainStation {
     pub id: Uuid,
     /// 駅ID
     pub station_id: Uuid,
+    /// 駅到着番線ID
+    pub track_id: Uuid,
     /// 停車時間
     pub stop_time: StopType,
 }

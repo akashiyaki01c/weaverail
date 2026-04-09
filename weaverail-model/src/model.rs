@@ -5,6 +5,7 @@ pub mod time;
 pub mod timetable;
 pub mod train;
 pub mod train_type;
+pub mod train_adjustment;
 
 use std::collections::HashMap;
 

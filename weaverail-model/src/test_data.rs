@@ -1,1 +1,1 @@
-mod diagram_root;
+pub mod diagram_root;
