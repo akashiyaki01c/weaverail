@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::ops::{Add, AddAssign};
 
 use serde::{Deserialize, Serialize};
 
@@ -62,6 +62,13 @@ impl std::fmt::Debug for Time {
 impl AddAssign for Time {
     fn add_assign(&mut self, rhs: Self) {
         self.0 = self.total_second() + rhs.total_second()
+    }
+}
+impl Add for Time {
+    type Output = Time;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::new_from_total_second(self.total_second() + rhs.total_second())
     }
 }
 
