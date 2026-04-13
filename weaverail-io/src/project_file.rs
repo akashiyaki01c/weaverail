@@ -24,7 +24,7 @@ pub fn is_file_weaverail(path: PathBuf) -> io::Result<bool> {
 }
 
 /// Weaverailプロジェクトファイルを読み込む関数
-pub fn read_file(path: PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
+pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
     let mut file = File::open(path)?;
     let mut magic = [0u8; 4];
     file.read_exact(&mut magic)?;
@@ -45,9 +45,9 @@ pub fn read_file(path: PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoEr
 
 /// Weaverailプロジェクトファイルを書き込む関数
 pub fn write_file(
-    path: PathBuf,
-    root: DiagramRoot,
-    metadata: Metadata,
+    path: &PathBuf,
+    root: &DiagramRoot,
+    metadata: &Metadata,
 ) -> Result<(), WeaverailIoError> {
     let mut file = File::create(path)?;
 
@@ -64,4 +64,12 @@ pub fn write_file(
     file.write_all(&root)?;
 
     Ok(())
+}
+
+#[test]
+fn write_read() {
+	let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+	let path = PathBuf::from("./test.wvr");
+	let _ = write_file(&path, &test_data.root, &test_data.metadata);
+	let _ = read_file(&path);
 }
