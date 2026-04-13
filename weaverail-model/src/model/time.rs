@@ -3,7 +3,9 @@ use std::ops::{Add, AddAssign};
 use serde::{Deserialize, Serialize};
 
 /// 時刻
-#[derive(ts_rs::TS, Copy, Clone, PartialEq, Default, Serialize, Deserialize, Eq, PartialOrd, Ord)]
+#[derive(
+    ts_rs::TS, Copy, Clone, PartialEq, Default, Serialize, Deserialize, Eq, PartialOrd, Ord,
+)]
 pub struct Time(u32);
 
 impl Time {

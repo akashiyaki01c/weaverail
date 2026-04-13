@@ -145,13 +145,13 @@ impl DiagramRoot {
     ) -> (&LineSegment, bool) {
         let start_station = self.find_station_by_name(start_station_name).expect("").id;
         let end_station = self.find_station_by_name(end_station_name).expect("").id;
-        let reversed_segment = self
-            .lines
-            .values()
-            .flat_map(|line| &line.segments)
-            .find(|segment| {
-                segment.start_station == start_station && segment.end_station == end_station
-            });
+        let reversed_segment =
+            self.lines
+                .values()
+                .flat_map(|line| &line.segments)
+                .find(|segment| {
+                    segment.start_station == start_station && segment.end_station == end_station
+                });
         let forward_segment = self
             .lines
             .values()

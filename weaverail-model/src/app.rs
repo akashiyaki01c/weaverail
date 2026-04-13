@@ -1,6 +1,4 @@
-use tauri::AppHandle;
-
-use crate::command::command_manager::CommandManager;
+use crate::command::{EventEmitter, command_manager::CommandManager};
 
 /// アプリの状態
 pub struct AppState {
@@ -8,9 +6,9 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(app_handle: &AppHandle) -> Self {
+    pub fn new(emitter: Box<dyn EventEmitter>) -> Self {
         Self {
-            command_manager: CommandManager::new(Some(app_handle.clone())),
+            command_manager: CommandManager::new(emitter),
         }
     }
 }

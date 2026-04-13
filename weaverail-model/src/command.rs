@@ -3,19 +3,34 @@ pub mod line;
 pub mod station;
 pub mod train_type;
 
-use std::sync::Mutex;
-
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
 
-use crate::{app::AppState, model::DiagramRoot};
+use crate::model::DiagramRoot;
+
+pub trait EventEmitter: Send + Sync {
+    fn emit(&self, event: &str, payload: &str);
+}
+pub struct EmptyEventEmitter;
+impl EventEmitter for EmptyEventEmitter {
+    fn emit(&self, _event: &str, _payload: &str) {
+        // no-op
+    }
+}
 
 /// モデルに対する「操作」を表すトレイト
 pub trait Command: Send + Sync {
     /// やり直す動作
-    fn redo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError>;
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError>;
     /// 元に戻す動作
-    fn undo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError>;
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError>;
 }
 
 /// コマンドのエラー一覧
@@ -31,54 +46,6 @@ pub enum CommandError {
     IndexOutOfBounds,
     /// 整合性がない
     Inconsistent,
-}
-
-#[tauri::command]
-pub async fn get_root(state: tauri::State<'_, Mutex<AppState>>) -> Result<DiagramRoot, String> {
-    Ok(state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .root
-        .clone())
-}
-
-#[tauri::command]
-pub async fn undo(state: tauri::State<'_, Mutex<AppState>>) -> Result<(), CommandError> {
-    let result = state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .undo();
-    result.unwrap_or(Ok(()))
-}
-
-#[tauri::command]
-pub async fn undoable(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, CommandError> {
-    Ok(state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .undoable())
-}
-
-#[tauri::command]
-pub async fn redo(state: tauri::State<'_, Mutex<AppState>>) -> Result<(), CommandError> {
-    let result = state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .redo();
-    result.unwrap_or(Ok(()))
-}
-
-#[tauri::command]
-pub async fn redoable(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, CommandError> {
-    Ok(state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .redoable())
 }
 
 #[test]

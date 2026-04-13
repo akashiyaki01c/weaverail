@@ -1,15 +1,10 @@
-use std::sync::Mutex;
-
 use crate::{
-    app::AppState,
-    command::{Command, CommandError},
+    command::{Command, CommandError, EventEmitter},
     model::{
         DiagramRoot,
         line::{Line, LineSegment},
     },
 };
-
-use tauri::{AppHandle, Emitter};
 use uuid::Uuid;
 
 /// 路線の追加
@@ -25,39 +20,24 @@ impl AddLineCommand {
 impl Command for AddLineCommand {
     fn redo(
         &mut self,
-        obj: &mut crate::model::DiagramRoot,
-        app: Option<&tauri::AppHandle>,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.add_line(self.line.clone())?;
-        if let Some(app) = app {
-            let _ = app.emit_filter("line_changed", &obj, |_| true);
-        }
+        emitter.emit("line::added", "");
         Ok(())
     }
 
     fn undo(
         &mut self,
-        obj: &mut crate::model::DiagramRoot,
-        app: Option<&tauri::AppHandle>,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.delete_line(self.line.id)?;
-        if let Some(app) = app {
-            let _ = app.emit_filter("line_changed", &obj, |_| true);
-        }
+        emitter.emit("line::removed", "");
 
         Ok(())
     }
-}
-
-#[tauri::command]
-pub async fn add_line(state: tauri::State<'_, Mutex<AppState>>, line: Line) -> Result<(), String> {
-    let command = AddLineCommand::new(line.clone());
-    let mut state = state.lock().expect("mutex lock error");
-
-    let command_manager = &mut state.command_manager;
-    command_manager.execute(Box::new(command));
-
-    Ok(())
 }
 
 /// 路線を削除する
@@ -76,39 +56,28 @@ impl RemoveLineCommand {
 }
 
 impl Command for RemoveLineCommand {
-    fn redo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         let line = obj.delete_line(self.line_id)?;
         self.line = Some(line);
-        if let Some(app) = app {
-            let _ = app.emit_filter("line_changed", &obj, |_| true);
-        }
+        emitter.emit("line::removed", "");
         Ok(())
     }
 
-    fn undo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         if let Some(line) = self.line.clone() {
             obj.add_line(line)?;
         }
-
-        if let Some(app) = app {
-            let _ = app.emit_filter("line_changed", &obj, |_| true);
-        }
-
+        emitter.emit("line::added", "");
         Ok(())
     }
-}
-#[tauri::command]
-pub async fn remove_line(
-    state: tauri::State<'_, Mutex<AppState>>,
-    line_id: Uuid,
-) -> Result<(), String> {
-    let command = RemoveLineCommand::new(line_id);
-    let mut state = state.lock().expect("mutex lock error");
-
-    let command_manager = &mut state.command_manager;
-    command_manager.execute(Box::new(command));
-
-    Ok(())
 }
 
 /// 路線に駅間を追加する
@@ -124,15 +93,21 @@ impl AppendSegmentToLine {
 }
 
 impl Command for AppendSegmentToLine {
-    fn redo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         obj.append_segment(self.line_id, self.segment.clone())?;
-        if let Some(app) = app {
-            let _ = app.emit_filter("line_changed", &obj, |_| true);
-        }
+        emitter.emit("segment::append", "");
         Ok(())
     }
 
-    fn undo(&mut self, _obj: &mut DiagramRoot, _app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn undo(
+        &mut self,
+        _obj: &mut DiagramRoot,
+        _emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         todo!();
     }
 }

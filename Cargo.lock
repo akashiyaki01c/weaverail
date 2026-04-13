@@ -4618,6 +4618,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "uuid",
  "weaverail-model",
 ]
 
@@ -4628,7 +4629,6 @@ dependencies = [
  "ron",
  "serde",
  "serde_json",
- "tauri",
  "ts-rs",
  "uuid",
  "zstd",

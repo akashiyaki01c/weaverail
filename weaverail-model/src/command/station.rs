@@ -1,11 +1,7 @@
-use std::sync::Mutex;
-
-use tauri::{AppHandle, Emitter};
 use uuid::Uuid;
 
 use crate::{
-    app::AppState,
-    command::{Command, CommandError},
+    command::{Command, CommandError, EmptyEventEmitter, EventEmitter},
     model::{DiagramRoot, station::Station},
 };
 
@@ -20,35 +16,25 @@ impl AddStationCommand {
     }
 }
 impl Command for AddStationCommand {
-    fn redo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         obj.add_station(self.station.clone())?;
-        if let Some(app) = app {
-            let _ = app.emit_filter("station_changed", &obj, |_| true);
-        }
+        emitter.emit("station::added", "");
         Ok(())
     }
 
-    fn undo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         obj.delete_station(self.station.id)?;
-        if let Some(app) = app {
-            let _ = app.emit_filter("station_changed", &obj, |_| true);
-        }
-
+        emitter.emit("station::removed", "");
         Ok(())
     }
-}
-#[tauri::command]
-pub async fn add_station(
-    state: tauri::State<'_, Mutex<AppState>>,
-    station: Station,
-) -> Result<(), String> {
-    let command = AddStationCommand::new(station.clone());
-    let mut state = state.lock().expect("mutex lock error");
-
-    let command_manager = &mut state.command_manager;
-    command_manager.execute(Box::new(command));
-
-    Ok(())
 }
 
 /// 駅の削除
@@ -66,45 +52,35 @@ impl RemoveStationCommand {
     }
 }
 impl Command for RemoveStationCommand {
-    fn redo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         let sta = obj.delete_station(self.station_id)?;
         self.station = Some(sta);
-        if let Some(app) = app {
-            let _ = app.emit_filter("station_changed", &obj, |_| true);
-        }
+        emitter.emit("station::removed", "");
         Ok(())
     }
 
-    fn undo(&mut self, obj: &mut DiagramRoot, app: Option<&AppHandle>) -> Result<(), CommandError> {
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
         if let Some(station) = self.station.clone() {
             obj.add_station(station)?;
         }
-
-        if let Some(app) = app {
-            let _ = app.emit_filter("station_changed", &obj, |_| true);
-        }
+        emitter.emit("station::added", "");
         Ok(())
     }
-}
-#[tauri::command]
-pub async fn remove_station(
-    state: tauri::State<'_, Mutex<AppState>>,
-    station_id: Uuid,
-) -> Result<(), String> {
-    let command = RemoveStationCommand::new(station_id);
-    let mut state = state.lock().expect("mutex lock error");
-
-    let command_manager = &mut state.command_manager;
-    command_manager.execute(Box::new(command));
-
-    Ok(())
 }
 
 #[test]
 fn test_station_command() {
     use crate::command::command_manager::CommandManager;
 
-    let mut manager = CommandManager::new(None);
+    let mut manager = CommandManager::new(Box::new(EmptyEventEmitter));
     {
         let command = AddStationCommand::new(Station::new("大阪梅田"));
         let _ = &manager.execute(Box::new(command));

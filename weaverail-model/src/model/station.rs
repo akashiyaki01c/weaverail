@@ -1,4 +1,7 @@
-use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty}};
+use crate::{
+    command::CommandError,
+    model::{DiagramRoot, ExtensionProperty},
+};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};
 use uuid::Uuid;
@@ -69,12 +72,16 @@ impl DiagramRoot {
         {
             return Err(CommandError::ExternalReference);
         }
-        self.stations.remove(&station_id).ok_or(CommandError::TargetObjectNotFound)
+        self.stations
+            .remove(&station_id)
+            .ok_or(CommandError::TargetObjectNotFound)
     }
 
     /// 駅名から駅を検索する関数
     /// 見つからない場合は None を返す
     pub fn find_station_by_name(&self, station_name: &str) -> Option<&Station> {
-        self.stations.values().find(|station| &station.name == station_name)
+        self.stations
+            .values()
+            .find(|station| &station.name == station_name)
     }
 }

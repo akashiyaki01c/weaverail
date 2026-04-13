@@ -3,7 +3,10 @@ use std::collections::{HashMap, hash_map::Entry};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty, train::Train, train_adjustment::TrainsAdjustment}};
+use crate::{
+    command::CommandError,
+    model::{DiagramRoot, ExtensionProperty, train::Train, train_adjustment::TrainsAdjustment},
+};
 
 /// 一つの時刻表を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -44,6 +47,8 @@ impl DiagramRoot {
     /// 時刻表を削除する関数
     /// 指定IDの時刻表が存在しない場合はエラーを返す
     pub fn delete_timetable(&mut self, timetable_id: Uuid) -> Result<Timetable, CommandError> {
-        self.timetables.remove(&timetable_id).ok_or(CommandError::TargetObjectNotFound)
+        self.timetables
+            .remove(&timetable_id)
+            .ok_or(CommandError::TargetObjectNotFound)
     }
 }

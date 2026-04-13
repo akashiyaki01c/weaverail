@@ -3,7 +3,10 @@ use std::collections::hash_map::Entry;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{command::CommandError, model::{DiagramRoot, ExtensionProperty}};
+use crate::{
+    command::CommandError,
+    model::{DiagramRoot, ExtensionProperty},
+};
 
 /// 一つの列車種別を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -50,12 +53,16 @@ impl DiagramRoot {
             return Err(CommandError::ExternalReference);
         }
 
-        self.train_types.remove(&train_type_id).ok_or(CommandError::TargetObjectNotFound)
+        self.train_types
+            .remove(&train_type_id)
+            .ok_or(CommandError::TargetObjectNotFound)
     }
 
     /// 列車種別名から列車種別を検索する関数
     /// 見つからない場合は None を返す
     pub fn find_train_type_by_name(&self, train_type_name: &str) -> Option<&TrainType> {
-        self.train_types.values().find(|train_type| &train_type.name == train_type_name)
+        self.train_types
+            .values()
+            .find(|train_type| &train_type.name == train_type_name)
     }
 }
