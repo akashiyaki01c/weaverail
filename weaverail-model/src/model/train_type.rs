@@ -8,7 +8,8 @@ use uuid::Uuid;
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty}, weaverail_id,
+    model::{DiagramRoot, ExtensionProperty},
+    weaverail_id,
 };
 
 weaverail_id!(TrainTypeId, "TYPE");
@@ -49,7 +50,10 @@ impl DiagramRoot {
     /// 列車種別を削除する関数
     /// 指定IDの列車種別が存在しない場合はエラーを返す
     /// テンプレート列車から讃匠されている場合はエラーを返す
-    pub fn delete_train_type(&mut self, train_type_id: TrainTypeId) -> Result<TrainType, CommandError> {
+    pub fn delete_train_type(
+        &mut self,
+        train_type_id: TrainTypeId,
+    ) -> Result<TrainType, CommandError> {
         if self
             .template_trains
             .values()

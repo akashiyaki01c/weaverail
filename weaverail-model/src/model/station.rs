@@ -4,7 +4,8 @@
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty}, weaverail_id,
+    model::{DiagramRoot, ExtensionProperty},
+    weaverail_id,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};

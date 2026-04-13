@@ -5,7 +5,10 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{model::{ExtensionProperty, station::StationId, template_train::TemplateTrainId, time::Time}, weaverail_id};
+use crate::{
+    model::{ExtensionProperty, station::StationId, template_train::TemplateTrainId, time::Time},
+    weaverail_id,
+};
 
 weaverail_id!(TrainId, "TRAI");
 

@@ -1,6 +1,9 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
-    model::{DiagramRoot, train_type::{TrainType, TrainTypeId}},
+    model::{
+        DiagramRoot,
+        train_type::{TrainType, TrainTypeId},
+    },
 };
 
 /// 列車種別の追加

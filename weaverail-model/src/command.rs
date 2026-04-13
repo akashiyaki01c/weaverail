@@ -6,8 +6,8 @@ pub mod line;
 pub mod station;
 pub mod train_type;
 
-use serde::{Deserialize, Serialize};
 use crate::model::DiagramRoot;
+use serde::{Deserialize, Serialize};
 
 /// バックエンド側からフロントエンド側へのイベント通知を行う構造体
 pub trait EventEmitter: Send + Sync {

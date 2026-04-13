@@ -1,7 +1,13 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{model::{station::{StationId, TrackId}, train::TrainId}, weaverail_id};
+use crate::{
+    model::{
+        station::{StationId, TrackId},
+        train::TrainId,
+    },
+    weaverail_id,
+};
 
 weaverail_id!(TrainsAdjustmentId, "ADJT");
 
@@ -23,8 +29,7 @@ impl TrainsAdjustment {
 }
 
 /// 列車同士の時刻調整種別を表す
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize, Default)]
 pub enum TrainsAdjustmentType {
     /// 時刻調整を行わない
     #[default]

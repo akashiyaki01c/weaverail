@@ -1,6 +1,9 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
-    model::{DiagramRoot, station::{Station, StationId}},
+    model::{
+        DiagramRoot,
+        station::{Station, StationId},
+    },
 };
 
 /// 駅の追加

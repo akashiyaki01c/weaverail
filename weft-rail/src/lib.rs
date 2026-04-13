@@ -5,7 +5,14 @@ use petgraph::{
     graph::{DiGraph, NodeIndex},
 };
 use weaverail_model::model::{
-    DiagramRoot, line::LineSegmentId, station::StationId, template_train::{StopType, TemplateTrainSegmentId}, time::Time, timetable::{Timetable, TimetableId}, train::{Train, TrainId}, train_adjustment::TrainsAdjustmentType
+    DiagramRoot,
+    line::LineSegmentId,
+    station::StationId,
+    template_train::{StopType, TemplateTrainSegmentId},
+    time::Time,
+    timetable::{Timetable, TimetableId},
+    train::{Train, TrainId},
+    train_adjustment::TrainsAdjustmentType,
 };
 
 /// ノードの種類
@@ -375,14 +382,16 @@ impl<'a> WeftGraph<'a> {
                             .iter()
                             .find(|info| info.segment_id == node.0.segment_id)
                             .unwrap();
-                        let mut current_trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> =
-                            if node.0.is_reversed {
-                                &current_info.train_times_retrograde
-                            } else {
-                                &current_info.train_times_prograde
-                            }
-                            .iter()
-                            .collect();
+                        let mut current_trains: Vec<(
+                            &TrainId,
+                            &(Time, Time, TemplateTrainSegmentId),
+                        )> = if node.0.is_reversed {
+                            &current_info.train_times_retrograde
+                        } else {
+                            &current_info.train_times_prograde
+                        }
+                        .iter()
+                        .collect();
                         current_trains.sort_by_key(|&(_uuid, times)| times.0);
                         println!("{:?}", current_trains);
 
@@ -449,15 +458,20 @@ impl<'a> WeftGraph<'a> {
                                 .find(|info| info.segment_id == before_segment.0.segment_id)
                                 .unwrap();
                             // 前区間での列車順序
-                            let before_trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> = {
-                                let mut trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> =
-                                    if node.0.is_reversed {
-                                        &before_info.train_times_retrograde
-                                    } else {
-                                        &before_info.train_times_prograde
-                                    }
-                                    .iter()
-                                    .collect();
+                            let before_trains: Vec<(
+                                &TrainId,
+                                &(Time, Time, TemplateTrainSegmentId),
+                            )> = {
+                                let mut trains: Vec<(
+                                    &TrainId,
+                                    &(Time, Time, TemplateTrainSegmentId),
+                                )> = if node.0.is_reversed {
+                                    &before_info.train_times_retrograde
+                                } else {
+                                    &before_info.train_times_prograde
+                                }
+                                .iter()
+                                .collect();
                                 trains.sort_by_key(|&(_uuid, times)| times.0);
                                 trains
                             };
@@ -495,7 +509,8 @@ impl<'a> WeftGraph<'a> {
                                                         node.0.train_id
                                                     );
                                                     if station_id == node.0.station_id {
-                                                        !(waiting_train_id != node.0.train_id && passing_train_id != node.0.train_id)
+                                                        !(waiting_train_id != node.0.train_id
+                                                            && passing_train_id != node.0.train_id)
                                                     } else {
                                                         println!("駅不合");
                                                         false
@@ -551,7 +566,8 @@ impl<'a> WeftGraph<'a> {
                                                         node.0.train_id
                                                     );
                                                     if station_id == node.0.station_id {
-                                                        !(waiting_train_id != node.0.train_id && passing_train_id != node.0.train_id)
+                                                        !(waiting_train_id != node.0.train_id
+                                                            && passing_train_id != node.0.train_id)
                                                     } else {
                                                         println!("駅不合");
                                                         false

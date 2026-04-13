@@ -1,5 +1,6 @@
 //! Weaverail上で用いられる全てのデータ構造を定義するモジュール
 
+pub mod id;
 pub mod line;
 pub mod station;
 pub mod template_train;
@@ -8,7 +9,6 @@ pub mod timetable;
 pub mod train;
 pub mod train_adjustment;
 pub mod train_type;
-pub mod id;
 
 use std::collections::HashMap;
 
@@ -16,7 +16,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::model::{
-    line::{Line, LineId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId},
+    line::{Line, LineId},
+    station::{Station, StationId},
+    template_train::{TemplateTrain, TemplateTrainId},
+    timetable::{Timetable, TimetableId},
     train_type::{TrainType, TrainTypeId},
 };
 

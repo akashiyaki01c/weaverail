@@ -7,7 +7,16 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{model::{DiagramRoot, ExtensionProperty, line::{Line, LineSegmentId}, station::{StationId, TrackId}, time::Time, train_type::TrainTypeId}, weaverail_id};
+use crate::{
+    model::{
+        DiagramRoot, ExtensionProperty,
+        line::{Line, LineSegmentId},
+        station::{StationId, TrackId},
+        time::Time,
+        train_type::TrainTypeId,
+    },
+    weaverail_id,
+};
 
 weaverail_id!(TemplateTrainId, "TMPT");
 

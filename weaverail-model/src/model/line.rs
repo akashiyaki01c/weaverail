@@ -10,7 +10,11 @@ use uuid::Uuid;
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty, station::{Station, StationId}}, weaverail_id,
+    model::{
+        DiagramRoot, ExtensionProperty,
+        station::{Station, StationId},
+    },
+    weaverail_id,
 };
 
 weaverail_id!(LineId, "LINE");
