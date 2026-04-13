@@ -21,7 +21,7 @@ impl TauriEmitter {
 }
 impl EventEmitter for TauriEmitter {
     fn emit(&self, event: &str, payload: &str) {
-        self.handle.emit_filter(event, payload, |_| true);
+        let _ = self.handle.emit_filter(event, payload, |_| true);
     }
 }
 
