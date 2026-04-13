@@ -1,3 +1,5 @@
+//! Weaverail上で用いられる全てのデータ構造を定義するモジュール
+
 pub mod line;
 pub mod station;
 pub mod template_train;
@@ -18,7 +20,7 @@ use crate::model::{
     train_type::TrainType,
 };
 
-/// 拡張プロパティ
+/// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct ExtensionProperty(HashMap<String, Value>);
 impl ExtensionProperty {
@@ -39,7 +41,7 @@ impl ExtensionProperty {
     }
 }
 
-/// ダイヤグラムファイル
+/// ダイヤグラムプロジェクトファイルを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct DiagramRoot {
     /// 駅の集合

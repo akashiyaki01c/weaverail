@@ -1,15 +1,20 @@
+//! Weaverail内の1操作に対応する `Command` を提供するモジュール
+//! フロントエンド側から行われる全ての操作は `Command` を通じて行われる
+
 pub mod command_manager;
 pub mod line;
 pub mod station;
 pub mod train_type;
 
 use serde::{Deserialize, Serialize};
-
 use crate::model::DiagramRoot;
 
+/// バックエンド側からフロントエンド側へのイベント通知を行う構造体
 pub trait EventEmitter: Send + Sync {
+    /// フロントエンド側にイベント通知を行なう
     fn emit(&self, event: &str, payload: &str);
 }
+/// フロントエンド側へのイベント通知を行わない空モジュール
 pub struct EmptyEventEmitter;
 impl EventEmitter for EmptyEventEmitter {
     fn emit(&self, _event: &str, _payload: &str) {
