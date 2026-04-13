@@ -8,7 +8,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use uuid::Uuid;
 
 /// Weaverail上の識別子を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Eq, Hash, Copy)]
+#[derive(ts_rs::TS, Clone, PartialEq, Default, Eq, Hash, Copy)]
 pub struct WeaverailId(pub Uuid);
 impl WeaverailId {
     pub fn new() -> Self {
@@ -49,11 +49,16 @@ impl Display for WeaverailId {
         f.write_str(&self.to_string())
     }
 }
+impl std::fmt::Debug for WeaverailId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("{:08x}", self.0.as_fields().0))
+    }
+}
 
 #[macro_export]
 macro_rules! weaverail_id {
     ($name: ident, $id: expr) => {
-        #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Debug, Default)]
+        #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default)]
         pub struct $name(pub $crate::model::id::WeaverailId);
 
         impl $name {
@@ -98,6 +103,11 @@ macro_rules! weaverail_id {
         impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 f.write_str(&self.to_string())
+            }
+        }
+        impl std::fmt::Debug for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str(&format!("{}{:08x}", $id, self.0.0.as_fields().0))
             }
         }
     };
