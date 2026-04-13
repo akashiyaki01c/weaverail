@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
 use crate::{
-    command::{Command, CommandError, EmptyEventEmitter, EventEmitter},
+    command::{Command, CommandError, EventEmitter},
     model::{DiagramRoot, station::Station},
 };
 
@@ -80,7 +80,7 @@ impl Command for RemoveStationCommand {
 fn test_station_command() {
     use crate::command::command_manager::CommandManager;
 
-    let mut manager = CommandManager::new(Box::new(EmptyEventEmitter));
+    let mut manager = CommandManager::new(Box::new(crate::command::EmptyEventEmitter));
     {
         let command = AddStationCommand::new(Station::new("大阪梅田"));
         let _ = &manager.execute(Box::new(command));
