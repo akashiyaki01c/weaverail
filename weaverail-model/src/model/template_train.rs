@@ -1,58 +1,26 @@
+//! Weaverail上の「テンプレート列車」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - TemplateTrain (テンプレート列車)
+//!   - TemplateTrainSegment (テンプレート列車の駅間情報)
+//!   - TemplateTrainStation (テンプレート列車の駅情報)
+//!     - StopType (停車種別)
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::model::{DiagramRoot, ExtensionProperty, line::Line, time::Time};
 
-/// 駅時刻の計算結果を表す
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
-pub struct ResultStationTime {
-    /// 駅ID
-    pub station_id: Uuid,
-    /// 到着時刻
-    pub arrival_time: Option<Time>,
-    /// 出発時刻
-    pub departure_time: Option<Time>,
-    /// 停車種別
-    pub stop_type: ResultStationStopType,
-}
-
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
-#[derive(Default)]
-pub enum ResultStationStopType {
-    /// 停車
-    #[default]
-    Stop,
-    /// 通過
-    Pass,
-}
-
-impl ResultStationTime {
-    pub fn new(
-        station_id: Uuid,
-        arrival_time: Option<Time>,
-        departure_time: Option<Time>,
-        stop_type: ResultStationStopType,
-    ) -> Self {
-        Self {
-            station_id,
-            arrival_time,
-            departure_time,
-            stop_type,
-        }
-    }
-}
-
-/// 一つのテンプレート列車を表す
+/// Weaverail上の1つのテンプレート列車を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrain {
     /// 識別ID
     pub id: Uuid,
-    /// テンプレート列車名
+    /// テンプレート列車名 (例: "本線下り普通列車")
     pub name: String,
     /// 列車種別ID
     pub train_type_id: Uuid,
+    /// 開始駅情報
     pub start_station: TemplateTrainStation,
-    /// 駅間情報群
+    /// 駅間/駅情報の一覧
     pub segments: Vec<(TemplateTrainSegment, TemplateTrainStation)>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
@@ -169,7 +137,7 @@ impl DiagramRoot {
     }
 }
 
-/// 一つのテンプレート列車の駅間情報を表す
+/// Weaverail上のテンプレート列車の駅間情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainSegment {
     /// 識別ID
@@ -182,7 +150,7 @@ pub struct TemplateTrainSegment {
     pub running_time: Time,
 }
 
-/// 一つのテンプレート列車の駅情報を表す
+/// Weaverail上のテンプレート列車の駅情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainStation {
     /// 識別ID
@@ -195,7 +163,7 @@ pub struct TemplateTrainStation {
     pub stop_time: StopType,
 }
 
-/// 停車種別
+/// テンプレート列車の停車種別を表す列挙体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
 pub enum StopType {
     /// 停車（停車時分）

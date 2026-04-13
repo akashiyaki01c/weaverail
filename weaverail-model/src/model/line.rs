@@ -1,3 +1,7 @@
+//! Weaverail上の「路線」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - Line (路線)
+//!   - LineSegment (駅間)
+
 use std::collections::hash_map::Entry;
 use std::iter;
 
@@ -9,14 +13,14 @@ use crate::{
     model::{DiagramRoot, ExtensionProperty, station::Station},
 };
 
-/// 一つの路線を表す
+/// Weaverail上の1つの路線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Line {
     /// 識別ID
     pub id: Uuid,
-    /// 路線名
+    /// 路線名 (例: "神明線")
     pub name: String,
-    /// 所属する駅ID
+    /// 路線に所属する駅間リスト
     pub segments: Vec<LineSegment>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
@@ -39,7 +43,7 @@ impl Line {
     }
 }
 
-/// 一つの駅間を表す
+/// Weaverail上の1つの路線に属する駅間を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct LineSegment {
     /// 識別ID
@@ -138,6 +142,7 @@ impl DiagramRoot {
         Ok(())
     }
 
+    /// 駅間を、開始/終了駅名から検索する関数
     pub fn find_segment_by_name(
         &self,
         start_station_name: &str,

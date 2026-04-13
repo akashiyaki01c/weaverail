@@ -1,3 +1,6 @@
+//! Weaverail上の「時刻表」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - Timetable (時刻表)
+
 use std::collections::{HashMap, hash_map::Entry};
 
 use serde::{Deserialize, Serialize};
@@ -8,7 +11,7 @@ use crate::{
     model::{DiagramRoot, ExtensionProperty, train::Train, train_adjustment::TrainsAdjustment},
 };
 
-/// 一つの時刻表を表す
+/// Weaverail上の1つの時刻表を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Timetable {
     /// 識別ID

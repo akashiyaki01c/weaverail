@@ -1,3 +1,6 @@
+//! Weaverail上の「列車種別」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - TrainType (列車種別)
+
 use std::collections::hash_map::Entry;
 
 use serde::{Deserialize, Serialize};
@@ -8,12 +11,12 @@ use crate::{
     model::{DiagramRoot, ExtensionProperty},
 };
 
-/// 一つの列車種別を表す
+/// Weaverail上の1つの「列車種別」を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TrainType {
     /// 識別ID
     pub id: Uuid,
-    /// 列車種別名
+    /// 列車種別名 (例: "普通列車")
     pub name: String,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,

@@ -1,9 +1,13 @@
+//! Weaverail上の「列車」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - Train (列車)
+//!   - TemplateSegment (テンプレート列車への部分参照)
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::model::{ExtensionProperty, time::Time};
 
-/// 一つの列車を表す
+/// Weaverail上の1つの「列車」を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Train {
     /// 識別ID
@@ -24,7 +28,7 @@ impl Train {
     }
 }
 
-/// 一つのテンプレート列車への参照を表す
+/// Weaverail上のテンプレート列車への部分参照
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateSegment {
     /// テンプレート列車ID

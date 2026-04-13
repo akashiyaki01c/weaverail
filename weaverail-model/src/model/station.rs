@@ -1,3 +1,7 @@
+//! Weaverail上の「駅」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
+//! - Station (駅)
+//!   - Track (列車番線)
+
 use crate::{
     command::CommandError,
     model::{DiagramRoot, ExtensionProperty},
@@ -6,12 +10,12 @@ use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};
 use uuid::Uuid;
 
-/// 一つの列車番線を表す
+/// Weaverail上の駅に存在している1つの列車番線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Track {
     /// 識別ID
     pub id: Uuid,
-    /// 番線名
+    /// 番線名 (例: "1番線")
     pub name: String,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
@@ -26,12 +30,12 @@ impl Track {
     }
 }
 
-/// 一つの駅を表す
+/// Weaverail上の1つの駅を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Station {
     /// 識別ID
     pub id: Uuid,
-    /// 駅名
+    /// 正式駅名 (例: "梅田")
     pub name: String,
     /// 列車番線一覧
     pub tracks: HashMap<Uuid, Track>,
