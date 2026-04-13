@@ -2,6 +2,6 @@
 import type { JsonValue } from "./serde_json/JsonValue";
 
 /**
- * 拡張プロパティ
+ * ユーザ定義で拡張が行える拡張プロパティを表す構造体
  */
 export type ExtensionProperty = { [key in string]: JsonValue };

@@ -2,6 +2,6 @@
 import type { Time } from "./Time";
 
 /**
- * 停車種別
+ * テンプレート列車の停車種別を表す列挙体
  */
 export type StopType = { "Stop": Time } | "Pass";
