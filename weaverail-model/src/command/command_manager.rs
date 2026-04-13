@@ -1,11 +1,11 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter},
-    model::DiagramRoot,
+    command::{Command, CommandError, EventEmitter}, metadata::Metadata, model::DiagramRoot
 };
 
 /// モデルに対する操作を管理する構造体
 pub struct CommandManager {
     pub root: DiagramRoot,
+    pub metadata: Metadata,
     undo_stack: Vec<Box<dyn Command>>,
     redo_stack: Vec<Box<dyn Command>>,
     emitter: Box<dyn EventEmitter>,
@@ -14,6 +14,7 @@ impl CommandManager {
     pub fn new(emitter: Box<dyn EventEmitter>) -> Self {
         Self {
             emitter,
+            metadata: Metadata::default(),
             root: DiagramRoot::default(),
             undo_stack: Vec::new(),
             redo_stack: Vec::new(),
