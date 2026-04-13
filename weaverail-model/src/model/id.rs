@@ -54,7 +54,7 @@ impl Display for WeaverailId {
 macro_rules! weaverail_id {
     ($name: ident, $id: expr) => {
         #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Debug, Default)]
-        pub struct $name(pub crate::model::id::WeaverailId);
+        pub struct $name(pub $crate::model::id::WeaverailId);
 
         impl $name {
             pub fn new() -> Self {
