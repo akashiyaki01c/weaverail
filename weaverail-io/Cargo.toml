@@ -1,0 +1,10 @@
+[package]
+name = "weaverail-io"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+weaverail-model = { path = "../weaverail-model" }

@@ -4623,6 +4623,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "weaverail-io"
+version = "0.2.0"
+dependencies = [
+ "weaverail-model",
+]
+
+[[package]]
 name = "weaverail-model"
 version = "0.2.0"
 dependencies = [
