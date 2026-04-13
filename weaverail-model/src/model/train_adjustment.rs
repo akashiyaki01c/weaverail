@@ -1,18 +1,22 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::{model::{station::{StationId, TrackId}, train::TrainId}, weaverail_id};
+
+weaverail_id!(TrainsAdjustmentId, "ADJT");
+
 /// 列車同士の時刻調整を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TrainsAdjustment {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TrainsAdjustmentId,
     /// 時刻調整種別
     pub adjustment: TrainsAdjustmentType,
 }
 impl TrainsAdjustment {
     pub fn new() -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: TrainsAdjustmentId::new(),
             ..Default::default()
         }
     }
@@ -28,12 +32,12 @@ pub enum TrainsAdjustmentType {
     /// 待避を行う
     Waiting {
         /// 待避を行う駅ID
-        station_id: Uuid,
+        station_id: StationId,
         /// (変更がある場合)待避列車の番線ID
-        waiting_track_id: Option<Uuid>,
+        waiting_track_id: Option<TrackId>,
         /// 待避側の列車ID
-        waiting_train_id: Uuid,
+        waiting_train_id: TrainId,
         /// 通過側の列車ID
-        passing_train_id: Uuid,
+        passing_train_id: TrainId,
     },
 }

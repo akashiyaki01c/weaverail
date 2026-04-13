@@ -5,13 +5,15 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::model::{ExtensionProperty, time::Time};
+use crate::{model::{ExtensionProperty, station::StationId, template_train::TemplateTrainId, time::Time}, weaverail_id};
+
+weaverail_id!(TrainId, "TRAI");
 
 /// Weaverail上の1つの「列車」を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Train {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TrainId,
     /// テンプレート列車ID
     pub template_segments: Vec<TemplateSegment>,
     /// 開始駅の出発時刻
@@ -22,7 +24,7 @@ pub struct Train {
 impl Train {
     pub fn new() -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: TrainId::new(),
             ..Default::default()
         }
     }
@@ -32,9 +34,9 @@ impl Train {
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateSegment {
     /// テンプレート列車ID
-    pub template_train_id: Uuid,
+    pub template_train_id: TemplateTrainId,
     /// 開始駅ID
-    pub start_station_id: Uuid,
+    pub start_station_id: StationId,
     /// 終了駅ID
-    pub end_station_id: Uuid,
+    pub end_station_id: StationId,
 }

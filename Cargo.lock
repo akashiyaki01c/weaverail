@@ -4638,6 +4638,7 @@ dependencies = [
 name = "weaverail-model"
 version = "0.2.0"
 dependencies = [
+ "base64 0.22.1",
  "ron",
  "serde",
  "serde_json",

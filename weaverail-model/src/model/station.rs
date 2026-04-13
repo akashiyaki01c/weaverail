@@ -4,17 +4,19 @@
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty},
+    model::{DiagramRoot, ExtensionProperty}, weaverail_id,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};
 use uuid::Uuid;
 
+weaverail_id!(TrackId, "TRCK");
+
 /// Weaverail上の駅に存在している1つの列車番線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Track {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TrackId,
     /// 番線名 (例: "1番線")
     pub name: String,
     /// 拡張プロパティ
@@ -23,29 +25,31 @@ pub struct Track {
 impl Track {
     pub fn new(name: &str) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: TrackId::new(),
             name: name.to_string(),
             ..Default::default()
         }
     }
 }
 
+weaverail_id!(StationId, "STAT");
+
 /// Weaverail上の1つの駅を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Station {
     /// 識別ID
-    pub id: Uuid,
+    pub id: StationId,
     /// 正式駅名 (例: "梅田")
     pub name: String,
     /// 列車番線一覧
-    pub tracks: HashMap<Uuid, Track>,
+    pub tracks: HashMap<TrackId, Track>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
 impl Station {
     pub fn new(name: &str) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: StationId::new(),
             name: name.to_string(),
             ..Default::default()
         }
@@ -68,7 +72,7 @@ impl DiagramRoot {
     /// 駅を削除する関数
     /// 指定IDの駅が存在しない場合はエラーを返す
     /// 路線から参照されている場合はエラーを返す
-    pub fn delete_station(&mut self, station_id: Uuid) -> Result<Station, CommandError> {
+    pub fn delete_station(&mut self, station_id: StationId) -> Result<Station, CommandError> {
         if self
             .lines
             .values()

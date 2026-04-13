@@ -1,10 +1,9 @@
 use std::sync::Mutex;
 
-use uuid::Uuid;
 use weaverail_model::{
     app::AppState,
     command::line::{AddLineCommand, RemoveLineCommand},
-    model::line::Line,
+    model::line::{Line, LineId},
 };
 
 #[tauri::command]
@@ -21,7 +20,7 @@ pub async fn add_line(state: tauri::State<'_, Mutex<AppState>>, line: Line) -> R
 #[tauri::command]
 pub async fn remove_line(
     state: tauri::State<'_, Mutex<AppState>>,
-    line_id: Uuid,
+    line_id: LineId,
 ) -> Result<(), String> {
     let command = RemoveLineCommand::new(line_id);
     let mut state = state.lock().expect("mutex lock error");

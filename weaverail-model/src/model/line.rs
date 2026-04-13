@@ -10,14 +10,16 @@ use uuid::Uuid;
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty, station::Station},
+    model::{DiagramRoot, ExtensionProperty, station::{Station, StationId}}, weaverail_id,
 };
+
+weaverail_id!(LineId, "LINE");
 
 /// Weaverail上の1つの路線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Line {
     /// 識別ID
-    pub id: Uuid,
+    pub id: LineId,
     /// 路線名 (例: "神明線")
     pub name: String,
     /// 路線に所属する駅間リスト
@@ -28,7 +30,7 @@ pub struct Line {
 impl Line {
     pub fn new(name: &str, stations: &[LineSegment]) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: LineId::new(),
             name: name.to_string(),
             segments: stations.into(),
             ..Default::default()
@@ -36,29 +38,31 @@ impl Line {
     }
 
     /// 路線が指定駅を参照しているか
-    pub fn contains_station(&self, station_id: Uuid) -> bool {
+    pub fn contains_station(&self, station_id: StationId) -> bool {
         self.segments
             .iter()
             .any(|segment| segment.contains_station(station_id))
     }
 }
 
+weaverail_id!(LineSegmentId, "SEGM");
+
 /// Weaverail上の1つの路線に属する駅間を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct LineSegment {
     /// 識別ID
-    pub id: Uuid,
+    pub id: LineSegmentId,
     /// 開始駅ID
-    pub start_station: Uuid,
+    pub start_station: StationId,
     /// 終了駅ID
-    pub end_station: Uuid,
+    pub end_station: StationId,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
 impl LineSegment {
-    pub fn new(start_station: Uuid, end_station: Uuid) -> Self {
+    pub fn new(start_station: StationId, end_station: StationId) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: LineSegmentId::new(),
             start_station,
             end_station,
             ..Default::default()
@@ -66,7 +70,7 @@ impl LineSegment {
     }
 
     /// 駅間が指定駅を参照しているか
-    pub fn contains_station(&self, station_id: Uuid) -> bool {
+    pub fn contains_station(&self, station_id: StationId) -> bool {
         self.start_station == station_id || self.end_station == station_id
     }
 }
@@ -87,7 +91,7 @@ impl DiagramRoot {
     /// 路線を削除する関数
     /// 指定IDの路線が存在しない場合はエラーを返す
     /// テンプレート列車から参照されている場合はエラーを返す
-    pub fn delete_line(&mut self, line_id: Uuid) -> Result<Line, CommandError> {
+    pub fn delete_line(&mut self, line_id: LineId) -> Result<Line, CommandError> {
         let line = self
             .lines
             .get(&line_id)
@@ -122,7 +126,7 @@ impl DiagramRoot {
     /// 路線の末尾に駅を追加する
     pub fn append_segment(
         &mut self,
-        line_id: Uuid,
+        line_id: LineId,
         segment: LineSegment,
     ) -> Result<(), CommandError> {
         let line = self

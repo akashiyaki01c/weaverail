@@ -8,14 +8,16 @@ use uuid::Uuid;
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty},
+    model::{DiagramRoot, ExtensionProperty}, weaverail_id,
 };
+
+weaverail_id!(TrainTypeId, "TYPE");
 
 /// Weaverail上の1つの「列車種別」を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TrainType {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TrainTypeId,
     /// 列車種別名 (例: "普通列車")
     pub name: String,
     /// 拡張プロパティ
@@ -24,7 +26,7 @@ pub struct TrainType {
 impl TrainType {
     pub fn new(name: &str) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: TrainTypeId::new(),
             name: name.to_string(),
             ..Default::default()
         }
@@ -47,7 +49,7 @@ impl DiagramRoot {
     /// 列車種別を削除する関数
     /// 指定IDの列車種別が存在しない場合はエラーを返す
     /// テンプレート列車から讃匠されている場合はエラーを返す
-    pub fn delete_train_type(&mut self, train_type_id: Uuid) -> Result<TrainType, CommandError> {
+    pub fn delete_train_type(&mut self, train_type_id: TrainTypeId) -> Result<TrainType, CommandError> {
         if self
             .template_trains
             .values()

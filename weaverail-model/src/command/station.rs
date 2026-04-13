@@ -1,8 +1,6 @@
-use uuid::Uuid;
-
 use crate::{
     command::{Command, CommandError, EventEmitter},
-    model::{DiagramRoot, station::Station},
+    model::{DiagramRoot, station::{Station, StationId}},
 };
 
 /// 駅の追加
@@ -40,11 +38,11 @@ impl Command for AddStationCommand {
 /// 駅の削除
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct RemoveStationCommand {
-    station_id: Uuid,
+    station_id: StationId,
     station: Option<Station>,
 }
 impl RemoveStationCommand {
-    pub fn new(station_id: Uuid) -> Self {
+    pub fn new(station_id: StationId) -> Self {
         Self {
             station_id,
             station: None,

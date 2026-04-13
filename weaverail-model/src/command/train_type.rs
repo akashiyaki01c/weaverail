@@ -1,8 +1,7 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
-    model::{DiagramRoot, train_type::TrainType},
+    model::{DiagramRoot, train_type::{TrainType, TrainTypeId}},
 };
-use uuid::Uuid;
 
 /// 列車種別の追加
 #[derive(Clone, PartialEq, Debug, Default)]
@@ -39,11 +38,11 @@ impl Command for AddTrainTypeCommand {
 /// 駅の削除
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct RemoveTrainTypeCommand {
-    train_type_id: Uuid,
+    train_type_id: TrainTypeId,
     train_type: Option<TrainType>,
 }
 impl RemoveTrainTypeCommand {
-    pub fn new(station_id: Uuid) -> Self {
+    pub fn new(station_id: TrainTypeId) -> Self {
         Self {
             train_type_id: station_id,
             train_type: None,

@@ -7,17 +7,19 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::model::{DiagramRoot, ExtensionProperty, line::Line, time::Time};
+use crate::{model::{DiagramRoot, ExtensionProperty, line::{Line, LineSegmentId}, station::{StationId, TrackId}, time::Time, train_type::TrainTypeId}, weaverail_id};
+
+weaverail_id!(TemplateTrainId, "TMPT");
 
 /// Weaverail上の1つのテンプレート列車を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrain {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TemplateTrainId,
     /// テンプレート列車名 (例: "本線下り普通列車")
     pub name: String,
     /// 列車種別ID
-    pub train_type_id: Uuid,
+    pub train_type_id: TrainTypeId,
     /// 開始駅情報
     pub start_station: TemplateTrainStation,
     /// 駅間/駅情報の一覧
@@ -27,7 +29,7 @@ pub struct TemplateTrain {
 }
 impl TemplateTrain {
     /// テンプレート列車が指定駅間を参照しているか
-    pub fn contains_segment(&self, segment_id: Uuid) -> bool {
+    pub fn contains_segment(&self, segment_id: LineSegmentId) -> bool {
         self.segments
             .iter()
             .any(|segment| segment.0.segment_id == segment_id)
@@ -48,7 +50,7 @@ impl TemplateTrain {
     }
 
     /// 指定の駅が含まれているか
-    pub fn contains_station(&self, station_id: Uuid) -> bool {
+    pub fn contains_station(&self, station_id: StationId) -> bool {
         let stations = self.get_stations();
         stations
             .iter()
@@ -56,7 +58,7 @@ impl TemplateTrain {
     }
 
     /// 指定の駅が何番目にあるか
-    pub fn get_station_index(&self, station_id: Uuid) -> usize {
+    pub fn get_station_index(&self, station_id: StationId) -> usize {
         let stations = self.get_stations();
         stations
             .iter()
@@ -67,8 +69,8 @@ impl TemplateTrain {
     /// 指定の駅間を抽出して返す関数
     pub fn get_filtered_segment(
         &self,
-        start_station_id: Uuid,
-        end_station_id: Uuid,
+        start_station_id: StationId,
+        end_station_id: StationId,
     ) -> (
         &TemplateTrainStation,
         Vec<(&TemplateTrainSegment, &TemplateTrainStation)>,
@@ -96,8 +98,8 @@ impl TemplateTrain {
     }
     pub fn get_filtered_segment_iter(
         &self,
-        start_station_id: Uuid,
-        end_station_id: Uuid,
+        start_station_id: StationId,
+        end_station_id: StationId,
     ) -> Vec<(
         &TemplateTrainStation,
         &TemplateTrainSegment,
@@ -137,28 +139,32 @@ impl DiagramRoot {
     }
 }
 
+weaverail_id!(TemplateTrainSegmentId, "TTSG");
+
 /// Weaverail上のテンプレート列車の駅間情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainSegment {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TemplateTrainSegmentId,
     /// 駅間ID
-    pub segment_id: Uuid,
+    pub segment_id: LineSegmentId,
     /// 駅間が反転しているか
     pub is_reversed: bool,
     /// 基準運転時分
     pub running_time: Time,
 }
 
+weaverail_id!(TemplateTrainStationId, "TTST");
+
 /// Weaverail上のテンプレート列車の駅情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainStation {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TemplateTrainStationId,
     /// 駅ID
-    pub station_id: Uuid,
+    pub station_id: StationId,
     /// 駅到着番線ID
-    pub track_id: Uuid,
+    pub track_id: TrackId,
     /// 停車時間
     pub stop_time: StopType,
 }

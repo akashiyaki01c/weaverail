@@ -2,10 +2,9 @@ use crate::{
     command::{Command, CommandError, EventEmitter},
     model::{
         DiagramRoot,
-        line::{Line, LineSegment},
+        line::{Line, LineId, LineSegment},
     },
 };
-use uuid::Uuid;
 
 /// 路線の追加
 #[derive(Clone, PartialEq, Debug, Default)]
@@ -43,11 +42,11 @@ impl Command for AddLineCommand {
 /// 路線を削除する
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct RemoveLineCommand {
-    line_id: Uuid,
+    line_id: LineId,
     line: Option<Line>,
 }
 impl RemoveLineCommand {
-    pub fn new(line_id: Uuid) -> Self {
+    pub fn new(line_id: LineId) -> Self {
         Self {
             line_id,
             line: None,
@@ -83,11 +82,11 @@ impl Command for RemoveLineCommand {
 /// 路線に駅間を追加する
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct AppendSegmentToLine {
-    line_id: Uuid,
+    line_id: LineId,
     segment: LineSegment,
 }
 impl AppendSegmentToLine {
-    pub fn new(line_id: Uuid, segment: LineSegment) -> Self {
+    pub fn new(line_id: LineId, segment: LineSegment) -> Self {
         Self { line_id, segment }
     }
 }

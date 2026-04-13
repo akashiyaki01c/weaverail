@@ -1,11 +1,10 @@
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter};
-use uuid::Uuid;
 use weaverail_model::{
     app::AppState,
     command::station::{AddStationCommand, RemoveStationCommand},
-    model::station::Station,
+    model::station::{Station, StationId},
 };
 
 #[tauri::command]
@@ -28,7 +27,7 @@ pub async fn add_station(
 #[tauri::command]
 pub async fn remove_station(
     state: tauri::State<'_, Mutex<AppState>>,
-    station_id: Uuid,
+    station_id: StationId,
     app: AppHandle,
 ) -> Result<(), String> {
     let command = RemoveStationCommand::new(station_id);

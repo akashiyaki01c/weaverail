@@ -8,27 +8,34 @@ use uuid::Uuid;
 
 use crate::{
     command::CommandError,
-    model::{DiagramRoot, ExtensionProperty, train::Train, train_adjustment::TrainsAdjustment},
+    model::{
+        DiagramRoot, ExtensionProperty,
+        train::{Train, TrainId},
+        train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},
+    },
+    weaverail_id,
 };
+
+weaverail_id!(TimetableId, "TABL");
 
 /// Weaverail上の1つの時刻表を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Timetable {
     /// 識別ID
-    pub id: Uuid,
+    pub id: TimetableId,
     /// 時刻表名
     pub name: String,
     /// 時刻表に含まれる列車
-    pub trains: HashMap<Uuid, Train>,
+    pub trains: HashMap<TrainId, Train>,
     /// 時間調整
-    pub adjustments: HashMap<Uuid, TrainsAdjustment>,
+    pub adjustments: HashMap<TrainsAdjustmentId, TrainsAdjustment>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
 impl Timetable {
     pub fn new(name: &str) -> Self {
         Self {
-            id: Uuid::new_v4(),
+            id: TimetableId::new(),
             name: name.to_string(),
             ..Default::default()
         }
@@ -49,7 +56,10 @@ impl DiagramRoot {
 
     /// 時刻表を削除する関数
     /// 指定IDの時刻表が存在しない場合はエラーを返す
-    pub fn delete_timetable(&mut self, timetable_id: Uuid) -> Result<Timetable, CommandError> {
+    pub fn delete_timetable(
+        &mut self,
+        timetable_id: TimetableId,
+    ) -> Result<Timetable, CommandError> {
         self.timetables
             .remove(&timetable_id)
             .ok_or(CommandError::TargetObjectNotFound)

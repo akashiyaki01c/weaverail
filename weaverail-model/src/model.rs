@@ -8,16 +8,16 @@ pub mod timetable;
 pub mod train;
 pub mod train_adjustment;
 pub mod train_type;
+pub mod id;
 
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use uuid::Uuid;
 
 use crate::model::{
-    line::Line, station::Station, template_train::TemplateTrain, timetable::Timetable,
-    train_type::TrainType,
+    line::{Line, LineId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId},
+    train_type::{TrainType, TrainTypeId},
 };
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
@@ -45,15 +45,15 @@ impl ExtensionProperty {
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct DiagramRoot {
     /// 駅の集合
-    pub stations: HashMap<Uuid, Station>,
+    pub stations: HashMap<StationId, Station>,
     /// 路線の集合
-    pub lines: HashMap<Uuid, Line>,
+    pub lines: HashMap<LineId, Line>,
     /// 列車種別の集合
-    pub train_types: HashMap<Uuid, TrainType>,
+    pub train_types: HashMap<TrainTypeId, TrainType>,
     /// テンプレート列車の集合
-    pub template_trains: HashMap<Uuid, TemplateTrain>,
+    pub template_trains: HashMap<TemplateTrainId, TemplateTrain>,
     /// 時刻表の集合
-    pub timetables: HashMap<Uuid, Timetable>,
+    pub timetables: HashMap<TimetableId, Timetable>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }

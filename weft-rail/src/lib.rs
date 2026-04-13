@@ -4,10 +4,8 @@ use petgraph::{
     algo::bellman_ford,
     graph::{DiGraph, NodeIndex},
 };
-use uuid::Uuid;
 use weaverail_model::model::{
-    DiagramRoot, template_train::StopType, time::Time, timetable::Timetable, train::Train,
-    train_adjustment::TrainsAdjustmentType,
+    DiagramRoot, line::LineSegmentId, station::StationId, template_train::{StopType, TemplateTrainSegmentId}, time::Time, timetable::{Timetable, TimetableId}, train::{Train, TrainId}, train_adjustment::TrainsAdjustmentType
 };
 
 /// ノードの種類
@@ -25,22 +23,22 @@ enum GraphNodeType {
 #[derive(Clone, PartialEq, Eq, Debug, Hash)]
 struct GraphNodeId {
     /// 列車ID
-    pub train_id: Uuid,
+    pub train_id: TrainId,
     /// 駅間ID
-    pub segment_id: Uuid,
+    pub segment_id: LineSegmentId,
     /// 駅間が逆転しているか
     pub is_reversed: bool,
     /// 駅ID
-    pub station_id: Uuid,
+    pub station_id: StationId,
     /// ノードの種類
     pub node_type: GraphNodeType,
 }
 impl GraphNodeId {
     pub fn new(
-        train_id: Uuid,
-        segment_id: Uuid,
+        train_id: TrainId,
+        segment_id: LineSegmentId,
         is_reversed: bool,
-        station_id: Uuid,
+        station_id: StationId,
         node_type: GraphNodeType,
     ) -> Self {
         Self {
@@ -69,19 +67,19 @@ impl<'a> TrainWrapper<'a> {
 
 #[derive(Default)]
 struct SegmentInfo {
-    pub segment_id: Uuid,
-    pub train_times_prograde: HashMap<Uuid, (Time, Time, Uuid)>,
-    pub train_times_retrograde: HashMap<Uuid, (Time, Time, Uuid)>,
+    pub segment_id: LineSegmentId,
+    pub train_times_prograde: HashMap<TrainId, (Time, Time, TemplateTrainSegmentId)>,
+    pub train_times_retrograde: HashMap<TrainId, (Time, Time, TemplateTrainSegmentId)>,
 }
 
 /// ダイヤグラムをグラフ理論によって生成するアルゴリズム
 pub struct WeftGraph<'a> {
     /// ダイヤグラムデータ
     root: &'a DiagramRoot,
-    timetable_id: Uuid,
+    timetable_id: TimetableId,
 }
 impl<'a> WeftGraph<'a> {
-    pub fn new(root: &'a DiagramRoot, timetable_id: Uuid) -> Self {
+    pub fn new(root: &'a DiagramRoot, timetable_id: TimetableId) -> Self {
         Self { root, timetable_id }
     }
 
@@ -332,10 +330,10 @@ impl<'a> WeftGraph<'a> {
         // 根ノード
         let root_node = {
             let node_id = GraphNodeId::new(
-                Uuid::nil(),
-                Uuid::nil(),
+                TrainId::new(),
+                LineSegmentId::new(),
                 false,
-                Uuid::nil(),
+                StationId::new(),
                 GraphNodeType::Root,
             );
             let index = graph1.add_node(node_id.clone());
@@ -353,7 +351,7 @@ impl<'a> WeftGraph<'a> {
         let segment_infos: Vec<SegmentInfo> = self.get_segment_info(&train_wrappers, &res1);
 
         for train_wrapper in &train_wrappers {
-            let mut current_before_train_info: Option<Uuid> = None;
+            let mut current_before_train_info: Option<TrainId> = None;
             for node in &train_wrapper.nodes {
                 println!(
                     "\n{}発列車 [{}]",
@@ -377,7 +375,7 @@ impl<'a> WeftGraph<'a> {
                             .iter()
                             .find(|info| info.segment_id == node.0.segment_id)
                             .unwrap();
-                        let mut current_trains: Vec<(&Uuid, &(Time, Time, Uuid))> =
+                        let mut current_trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> =
                             if node.0.is_reversed {
                                 &current_info.train_times_retrograde
                             } else {
@@ -421,8 +419,8 @@ impl<'a> WeftGraph<'a> {
                             .find(|info| info.segment_id == node.0.segment_id)
                             .unwrap();
                         // 現区間での列車順序
-                        let current_trains: Vec<(&Uuid, &(Time, Time, Uuid))> = {
-                            let mut trains: Vec<(&Uuid, &(Time, Time, Uuid))> =
+                        let current_trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> = {
+                            let mut trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> =
                                 if node.0.is_reversed {
                                     &current_info.train_times_retrograde
                                 } else {
@@ -451,8 +449,8 @@ impl<'a> WeftGraph<'a> {
                                 .find(|info| info.segment_id == before_segment.0.segment_id)
                                 .unwrap();
                             // 前区間での列車順序
-                            let before_trains: Vec<(&Uuid, &(Time, Time, Uuid))> = {
-                                let mut trains: Vec<(&Uuid, &(Time, Time, Uuid))> =
+                            let before_trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> = {
+                                let mut trains: Vec<(&TrainId, &(Time, Time, TemplateTrainSegmentId))> =
                                     if node.0.is_reversed {
                                         &before_info.train_times_retrograde
                                     } else {
