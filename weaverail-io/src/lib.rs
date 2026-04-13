@@ -1,14 +1,24 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use thiserror::Error;
+
+
+pub mod project_file;
+
+#[derive(Error, Debug)]
+pub enum WeaverailIoError {
+    #[error("File is invalid format")]
+    InvalidMagicNumber,
+    #[error("io error")]
+    Io(#[from] std::io::Error),
+    #[error("Metadata text encoding format is invalid")]
+    InvalidMetadataEncodingFormat(#[from] std::str::Utf8Error),
+    #[error("ron deserializing error")]
+    RonDeserializeError(#[from] ron::de::SpannedError),
+    #[error("ron serializing error")]
+    RonSerializeError(#[from] ron::error::Error),
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Weaverailプロジェクトファイルを読み込む関数
+pub fn read_project_file() {}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+/// Weaverailプロジェクトファイルを書き込む関数
+pub fn write_project_file() {}
