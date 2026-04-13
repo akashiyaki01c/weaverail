@@ -17,16 +17,13 @@ pub struct ResultStationTime {
 }
 
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum ResultStationStopType {
     /// 停車
+    #[default]
     Stop,
     /// 通過
     Pass,
-}
-impl Default for ResultStationStopType {
-    fn default() -> Self {
-        Self::Stop
-    }
 }
 
 impl ResultStationTime {
@@ -85,18 +82,18 @@ impl TemplateTrain {
     /// 指定の駅が含まれているか
     pub fn contains_station(&self, station_id: Uuid) -> bool {
         let stations = self.get_stations();
-        return stations
+        stations
             .iter()
-            .any(|station| station.station_id == station_id);
+            .any(|station| station.station_id == station_id)
     }
 
     /// 指定の駅が何番目にあるか
     pub fn get_station_index(&self, station_id: Uuid) -> usize {
         let stations = self.get_stations();
-        return stations
+        stations
             .iter()
             .position(|station| station.station_id == station_id)
-            .expect("Station ID not found in template train");
+            .expect("Station ID not found in template train")
     }
 
     /// 指定の駅間を抽出して返す関数
@@ -168,7 +165,7 @@ impl DiagramRoot {
     pub fn find_template_train_by_name(&self, template_train_name: &str) -> Option<&TemplateTrain> {
         self.template_trains
             .values()
-            .find(|template_train| &template_train.name == template_train_name)
+            .find(|template_train| template_train.name == template_train_name)
     }
 }
 

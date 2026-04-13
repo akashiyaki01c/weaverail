@@ -63,6 +63,6 @@ impl DiagramRoot {
     pub fn find_train_type_by_name(&self, train_type_name: &str) -> Option<&TrainType> {
         self.train_types
             .values()
-            .find(|train_type| &train_type.name == train_type_name)
+            .find(|train_type| train_type.name == train_type_name)
     }
 }

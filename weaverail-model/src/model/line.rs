@@ -91,7 +91,7 @@ impl DiagramRoot {
         let is_referenced = self
             .template_trains
             .values()
-            .any(|train| train.contains_line(&line));
+            .any(|train| train.contains_line(line));
 
         if is_referenced {
             return Err(CommandError::ExternalReference);
@@ -107,7 +107,7 @@ impl DiagramRoot {
         if line.segments.is_empty() {
             return Vec::new();
         }
-        let start_id = line.segments.get(0).unwrap().start_station;
+        let start_id = line.segments.first().unwrap().start_station;
         let end_ids = line.segments.iter().map(|segment| segment.end_station);
         iter::once(start_id)
             .chain(end_ids)

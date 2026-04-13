@@ -102,7 +102,7 @@ impl<'a> WeftGraph<'a> {
         root_node: &NodeIndex,
     ) {
         for train in self.timetable().trains.values() {
-            let mut train_wrapper = TrainWrapper::new(&train);
+            let mut train_wrapper = TrainWrapper::new(train);
             for template_segment in &train.template_segments {
                 let template_train = self
                     .root
@@ -497,13 +497,7 @@ impl<'a> WeftGraph<'a> {
                                                         node.0.train_id
                                                     );
                                                     if station_id == node.0.station_id {
-                                                        if waiting_train_id != node.0.train_id
-                                                            && passing_train_id != node.0.train_id
-                                                        {
-                                                            false
-                                                        } else {
-                                                            true
-                                                        }
+                                                        !(waiting_train_id != node.0.train_id && passing_train_id != node.0.train_id)
                                                     } else {
                                                         println!("駅不合");
                                                         false
@@ -559,13 +553,7 @@ impl<'a> WeftGraph<'a> {
                                                         node.0.train_id
                                                     );
                                                     if station_id == node.0.station_id {
-                                                        if waiting_train_id != node.0.train_id
-                                                            && passing_train_id != node.0.train_id
-                                                        {
-                                                            false
-                                                        } else {
-                                                            true
-                                                        }
+                                                        !(waiting_train_id != node.0.train_id && passing_train_id != node.0.train_id)
                                                     } else {
                                                         println!("駅不合");
                                                         false

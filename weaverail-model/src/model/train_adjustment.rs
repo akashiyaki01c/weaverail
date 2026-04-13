@@ -20,8 +20,10 @@ impl TrainsAdjustment {
 
 /// 列車同士の時刻調整種別を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Default)]
 pub enum TrainsAdjustmentType {
     /// 時刻調整を行わない
+    #[default]
     None,
     /// 待避を行う
     Waiting {
@@ -34,9 +36,4 @@ pub enum TrainsAdjustmentType {
         /// 通過側の列車ID
         passing_train_id: Uuid,
     },
-}
-impl Default for TrainsAdjustmentType {
-    fn default() -> Self {
-        Self::None
-    }
 }

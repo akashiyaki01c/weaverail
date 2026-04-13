@@ -82,6 +82,6 @@ impl DiagramRoot {
     pub fn find_station_by_name(&self, station_name: &str) -> Option<&Station> {
         self.stations
             .values()
-            .find(|station| &station.name == station_name)
+            .find(|station| station.name == station_name)
     }
 }
