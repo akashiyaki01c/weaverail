@@ -27,7 +27,7 @@ impl NumberIssuer {
 }
 
 /// ノードを生成する関数
-pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<WeftNode> {
+pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeId, WeftNode> {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
     let mut result: HashMap<TrainId, Vec<WeftNode>> = HashMap::new();
@@ -49,7 +49,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<WeftNode>
 	connect_hatsuhatsu_edge(root, timetable, &mut result);
 	connect_chakuchaku_edge(root, timetable, &mut result);
 
-    result.into_values().flatten().collect()
+    result.into_values().flatten().map(|node| (node.node_id, node)).collect()
 }
 
 /// 1つの列車時刻のノードを生成する関数
