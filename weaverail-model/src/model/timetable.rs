@@ -9,9 +9,7 @@ use uuid::Uuid;
 use crate::{
     command::CommandError,
     model::{
-        DiagramRoot, ExtensionProperty,
-        train::{Train, TrainId},
-        train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},
+        DiagramRoot, ExtensionProperty, line::LineSegmentId, segment_train_order::SegmentTrainOrder, train::{Train, TrainId}, train_adjustment::{TrainsAdjustment, TrainsAdjustmentId}
     },
     weaverail_id,
 };
@@ -29,6 +27,8 @@ pub struct Timetable {
     pub trains: HashMap<TrainId, Train>,
     /// 時間調整
     pub adjustments: HashMap<TrainsAdjustmentId, TrainsAdjustment>,
+    /// 駅間の列車順序
+    pub segment_train_orders: HashMap<LineSegmentId, SegmentTrainOrder>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }

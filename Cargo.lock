@@ -4754,6 +4754,7 @@ name = "weft-rail"
 version = "0.2.0"
 dependencies = [
  "petgraph",
+ "smallvec",
  "uuid",
  "weaverail-model",
 ]

@@ -127,6 +127,14 @@ impl DiagramRoot {
             .collect()
     }
 
+    /// SegmentIdから駅間を取得する関数
+    pub fn get_segment(&self, segment_id: LineSegmentId) -> Option<&LineSegment> {
+        self.lines
+            .values()
+            .flat_map(|line| &line.segments)
+            .find(|segment| segment.id == segment_id)
+    }
+
     /// 路線の末尾に駅を追加する
     pub fn append_segment(
         &mut self,
