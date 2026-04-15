@@ -3,8 +3,8 @@ use crate::{
     model::{DiagramRoot, timetable::TimetableId, train::Train},
 };
 
-/// 駅に番線を追加する操作
-/// 指定駅が存在しない場合エラー
+/// 駅に列車を追加する操作
+/// 指定時刻表が存在しない場合エラー
 /// IDが重複した場合エラー
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct AddTrainCommand {
