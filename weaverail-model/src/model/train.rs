@@ -2,15 +2,16 @@
 //! - Train (列車)
 //!   - TemplateSegment (テンプレート列車への部分参照)
 
+use std::collections::hash_map::Entry;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    model::{
+    command::CommandError, model::{
         DiagramRoot, ExtensionProperty, station::StationId, template_train::TemplateTrainId,
-        time::Time,
-    },
-    weaverail_id,
+        time::Time, timetable::TimetableId,
+    }, weaverail_id
 };
 
 weaverail_id!(TrainId, "TRAI");
@@ -36,6 +37,34 @@ impl Train {
     }
 }
 impl DiagramRoot {
+    /// 列車を追加する関数
+    /// 既に同一IDの列車が存在している場合はエラーを返す
+    pub fn add_train(&mut self, timetable_id: TimetableId, train: Train) -> Result<(), CommandError> {
+        let station = self
+            .timetables
+            .get_mut(&timetable_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        match station.trains.entry(train.id) {
+            Entry::Vacant(entry) => {
+                entry.insert(train);
+                Ok(())
+            }
+            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+        }
+    }
+
+    /// 列車を削除する関数
+    /// 指定IDの番線が存在しない場合はエラーを返す
+    pub fn delete_train(&mut self, timetable_id: TimetableId, train_id: TrainId) -> Result<Train, CommandError> {
+        let timetable = self
+            .timetables
+            .get_mut(&timetable_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        timetable.trains
+            .remove(&train_id)
+            .ok_or(CommandError::TargetObjectNotFound)
+    }
+
     pub fn get_stations(&self, train: &Train) -> Vec<StationId> {
         let mut result = Vec::new();
         for segment in &train.template_segments {

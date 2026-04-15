@@ -10,6 +10,7 @@ pub mod segment;
 pub mod template_train;
 pub mod template_train_segment;
 pub mod timetable;
+pub mod train;
 
 use crate::model::DiagramRoot;
 use serde::{Deserialize, Serialize};
