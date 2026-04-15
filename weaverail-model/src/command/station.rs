@@ -83,12 +83,12 @@ impl Command for RemoveStationCommand {
 /// 指定駅の駅名を変更する操作
 /// 対象駅が存在しない場合はエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
-pub struct RenameStation {
+pub struct RenameStationCommand {
     station_id: StationId,
     old_name: Option<String>,
     new_name: String,
 }
-impl RenameStation {
+impl RenameStationCommand {
     pub fn new(station_id: StationId, new_name: &str) -> Self {
         Self {
             station_id,
@@ -97,7 +97,7 @@ impl RenameStation {
         }
     }
 }
-impl Command for RenameStation {
+impl Command for RenameStationCommand {
     fn redo(
         &mut self,
         obj: &mut DiagramRoot,
