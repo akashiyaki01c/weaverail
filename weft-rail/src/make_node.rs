@@ -5,12 +5,13 @@ use weaverail_model::model::{
     DiagramRoot,
     line::LineSegmentId,
     station::StationId,
+    template_train::StopType as TemplateTrainStopType,
     time::Time,
     timetable::{Timetable, TimetableId},
     train::{Train, TrainId},
 };
 
-use crate::{NodeId, NodeType, WeftNode};
+use crate::{NodeId, NodeType, StopType, WeftNode};
 
 struct NumberIssuer {
     current: usize,
@@ -21,8 +22,9 @@ impl NumberIssuer {
     }
 
     pub fn next(&mut self) -> NodeId {
+        let result = NodeId(self.current);
         self.current += 1;
-        NodeId(self.current)
+        result
     }
 }
 
@@ -38,6 +40,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
         segment_id: LineSegmentId::new(),
         edges: SmallVec::new(),
         node_type: NodeType::Root,
+        stop_type: StopType::Pass,
     };
 
     // 列車の生時刻の取得
@@ -46,10 +49,16 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
         result.insert(train.id, nodes);
     }
 
-	connect_hatsuhatsu_edge(root, timetable, &mut result);
-	connect_chakuchaku_edge(root, timetable, &mut result);
+    connect_hatsuhatsu_edge(root, timetable, &mut result);
+    connect_chakuchaku_edge(root, timetable, &mut result);
 
-    result.into_values().flatten().map(|node| (node.node_id, node)).collect()
+    let mut result: HashMap<NodeId, WeftNode> = result
+        .into_values()
+        .flatten()
+        .map(|node| (node.node_id, node))
+        .collect();
+	result.insert(root_node.node_id, root_node);
+	result
 }
 
 /// 1つの列車時刻のノードを生成する関数
@@ -60,6 +69,7 @@ fn make_train_node(
     issuer: &mut NumberIssuer,
 ) -> Vec<WeftNode> {
     let mut result = Vec::new();
+	let root_node_id = root_node.node_id;
     let mut before_node: &mut WeftNode = root_node;
     for template_segment in &train.template_segments {
         let template_train = diagram_root
@@ -77,10 +87,18 @@ fn make_train_node(
                 segment_id: template_segment.segment_id,
                 edges: SmallVec::new(),
                 node_type: NodeType::Departure,
+                stop_type: match start.stop_time {
+                    TemplateTrainStopType::Stop(_) => StopType::Stop,
+                    TemplateTrainStopType::Pass => StopType::Pass,
+                },
             };
             match start.stop_time {
                 weaverail_model::model::template_train::StopType::Stop(time) => {
-                    before_node.edges.push((departure_node.node_id, time))
+                    if before_node.node_id == root_node_id {
+						before_node.edges.push((departure_node.node_id, train.start_departure_time))
+					} else {
+						before_node.edges.push((departure_node.node_id, time))
+					}
                 }
                 weaverail_model::model::template_train::StopType::Pass => before_node
                     .edges
@@ -96,6 +114,10 @@ fn make_train_node(
                 segment_id: template_segment.segment_id,
                 edges: SmallVec::new(),
                 node_type: NodeType::Arrival,
+                stop_type: match end.stop_time {
+                    TemplateTrainStopType::Stop(_) => StopType::Stop,
+                    TemplateTrainStopType::Pass => StopType::Pass,
+                },
             };
             before_node
                 .edges
@@ -120,7 +142,7 @@ fn connect_hatsuhatsu_edge(
             let before = train_ids[0];
             let current = train_ids[1];
 
-			let current_station_node = {
+            let current_station_node = {
                 let current_train_nodes = nodes.get(&current).unwrap();
                 current_train_nodes
                     .iter()
@@ -129,7 +151,8 @@ fn connect_hatsuhatsu_edge(
                             && node.segment_id == orders.segment_id
                             && node.node_type == NodeType::Departure
                     })
-                    .unwrap().node_id
+                    .unwrap()
+                    .node_id
             };
 
             let before_station_nodes = {
@@ -164,7 +187,7 @@ fn connect_chakuchaku_edge(
             let before = train_ids[0];
             let current = train_ids[1];
 
-			let current_station_node = {
+            let current_station_node = {
                 let current_train_nodes = nodes.get(&current).unwrap();
                 current_train_nodes
                     .iter()
@@ -173,7 +196,8 @@ fn connect_chakuchaku_edge(
                             && node.segment_id == orders.segment_id
                             && node.node_type == NodeType::Arrival
                     })
-                    .unwrap().node_id
+                    .unwrap()
+                    .node_id
             };
 
             let before_station_nodes = {

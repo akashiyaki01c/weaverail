@@ -58,6 +58,18 @@ impl TemplateTrain {
             .collect()
     }
 
+    /// 指定区間の全ての駅を取得する関数
+    pub fn get_filtered_stations(
+        &self,
+        start_station_id: StationId,
+        end_station_id: StationId,
+    ) -> Vec<&TemplateTrainStation> {
+        let (start_station, segments) = self.get_filtered_segment(start_station_id, end_station_id);
+        std::iter::once(start_station)
+            .chain(segments.iter().map(|segment| segment.1))
+            .collect()
+    }
+
     /// 指定の駅が含まれているか
     pub fn contains_station(&self, station_id: StationId) -> bool {
         let stations = self.get_stations();

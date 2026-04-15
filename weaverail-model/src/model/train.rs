@@ -6,7 +6,10 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    model::{ExtensionProperty, station::StationId, template_train::TemplateTrainId, time::Time},
+    model::{
+        DiagramRoot, ExtensionProperty, station::StationId, template_train::TemplateTrainId,
+        time::Time,
+    },
     weaverail_id,
 };
 
@@ -30,6 +33,26 @@ impl Train {
             id: TrainId::new(),
             ..Default::default()
         }
+    }
+}
+impl DiagramRoot {
+    pub fn get_stations(&self, train: &Train) -> Vec<StationId> {
+        let mut result = Vec::new();
+        for segment in &train.template_segments {
+            let template_train = self
+                .template_trains
+                .get(&segment.template_train_id)
+                .unwrap();
+            let mut stations = template_train
+                .get_filtered_stations(segment.start_station_id, segment.end_station_id);
+            if result.is_empty() {
+                result.extend(stations.iter().map(|sta| sta.station_id));
+            } else {
+                result.extend(stations[1..].iter().map(|sta| sta.station_id));
+            }
+        }
+
+        result
     }
 }
 
