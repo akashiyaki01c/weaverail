@@ -82,34 +82,52 @@ impl Command for RemoveLineCommand {
     }
 }
 
-/// 路線に駅間を追加する
+/// 指定路線の駅名を変更する操作
+/// 対象路線が存在しない場合はエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
-pub struct AppendSegmentToLine {
+pub struct RenameLineCommand {
     line_id: LineId,
-    segment: LineSegment,
+    old_name: Option<String>,
+    new_name: String,
 }
-impl AppendSegmentToLine {
-    pub fn new(line_id: LineId, segment: LineSegment) -> Self {
-        Self { line_id, segment }
+impl RenameLineCommand {
+    pub fn new(line_id: LineId, new_name: &str) -> Self {
+        Self {
+            line_id,
+            old_name: None,
+            new_name: new_name.to_string(),
+        }
     }
 }
-
-impl Command for AppendSegmentToLine {
+impl Command for RenameLineCommand {
     fn redo(
         &mut self,
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.append_segment(self.line_id, self.segment.clone())?;
-        emitter.emit("segment::append", "");
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        self.old_name = Some(line.name.to_string());
+        line.name = self.new_name.clone();
+        emitter.emit("line::renamed", "");
         Ok(())
     }
 
     fn undo(
         &mut self,
-        _obj: &mut DiagramRoot,
-        _emitter: &dyn EventEmitter,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        todo!();
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        if let Some(name) = &self.old_name {
+            line.name = name.clone();
+        }
+        emitter.emit("line::renamed", "");
+        Ok(())
     }
 }

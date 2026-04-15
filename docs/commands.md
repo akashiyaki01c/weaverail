@@ -58,7 +58,7 @@
 
 ## 時刻表系
 
-- AddTimetable (時刻表を追加する)
+- **AddTimetable** (時刻表を追加する)
 - DeleteTimetable (時刻表を削除する)
 - RenameTimetable (時刻表名を変更する)
 - (列車順序を変更する)
