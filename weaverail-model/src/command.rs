@@ -6,6 +6,9 @@ pub mod line;
 pub mod station;
 pub mod train_type;
 pub mod track;
+pub mod segment;
+pub mod template_train;
+pub mod template_train_segment;
 
 use crate::model::DiagramRoot;
 use serde::{Deserialize, Serialize};

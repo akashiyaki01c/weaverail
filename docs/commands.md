@@ -27,9 +27,9 @@
 - RenameLine (路線名を変更する)
 - AppendSegment (駅間を末尾に追加する)
 	- ID重複時エラー
-- (駅間を先頭に追加する)
+- **PushFrontSegment** (駅間を先頭に追加する)
 	- 駅が路線に既に含まれている場合エラー
-- (末尾の駅間を削除する)
+- **PushBackSegment** (末尾の駅間を削除する)
 	- 駅間がTemplateTrainから参照されている場合エラー
 - (先頭の駅間を削除する)
 	- 駅間がTemplateTrainから参照されている場合エラー
@@ -46,10 +46,10 @@
 
 ## テンプレート列車系
 
-- AddTemplateTrain (テンプレート列車を追加する)
+- **AddTemplateTrain** (テンプレート列車を追加する)
 - DeleteTemplateTrain (テンプレート列車を削除する)
 - RenameTemplateTrain (テンプレート列車名を変更する)
-- (テンプレート列車の末尾に走行区間を追加する)
+- **PushBackTemplateTrainSegment** (テンプレート列車の末尾に走行区間を追加する)
 - (テンプレート列車の先頭に走行区間を追加する)
 - (テンプレート列車の末尾の走行区間を削除する)
 - (テンプレート列車の先頭の走行区間を削除する)

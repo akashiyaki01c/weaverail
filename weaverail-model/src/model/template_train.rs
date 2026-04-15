@@ -4,18 +4,19 @@
 //!   - TemplateTrainStation (テンプレート列車の駅情報)
 //!     - StopType (停車種別)
 
+use std::collections::hash_map::Entry;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    model::{
+    command::CommandError, model::{
         DiagramRoot, ExtensionProperty,
         line::{Line, LineSegmentId},
         station::{StationId, TrackId},
         time::Time,
         train_type::TrainTypeId,
-    },
-    weaverail_id,
+    }, weaverail_id
 };
 
 weaverail_id!(TemplateTrainId, "TMPT");
@@ -151,6 +152,29 @@ impl TemplateTrain {
     }
 }
 impl DiagramRoot {
+    /// テンプレート列車を追加する関数
+    /// 既に同一IDのテンプレート列車が存在している場合はエラーを返す
+    pub fn add_template_train(&mut self, template_train: TemplateTrain) -> Result<(), CommandError> {
+        match self.template_trains.entry(template_train.id) {
+            Entry::Vacant(entry) => {
+                entry.insert(template_train);
+                Ok(())
+            }
+            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+        }
+    }
+
+    /// テンプレート列車を削除する関数
+    /// 指定IDのテンプレート列車が存在しない場合はエラーを返す
+    pub fn delete_template_train(
+        &mut self,
+        template_train_id: TemplateTrainId,
+    ) -> Result<TemplateTrain, CommandError> {
+        self.template_trains
+            .remove(&template_train_id)
+            .ok_or(CommandError::TargetObjectNotFound)
+    }
+    
     /// テンプレート列車名からテンプレート列車を検索する関数
     /// 見つからない場合は None を返す
     pub fn find_template_train_by_name(&self, template_train_name: &str) -> Option<&TemplateTrain> {
