@@ -3,6 +3,8 @@ use std::collections::{HashMap, VecDeque};
 use crate::{NodeId, WeftNode};
 
 /// ノードを整列する関数
+/// 計算量は O(|V|+|E|)
+/// アルゴリズムは Kahn (1962) のトポロジカルソートを使用
 pub(crate) fn sort_node(nodes: &HashMap<NodeId, WeftNode>) -> Vec<&WeftNode> {
     let count = nodes.len();
     // 入次数
