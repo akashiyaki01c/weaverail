@@ -68,10 +68,10 @@ pub fn write_file(
 
 #[test]
 fn write_read() {
-	let test_data = weaverail_model::test_data::diagram_root::get_test_data();
-	let path = PathBuf::from("./test.wvr");
-	let _ = write_file(&path, &test_data.root, &test_data.metadata);
-	let data = read_file(&path);
-	let data = data.unwrap();
-	println!("{:?}", data);
+    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let path = PathBuf::from("./test.wvr");
+    let _ = write_file(&path, &test_data.root, &test_data.metadata);
+    let data = read_file(&path);
+    let data = data.unwrap();
+    println!("{:?}", data);
 }

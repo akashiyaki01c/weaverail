@@ -2,6 +2,7 @@
 
 pub mod id;
 pub mod line;
+pub mod segment_train_order;
 pub mod station;
 pub mod template_train;
 pub mod time;
@@ -9,7 +10,6 @@ pub mod timetable;
 pub mod train;
 pub mod train_adjustment;
 pub mod train_type;
-pub mod segment_train_order;
 
 use std::collections::HashMap;
 

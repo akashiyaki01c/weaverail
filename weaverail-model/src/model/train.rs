@@ -43,7 +43,7 @@ impl DiagramRoot {
                 .template_trains
                 .get(&segment.template_train_id)
                 .unwrap();
-            let mut stations = template_train
+            let stations = template_train
                 .get_filtered_stations(segment.start_station_id, segment.end_station_id);
             if result.is_empty() {
                 result.extend(stations.iter().map(|sta| sta.station_id));

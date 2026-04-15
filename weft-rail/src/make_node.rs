@@ -57,8 +57,8 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
         .flatten()
         .map(|node| (node.node_id, node))
         .collect();
-	result.insert(root_node.node_id, root_node);
-	result
+    result.insert(root_node.node_id, root_node);
+    result
 }
 
 /// 1つの列車時刻のノードを生成する関数
@@ -69,7 +69,7 @@ fn make_train_node(
     issuer: &mut NumberIssuer,
 ) -> Vec<WeftNode> {
     let mut result = Vec::new();
-	let root_node_id = root_node.node_id;
+    let root_node_id = root_node.node_id;
     let mut before_node: &mut WeftNode = root_node;
     for template_segment in &train.template_segments {
         let template_train = diagram_root
@@ -95,10 +95,12 @@ fn make_train_node(
             match start.stop_time {
                 weaverail_model::model::template_train::StopType::Stop(time) => {
                     if before_node.node_id == root_node_id {
-						before_node.edges.push((departure_node.node_id, train.start_departure_time))
-					} else {
-						before_node.edges.push((departure_node.node_id, time))
-					}
+                        before_node
+                            .edges
+                            .push((departure_node.node_id, train.start_departure_time))
+                    } else {
+                        before_node.edges.push((departure_node.node_id, time))
+                    }
                 }
                 weaverail_model::model::template_train::StopType::Pass => before_node
                     .edges

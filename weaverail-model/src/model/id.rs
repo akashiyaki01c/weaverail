@@ -63,7 +63,7 @@ macro_rules! weaverail_id {
 
         impl $name {
             pub fn new() -> Self {
-                Self(crate::model::id::WeaverailId::new())
+                Self($crate::model::id::WeaverailId::new())
             }
             pub fn to_string(&self) -> String {
                 format!("{}{}", $id, self.0.to_string())
@@ -97,7 +97,7 @@ macro_rules! weaverail_id {
                 if id != $id {
                     return Err(serde::de::Error::custom("type is invalid"));
                 }
-                Ok(Self(crate::model::id::WeaverailId(Uuid::from_bytes(bytes))))
+                Ok(Self($crate::model::id::WeaverailId(Uuid::from_bytes(bytes))))
             }
         }
         impl std::fmt::Display for $name {

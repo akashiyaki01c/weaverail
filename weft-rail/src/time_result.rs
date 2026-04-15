@@ -27,26 +27,10 @@ pub(crate) fn get_time_result(
                     && node.station_id == station_id
                     && node.node_type == NodeType::Departure
             });
-            let arrival_segment_time = if let Some(id) = arrival_segment_node_id {
-                Some(times[id.node_id.0])
-            } else {
-                None
-            };
-            let arrival_segment_id = if let Some(id) = arrival_segment_node_id {
-                Some(id.segment_id)
-            } else {
-                None
-            };
-            let departure_segment_time = if let Some(id) = departure_segment_node_id {
-                Some(times[id.node_id.0])
-            } else {
-                None
-            };
-            let departure_segment_id = if let Some(id) = departure_segment_node_id {
-                Some(id.segment_id)
-            } else {
-                None
-            };
+            let arrival_segment_time = arrival_segment_node_id.map(|id| times[id.node_id.0]);
+            let arrival_segment_id = arrival_segment_node_id.map(|id| id.segment_id);
+            let departure_segment_time = departure_segment_node_id.map(|id| times[id.node_id.0]);
+            let departure_segment_id = departure_segment_node_id.map(|id| id.segment_id);
             let stop_type: StopType = {
                 if let Some(id) = arrival_segment_node_id {
                     id.stop_type
@@ -62,7 +46,7 @@ pub(crate) fn get_time_result(
                 next_segment_id: departure_segment_id,
                 arrival_time: arrival_segment_time,
                 departure_time: departure_segment_time,
-                stop_type: stop_type,
+                stop_type,
                 station_id,
                 train_id: train.id,
             };

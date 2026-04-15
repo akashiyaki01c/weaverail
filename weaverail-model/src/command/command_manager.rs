@@ -1,5 +1,7 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter}, metadata::Metadata, model::DiagramRoot
+    command::{Command, CommandError, EventEmitter},
+    metadata::Metadata,
+    model::DiagramRoot,
 };
 
 /// モデルに対する操作を管理する構造体

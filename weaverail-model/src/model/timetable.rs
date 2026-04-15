@@ -9,7 +9,11 @@ use uuid::Uuid;
 use crate::{
     command::CommandError,
     model::{
-        DiagramRoot, ExtensionProperty, line::LineSegmentId, segment_train_order::SegmentTrainOrder, train::{Train, TrainId}, train_adjustment::{TrainsAdjustment, TrainsAdjustmentId}
+        DiagramRoot, ExtensionProperty,
+        line::LineSegmentId,
+        segment_train_order::SegmentTrainOrder,
+        train::{Train, TrainId},
+        train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},
     },
     weaverail_id,
 };
