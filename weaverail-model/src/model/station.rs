@@ -32,6 +32,35 @@ impl Track {
         }
     }
 }
+impl DiagramRoot {
+    /// 列車番線を追加する関数
+    /// 既に同一IDの番線が存在している場合はエラーを返す
+    pub fn add_track(&mut self, station_id: StationId, track: Track) -> Result<(), CommandError> {
+        let station = self
+            .stations
+            .get_mut(&station_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        match station.tracks.entry(track.id) {
+            Entry::Vacant(entry) => {
+                entry.insert(track);
+                Ok(())
+            }
+            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+        }
+    }
+
+    /// 番線を削除する関数
+    /// 指定IDの番線が存在しない場合はエラーを返す
+    pub fn delete_track(&mut self, station_id: StationId, track_id: TrackId) -> Result<Track, CommandError> {
+        let station = self
+            .stations
+            .get_mut(&station_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        station.tracks
+            .remove(&track_id)
+            .ok_or(CommandError::TargetObjectNotFound)
+    }
+}
 
 weaverail_id!(StationId, "STAT");
 

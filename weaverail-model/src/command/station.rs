@@ -6,7 +6,8 @@ use crate::{
     },
 };
 
-/// 駅の追加
+/// プロジェクトに駅を追加する操作
+/// ID重複時にエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct AddStationCommand {
     station: Station,
@@ -38,7 +39,9 @@ impl Command for AddStationCommand {
     }
 }
 
-/// 駅の削除
+/// プロジェクトから駅を削除する操作
+/// 対象駅が存在しない場合はエラーを返す
+/// 駅間から参照されている場合はエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct RemoveStationCommand {
     station_id: StationId,
@@ -73,6 +76,56 @@ impl Command for RemoveStationCommand {
             obj.add_station(station)?;
         }
         emitter.emit("station::added", "");
+        Ok(())
+    }
+}
+
+/// 指定駅の駅名を変更する操作
+/// 対象駅が存在しない場合はエラーを返す
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct RenameStation {
+    station_id: StationId,
+    old_name: Option<String>,
+    new_name: String,
+}
+impl RenameStation {
+    pub fn new(station_id: StationId, new_name: &str) -> Self {
+        Self {
+            station_id,
+            old_name: None,
+            new_name: new_name.to_string(),
+        }
+    }
+}
+impl Command for RenameStation {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let station = obj
+            .stations
+            .get_mut(&self.station_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        self.old_name = Some(station.name.to_string());
+        station.name = self.new_name.clone();
+        emitter.emit("station::renamed", "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let station = obj
+            .stations
+            .get_mut(&self.station_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        if let Some(name) = &self.old_name {
+            station.name = name.clone();
+        }
+        emitter.emit("station::renamed", "");
         Ok(())
     }
 }

@@ -5,6 +5,7 @@ pub mod command_manager;
 pub mod line;
 pub mod station;
 pub mod train_type;
+pub mod track;
 
 use crate::model::DiagramRoot;
 use serde::{Deserialize, Serialize};

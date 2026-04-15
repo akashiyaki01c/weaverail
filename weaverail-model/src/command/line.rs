@@ -6,7 +6,8 @@ use crate::{
     },
 };
 
-/// 路線の追加
+/// プロジェクトに路線を追加する操作
+/// ID重複時にエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct AddLineCommand {
     line: Line,
@@ -39,7 +40,9 @@ impl Command for AddLineCommand {
     }
 }
 
-/// 路線を削除する
+/// プロジェクトから路線を削除する操作
+/// 対象路線が存在しない場合はエラーを返す
+/// テンプレート列車から参照されている場合はエラーを返す
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct RemoveLineCommand {
     line_id: LineId,

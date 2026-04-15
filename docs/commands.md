@@ -7,9 +7,9 @@
 - **DeleteStation** (駅を削除する)
 	- 参照先不明時エラー
 	- Lineから被参照時エラー
-- RenameStation (駅名を変更する)
+- **RenameStation** (駅名を変更する)
 	- 参照先不明時エラー
-- AddTrack (番線を追加する)
+- **AddTrack** (番線を追加する)
 	- 指定駅不明時エラー
 	- ID重複時エラー
 - DeleteTrack (番線を削除する)
