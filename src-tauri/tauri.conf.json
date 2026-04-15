@@ -4,10 +4,10 @@
   "version": "0.1.7",
   "identifier": "com.github.akashiyaki01c.weaverail",
   "build": {
-    "beforeDevCommand": "npm run dev",
+    "beforeDevCommand": "pnpm --filter @weaverail/app dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "beforeBuildCommand": "pnpm --filter @weaverail/app build",
+    "frontendDist": "../packages/app/dist"
   },
   "app": {
     "windows": [
