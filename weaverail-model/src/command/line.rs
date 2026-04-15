@@ -2,7 +2,7 @@ use crate::{
     command::{Command, CommandError, EventEmitter},
     model::{
         DiagramRoot,
-        line::{Line, LineId, LineSegment},
+        line::{Line, LineId},
     },
 };
 

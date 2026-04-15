@@ -24,12 +24,12 @@
 - **DeleteLine** (路線を削除する)
 	- 参照先不明時エラー
 	- 内包SegmentがTemplateTrainから被参照時エラー
-- RenameLine (路線名を変更する)
-- AppendSegment (駅間を末尾に追加する)
+- **RenameLine** (路線名を変更する)
+- **PushBackSegment** (駅間を末尾に追加する)
 	- ID重複時エラー
 - **PushFrontSegment** (駅間を先頭に追加する)
 	- 駅が路線に既に含まれている場合エラー
-- **PushBackSegment** (末尾の駅間を削除する)
+- (末尾の駅間を削除する)
 	- 駅間がTemplateTrainから参照されている場合エラー
 - (先頭の駅間を削除する)
 	- 駅間がTemplateTrainから参照されている場合エラー
