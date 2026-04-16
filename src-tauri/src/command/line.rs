@@ -7,6 +7,11 @@ use weaverail_model::{
 };
 
 #[tauri::command]
+pub async fn new_line_id() -> Result<LineId, String> {
+    Ok(LineId::new())
+}
+
+#[tauri::command]
 pub async fn add_line(state: tauri::State<'_, Mutex<AppState>>, line: Line) -> Result<(), String> {
     let command = AddLineCommand::new(line.clone());
     let mut state = state.lock().expect("mutex lock error");

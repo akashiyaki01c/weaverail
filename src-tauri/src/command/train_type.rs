@@ -7,6 +7,11 @@ use weaverail_model::{
 };
 
 #[tauri::command]
+pub async fn new_train_type_id() -> Result<TrainTypeId, String> {
+    Ok(TrainTypeId::new())
+}
+
+#[tauri::command]
 pub async fn add_train_type(
     state: tauri::State<'_, Mutex<AppState>>,
     train_type: TrainType,

@@ -7,6 +7,14 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@tauri-apps/cli':
+        specifier: ^2
+        version: 2.10.1
+
+  packages/api: {}
+
+  packages/app:
     dependencies:
       '@tauri-apps/api':
         specifier: ^2
@@ -14,6 +22,9 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.5.3
+      '@weaverail/types':
+        specifier: workspace:*
+        version: link:../types
       react:
         specifier: ^19.1.0
         version: 19.2.4
@@ -39,6 +50,8 @@ importers:
       vite:
         specifier: ^7.0.4
         version: 7.3.1
+
+  packages/types: {}
 
 packages:
 

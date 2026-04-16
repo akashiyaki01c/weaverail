@@ -3,8 +3,18 @@ use std::sync::Mutex;
 use weaverail_model::{
     app::AppState,
     command::station::{AddStationCommand, RemoveStationCommand},
-    model::station::{Station, StationId},
+    model::station::{Station, StationId, TrackId},
 };
+
+#[tauri::command]
+pub async fn new_station_id() -> Result<StationId, String> {
+    Ok(StationId::new())
+}
+
+#[tauri::command]
+pub async fn new_track_id() -> Result<TrackId, String> {
+    Ok(TrackId::new())
+}
 
 #[tauri::command]
 pub async fn add_station(

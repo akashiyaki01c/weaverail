@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
+import { StationId } from "@weaverail/types/bidings/StationId";
+import { Station } from "@weaverail/types/bidings/Station";
 
 function App() {
   const [newStationName, setNewStationName] = useState("");
@@ -10,8 +12,11 @@ function App() {
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
 
-  listen<any>("station_changed", (event) => {
-    setRoot(event.payload);
+  listen<any>("station::added", async (event) => {
+    setRoot(await invoke("get_root"));
+  });
+  listen<any>("station::deleted", async (event) => {
+    setRoot(await invoke("get_root"));
   });
 
   return (
@@ -53,11 +58,13 @@ function App() {
         </label>
         <button
           onClick={async () => {
+            const newId = await invoke("new_station_id", {}) as StationId;
             const station = {
-              id: crypto.randomUUID(),
+              id: newId,
               name: newStationName,
               properties: {},
-            };
+              tracks: {}
+            } satisfies Station;
             await invoke("add_station", { station });
 
             const undoable = await invoke("undoable");
