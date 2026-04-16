@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 use smallvec::SmallVec;
 use weaverail_model::model::{
@@ -13,6 +13,8 @@ use weaverail_model::model::{
 
 use crate::{NodeId, NodeType, StopType, WeftNode};
 type NodeKey = (TrainId, LineSegmentId, NodeType);
+
+static DUMMY_NODE: LazyLock<WeftNode> = LazyLock::new(|| WeftNode::default());
 
 struct NumberIssuer {
     current: usize,
@@ -30,10 +32,14 @@ impl NumberIssuer {
 }
 
 /// ノードを生成する関数
-pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeId, WeftNode> {
+pub fn make_node(
+    root: &DiagramRoot,
+    timetable_id: TimetableId,
+) -> (WeftNode, HashMap<TrainId, Vec<WeftNode>>) {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
-    let mut result: HashMap<TrainId, Vec<WeftNode>> = HashMap::new();
+    let mut result: HashMap<TrainId, Vec<WeftNode>> =
+        HashMap::with_capacity(timetable.trains.len());
     let mut root_node = WeftNode {
         node_id: number_issuer.next(),
         station_id: StationId::new(),
@@ -50,7 +56,8 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
         result.insert(train.id, nodes);
     }
 
-    let mut node_lookup: HashMap<NodeKey, NodeId> = HashMap::new();
+    let mut node_lookup: HashMap<NodeKey, NodeId> =
+        HashMap::with_capacity(result.values().flatten().count());
     for train_nodes in result.values() {
         for node in train_nodes {
             node_lookup.insert(
@@ -63,12 +70,20 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
     connect_hatsuhatsu_edge(timetable, &mut result, &node_lookup);
     connect_chakuchaku_edge(timetable, &mut result, &node_lookup);
 
-    let mut result: HashMap<NodeId, WeftNode> = result
-        .into_values()
-        .flatten()
-        .map(|node| (node.node_id, node))
-        .collect();
-    result.insert(root_node.node_id, root_node);
+    (root_node, result)
+}
+
+pub fn get_node_by_nodeid<'a>(
+    root_node: &'a WeftNode,
+    nodes: &'a HashMap<TrainId, Vec<WeftNode>>,
+) -> Vec<&'a WeftNode> {
+    let len = nodes.values().flatten().count();
+    let mut result: Vec<&WeftNode> = vec![&DUMMY_NODE; len + 1];
+    for node in nodes.values().flatten() {
+        result[node.node_id.0] = node;
+    }
+    result[root_node.node_id.0] = root_node;
+
     result
 }
 
