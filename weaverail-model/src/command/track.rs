@@ -1,4 +1,10 @@
-use crate::{command::{Command, CommandError, EventEmitter}, model::{DiagramRoot, station::{StationId, Track}}};
+use crate::{
+    command::{Command, CommandError, EventEmitter},
+    model::{
+        DiagramRoot,
+        station::{StationId, Track},
+    },
+};
 
 /// 駅に番線を追加する操作
 /// 指定駅が存在しない場合エラー

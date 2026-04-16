@@ -3,14 +3,14 @@
 
 pub mod command_manager;
 pub mod line;
-pub mod station;
-pub mod train_type;
-pub mod track;
 pub mod segment;
+pub mod station;
 pub mod template_train;
 pub mod template_train_segment;
 pub mod timetable;
+pub mod track;
 pub mod train;
+pub mod train_type;
 
 use crate::model::DiagramRoot;
 use serde::{Deserialize, Serialize};

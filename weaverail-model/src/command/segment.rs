@@ -35,7 +35,9 @@ impl Command for PushBackSegmentCommand {
             .lines
             .get_mut(&self.line_id)
             .ok_or(CommandError::TargetObjectNotFound)?;
-        if !line.segments.is_empty() && line.segments.last().unwrap().end_station != self.segment.start_station {
+        if !line.segments.is_empty()
+            && line.segments.last().unwrap().end_station != self.segment.start_station
+        {
             return Err(CommandError::Inconsistent);
         }
         line.segments.push(self.segment.clone());

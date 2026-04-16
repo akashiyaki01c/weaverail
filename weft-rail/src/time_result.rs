@@ -26,7 +26,7 @@ pub(crate) fn get_time_result(
         for station_id in diagram_root.get_stations(train) {
             let arrival_node = node_map.get(&(train.id, station_id, NodeType::Arrival));
             let departure_node = node_map.get(&(train.id, station_id, NodeType::Departure));
-            
+
             let arrival_segment_time = arrival_node.map(|id| times[id.node_id.0]);
             let arrival_segment_id = arrival_node.map(|id| id.segment_id);
             let departure_segment_time = departure_node.map(|id| times[id.node_id.0]);

@@ -1,4 +1,7 @@
-use crate::{command::{Command, CommandError, EventEmitter}, model::{DiagramRoot, template_train::TemplateTrain}};
+use crate::{
+    command::{Command, CommandError, EventEmitter},
+    model::{DiagramRoot, template_train::TemplateTrain},
+};
 
 /// プロジェクトにテンプレート列車を追加する操作
 /// ID重複時にエラーを返す

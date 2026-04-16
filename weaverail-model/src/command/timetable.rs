@@ -1,4 +1,7 @@
-use crate::{command::{Command, EventEmitter}, model::{DiagramRoot, timetable::Timetable}};
+use crate::{
+    command::{Command, EventEmitter},
+    model::{DiagramRoot, timetable::Timetable},
+};
 
 /// プロジェクトに時刻表を追加する操作
 /// ID重複時にエラーを返す

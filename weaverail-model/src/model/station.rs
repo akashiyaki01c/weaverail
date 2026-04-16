@@ -51,12 +51,17 @@ impl DiagramRoot {
 
     /// 番線を削除する関数
     /// 指定IDの番線が存在しない場合はエラーを返す
-    pub fn delete_track(&mut self, station_id: StationId, track_id: TrackId) -> Result<Track, CommandError> {
+    pub fn delete_track(
+        &mut self,
+        station_id: StationId,
+        track_id: TrackId,
+    ) -> Result<Track, CommandError> {
         let station = self
             .stations
             .get_mut(&station_id)
             .ok_or(CommandError::TargetObjectNotFound)?;
-        station.tracks
+        station
+            .tracks
             .remove(&track_id)
             .ok_or(CommandError::TargetObjectNotFound)
     }

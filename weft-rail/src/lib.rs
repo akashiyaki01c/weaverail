@@ -8,11 +8,7 @@ use std::collections::HashMap;
 
 use smallvec::SmallVec;
 use weaverail_model::model::{
-    DiagramRoot,
-    line::LineSegmentId,
-    station::StationId,
-    time::Time,
-    timetable::TimetableId,
+    DiagramRoot, line::LineSegmentId, station::StationId, time::Time, timetable::TimetableId,
     train::TrainId,
 };
 
@@ -118,9 +114,9 @@ pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTra
 
 #[test]
 fn weave_test() {
+    use crate::update_node::UpdateType;
     use crate::update_node::update_node;
     use weaverail_model::model::train::Train;
-    use crate::update_node::UpdateType;
 
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
     let timetable_id = test_data

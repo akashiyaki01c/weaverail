@@ -10,13 +10,15 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    command::CommandError, model::{
+    command::CommandError,
+    model::{
         DiagramRoot, ExtensionProperty,
         line::{Line, LineSegmentId},
         station::{StationId, TrackId},
         time::Time,
         train_type::TrainTypeId,
-    }, weaverail_id
+    },
+    weaverail_id,
 };
 
 weaverail_id!(TemplateTrainId, "TMPT");
@@ -154,7 +156,10 @@ impl TemplateTrain {
 impl DiagramRoot {
     /// テンプレート列車を追加する関数
     /// 既に同一IDのテンプレート列車が存在している場合はエラーを返す
-    pub fn add_template_train(&mut self, template_train: TemplateTrain) -> Result<(), CommandError> {
+    pub fn add_template_train(
+        &mut self,
+        template_train: TemplateTrain,
+    ) -> Result<(), CommandError> {
         match self.template_trains.entry(template_train.id) {
             Entry::Vacant(entry) => {
                 entry.insert(template_train);
@@ -174,7 +179,7 @@ impl DiagramRoot {
             .remove(&template_train_id)
             .ok_or(CommandError::TargetObjectNotFound)
     }
-    
+
     /// テンプレート列車名からテンプレート列車を検索する関数
     /// 見つからない場合は None を返す
     pub fn find_template_train_by_name(&self, template_train_name: &str) -> Option<&TemplateTrain> {

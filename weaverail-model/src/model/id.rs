@@ -97,7 +97,9 @@ macro_rules! weaverail_id {
                 if id != $id {
                     return Err(serde::de::Error::custom("type is invalid"));
                 }
-                Ok(Self($crate::model::id::WeaverailId(Uuid::from_bytes(bytes))))
+                Ok(Self($crate::model::id::WeaverailId(Uuid::from_bytes(
+                    bytes,
+                ))))
             }
         }
         impl std::fmt::Display for $name {
