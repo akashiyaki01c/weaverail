@@ -1,6 +1,6 @@
 use weaverail_model::model::time::Time;
 
-use crate::{NodeType, WeftNode};
+use crate::WeftNode;
 
 /// ノードを実際に計算する関数
 pub(crate) fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
@@ -15,13 +15,6 @@ pub(crate) fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
                 times[next_node_index] = arrival_time;
             }
         }
-    }
-
-    for node in sorted_nodes {
-        if node.node_type == NodeType::Root {
-            println!("root edges: {:?}", node.edges); // ← 追加
-        }
-        // ...
     }
 
     times

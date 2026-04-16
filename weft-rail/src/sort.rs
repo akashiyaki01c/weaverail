@@ -23,7 +23,7 @@ pub(crate) fn sort_node(nodes: &HashMap<NodeId, WeftNode>) -> Vec<&WeftNode> {
         }
     }
 
-    let mut answer = Vec::new();
+    let mut answer = Vec::with_capacity(count);
     while !que.is_empty() {
         let node = {
             let node_index = que.front().unwrap();

@@ -12,6 +12,7 @@ use weaverail_model::model::{
 };
 
 use crate::{NodeId, NodeType, StopType, WeftNode};
+type NodeKey = (TrainId, LineSegmentId, NodeType);
 
 struct NumberIssuer {
     current: usize,
@@ -49,8 +50,18 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> HashMap<NodeI
         result.insert(train.id, nodes);
     }
 
-    connect_hatsuhatsu_edge(root, timetable, &mut result);
-    connect_chakuchaku_edge(root, timetable, &mut result);
+    let mut node_lookup: HashMap<NodeKey, NodeId> = HashMap::new();
+    for train_nodes in result.values() {
+        for node in train_nodes {
+            node_lookup.insert(
+                (node.train_id, node.segment_id, node.node_type),
+                node.node_id,
+            );
+        }
+    }
+
+    connect_hatsuhatsu_edge(timetable, &mut result, &node_lookup);
+    connect_chakuchaku_edge(timetable, &mut result, &node_lookup);
 
     let mut result: HashMap<NodeId, WeftNode> = result
         .into_values()
@@ -133,90 +144,62 @@ fn make_train_node(
 
 /// 発発時隔エッジを追加する関数
 fn connect_hatsuhatsu_edge(
-    diagram_root: &DiagramRoot,
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
+    node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
-        let line_segment = diagram_root.get_segment(orders.segment_id).unwrap();
-        let segment_start_id = line_segment.start_station;
         for train_ids in orders.order.windows(2) {
-            let before = train_ids[0];
-            let current = train_ids[1];
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
 
-            let current_station_node = {
-                let current_train_nodes = nodes.get(&current).unwrap();
-                current_train_nodes
-                    .iter()
-                    .find(|node| {
-                        node.station_id == segment_start_id
-                            && node.segment_id == orders.segment_id
-                            && node.node_type == NodeType::Departure
-                    })
-                    .unwrap()
-                    .node_id
-            };
+            let current_node_id = *node_lookup
+                .get(&(current_tid, orders.segment_id, NodeType::Departure))
+                .unwrap();
 
-            let before_station_nodes = {
-                let before_train_nodes = nodes.get_mut(&before).unwrap();
-                before_train_nodes
-                    .iter_mut()
-                    .find(|node| {
-                        node.station_id == segment_start_id
-                            && node.segment_id == orders.segment_id
-                            && node.node_type == NodeType::Departure
-                    })
-                    .unwrap()
-            };
+            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
 
-            before_station_nodes
-                .edges
-                .push((current_station_node, Time::new(0, 2, 0)));
+            let before_node_id = *node_lookup
+                .get(&(before_tid, orders.segment_id, NodeType::Departure))
+                .unwrap();
+
+            if let Some(node) = before_train_nodes
+                .iter_mut()
+                .find(|n| n.node_id == before_node_id)
+            {
+                node.edges.push((current_node_id, Time::new(0, 2, 0)));
+            }
         }
     }
 }
 
 /// 着着時隔エッジを追加する関数
 fn connect_chakuchaku_edge(
-    diagram_root: &DiagramRoot,
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
+    node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
-        let line_segment = diagram_root.get_segment(orders.segment_id).unwrap();
-        let segment_end_id = line_segment.end_station;
         for train_ids in orders.order.windows(2) {
-            let before = train_ids[0];
-            let current = train_ids[1];
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
 
-            let current_station_node = {
-                let current_train_nodes = nodes.get(&current).unwrap();
-                current_train_nodes
-                    .iter()
-                    .find(|node| {
-                        node.station_id == segment_end_id
-                            && node.segment_id == orders.segment_id
-                            && node.node_type == NodeType::Arrival
-                    })
-                    .unwrap()
-                    .node_id
-            };
+            let current_node_id = *node_lookup
+                .get(&(current_tid, orders.segment_id, NodeType::Arrival))
+                .unwrap();
 
-            let before_station_nodes = {
-                let before_train_nodes = nodes.get_mut(&before).unwrap();
-                before_train_nodes
-                    .iter_mut()
-                    .find(|node| {
-                        node.station_id == segment_end_id
-                            && node.segment_id == orders.segment_id
-                            && node.node_type == NodeType::Arrival
-                    })
-                    .unwrap()
-            };
+            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
 
-            before_station_nodes
-                .edges
-                .push((current_station_node, Time::new(0, 2, 0)));
+            let before_node_id = *node_lookup
+                .get(&(before_tid, orders.segment_id, NodeType::Arrival))
+                .unwrap();
+
+            if let Some(node) = before_train_nodes
+                .iter_mut()
+                .find(|n| n.node_id == before_node_id)
+            {
+                node.edges.push((current_node_id, Time::new(0, 2, 0)));
+            }
         }
     }
 }

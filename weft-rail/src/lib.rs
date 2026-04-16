@@ -49,7 +49,7 @@ pub enum StopType {
     Pass,
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, Eq, Hash, Copy)]
 pub(crate) enum NodeType {
     Arrival,
     Departure,
@@ -74,10 +74,26 @@ pub struct ResultWeftTime {
 }
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
+    let start = std::time::Instant::now();
     let nodes: HashMap<NodeId, WeftNode> = make_node(root, timetable_id);
+    let duration = start.elapsed();
+    println!("make_node: {}ms", duration.as_millis());
+
+    let start = std::time::Instant::now();
     let nodes: Vec<&WeftNode> = sort_node(&nodes);
+    let duration = start.elapsed();
+    println!("sort_node: {}ms", duration.as_millis());
+
+    let start = std::time::Instant::now();
     let times: Vec<Time> = ripple_time(&nodes);
+    let duration = start.elapsed();
+    println!("ripple_node: {}ms", duration.as_millis());
+
+    let start = std::time::Instant::now();
     let result: Vec<ResultWeftTrain> = get_time_result(root, timetable_id, nodes, &times);
+    let duration = start.elapsed();
+    println!("get_time: {}ms", duration.as_millis());
+
     result
 }
 
@@ -91,6 +107,9 @@ fn weave_test() {
         .find(|_| true)
         .unwrap()
         .id;
+    let start = std::time::Instant::now();
     let result = weave(&test_data.root, timetable_id);
-    println!("{:?}", result);
+    let duration = start.elapsed();
+    println!("weaved: {}ms", duration.as_millis());
+    // println!("{:?}", result);
 }
