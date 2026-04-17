@@ -11,9 +11,12 @@
 )]
 pub enum EmitEventType {
 	/// 駅が追加された
+	#[strum(serialize = "station::added")]
     StationAdded,
 	/// 駅が削除された
+	#[strum(serialize = "station::deleted")]
     StationDeleted,
 	/// 駅名が変更された
-    StationRenamed,
+    #[strum(serialize = "station::renamed")]
+	StationRenamed,
 }
