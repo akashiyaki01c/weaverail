@@ -40,6 +40,17 @@ pub(crate) fn get_time_result(
                     panic!()
                 }
             };
+            let arrival_segment_time = if let (Some(arrival), Some(departure)) =
+                (arrival_segment_time, departure_segment_time)
+            {
+                if stop_type == StopType::Pass && departure != arrival {
+                    Some(departure)
+                } else {
+                    Some(arrival)
+                }
+            } else {
+                arrival_segment_time
+            };
 
             let time = ResultWeftTime {
                 before_segment_id: arrival_segment_id,

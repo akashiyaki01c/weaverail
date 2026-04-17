@@ -47,7 +47,7 @@ pub(crate) struct WeftNode {
     pub node_type: NodeType,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum StopType {
     Stop,
     Pass,
