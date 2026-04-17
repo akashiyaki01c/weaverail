@@ -13,7 +13,7 @@ use crate::{
     }, weaverail_id
 };
 
-weaverail_id!(TrainId, "TRAI");
+weaverail_id!(TrainId, "TRA_");
 
 /// Weaverail上の1つの「列車」を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

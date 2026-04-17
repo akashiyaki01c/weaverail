@@ -15,7 +15,7 @@ use crate::{
     }, weaverail_id
 };
 
-weaverail_id!(TimetableId, "TABL");
+weaverail_id!(TimetableId, "TBL_");
 
 /// Weaverail上の1つの時刻表を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

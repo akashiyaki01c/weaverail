@@ -20,7 +20,7 @@ use crate::{
     weaverail_id,
 };
 
-weaverail_id!(TemplateTrainId, "TMPT");
+weaverail_id!(TemplateTrainId, "TTR_");
 
 /// Weaverail上の1つのテンプレート列車を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -188,7 +188,7 @@ impl DiagramRoot {
     }
 }
 
-weaverail_id!(TemplateTrainSegmentId, "TTSG");
+weaverail_id!(TemplateTrainSegmentId, "TSG_");
 
 /// Weaverail上のテンプレート列車の駅間情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -203,7 +203,7 @@ pub struct TemplateTrainSegment {
     pub running_time: Time,
 }
 
-weaverail_id!(TemplateTrainStationId, "TTST");
+weaverail_id!(TemplateTrainStationId, "TST_");
 
 /// Weaverail上のテンプレート列車の駅情報を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

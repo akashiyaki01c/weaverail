@@ -14,7 +14,7 @@ use crate::{
     }, weaverail_id
 };
 
-weaverail_id!(LineId, "LINE");
+weaverail_id!(LineId, "LIN_");
 
 /// Weaverail上の1つの路線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -46,7 +46,7 @@ impl Line {
     }
 }
 
-weaverail_id!(LineSegmentId, "SEGM");
+weaverail_id!(LineSegmentId, "SGM_");
 
 /// Weaverail上の1つの路線に属する駅間を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

@@ -8,7 +8,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};
 
-weaverail_id!(TrackId, "TRCK");
+weaverail_id!(TrackId, "TRC_");
 
 /// Weaverail上の駅に存在している1つの列車番線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -64,7 +64,7 @@ impl DiagramRoot {
     }
 }
 
-weaverail_id!(StationId, "STAT");
+weaverail_id!(StationId, "STA_");
 
 /// Weaverail上の1つの駅を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

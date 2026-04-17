@@ -9,7 +9,7 @@ use crate::{
     command::CommandError, model::{DiagramRoot, ExtensionProperty}, weaverail_id
 };
 
-weaverail_id!(TrainTypeId, "TYPE");
+weaverail_id!(TrainTypeId, "TYP_");
 
 /// Weaverail上の1つの「列車種別」を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

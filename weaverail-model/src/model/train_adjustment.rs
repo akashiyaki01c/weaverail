@@ -8,7 +8,7 @@ use crate::{
     weaverail_id,
 };
 
-weaverail_id!(TrainsAdjustmentId, "ADJT");
+weaverail_id!(TrainsAdjustmentId, "ADJ_");
 
 /// 列車同士の時刻調整を表す
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
