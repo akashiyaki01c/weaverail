@@ -4,12 +4,9 @@
 use std::collections::hash_map::Entry;
 
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
-    command::CommandError,
-    model::{DiagramRoot, ExtensionProperty},
-    weaverail_id,
+    command::CommandError, model::{DiagramRoot, ExtensionProperty}, weaverail_id
 };
 
 weaverail_id!(TrainTypeId, "TYPE");
@@ -25,9 +22,9 @@ pub struct TrainType {
     pub properties: ExtensionProperty,
 }
 impl TrainType {
-    pub fn new(name: &str) -> Self {
+    pub fn new(id: TrainTypeId, name: &str) -> Self {
         Self {
-            id: TrainTypeId::new(),
+            id,
             name: name.to_string(),
             ..Default::default()
         }

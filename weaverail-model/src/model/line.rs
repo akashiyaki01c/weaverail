@@ -6,15 +6,12 @@ use std::collections::hash_map::Entry;
 use std::iter;
 
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
-    command::CommandError,
-    model::{
+    command::CommandError, model::{
         DiagramRoot, ExtensionProperty,
         station::{Station, StationId},
-    },
-    weaverail_id,
+    }, weaverail_id
 };
 
 weaverail_id!(LineId, "LINE");
@@ -32,9 +29,9 @@ pub struct Line {
     pub properties: ExtensionProperty,
 }
 impl Line {
-    pub fn new(name: &str, stations: &[LineSegment]) -> Self {
+    pub fn new(id: LineId, name: &str, stations: &[LineSegment]) -> Self {
         Self {
-            id: LineId::new(),
+            id,
             name: name.to_string(),
             segments: stations.into(),
             ..Default::default()
@@ -64,9 +61,9 @@ pub struct LineSegment {
     pub properties: ExtensionProperty,
 }
 impl LineSegment {
-    pub fn new(start_station: StationId, end_station: StationId) -> Self {
+    pub fn new(id: LineSegmentId, start_station: StationId, end_station: StationId) -> Self {
         Self {
-            id: LineSegmentId::new(),
+            id,
             start_station,
             end_station,
             ..Default::default()

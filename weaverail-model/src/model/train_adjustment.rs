@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
     model::{
@@ -20,9 +19,9 @@ pub struct TrainsAdjustment {
     pub adjustment: TrainsAdjustmentType,
 }
 impl TrainsAdjustment {
-    pub fn new() -> Self {
+    pub fn new(id: TrainsAdjustmentId) -> Self {
         Self {
-            id: TrainsAdjustmentId::new(),
+            id,
             ..Default::default()
         }
     }

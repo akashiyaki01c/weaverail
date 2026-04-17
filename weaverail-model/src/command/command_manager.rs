@@ -10,7 +10,7 @@ pub struct CommandManager {
     pub metadata: Metadata,
     undo_stack: Vec<Box<dyn Command>>,
     redo_stack: Vec<Box<dyn Command>>,
-    emitter: Box<dyn EventEmitter>,
+    pub emitter: Box<dyn EventEmitter>,
 }
 impl CommandManager {
     pub fn new(emitter: Box<dyn EventEmitter>) -> Self {

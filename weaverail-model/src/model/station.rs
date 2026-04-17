@@ -3,13 +3,10 @@
 //!   - Track (列車番線)
 
 use crate::{
-    command::CommandError,
-    model::{DiagramRoot, ExtensionProperty},
-    weaverail_id,
+    command::CommandError, model::{DiagramRoot, ExtensionProperty}, weaverail_id
 };
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, hash_map::Entry};
-use uuid::Uuid;
 
 weaverail_id!(TrackId, "TRCK");
 
@@ -24,9 +21,9 @@ pub struct Track {
     pub properties: ExtensionProperty,
 }
 impl Track {
-    pub fn new(name: &str) -> Self {
+    pub fn new(id: TrackId, name: &str) -> Self {
         Self {
-            id: TrackId::new(),
+            id,
             name: name.to_string(),
             ..Default::default()
         }
@@ -82,9 +79,9 @@ pub struct Station {
     pub properties: ExtensionProperty,
 }
 impl Station {
-    pub fn new(name: &str) -> Self {
+    pub fn new(id: StationId, name: &str) -> Self {
         Self {
-            id: StationId::new(),
+            id,
             name: name.to_string(),
             ..Default::default()
         }

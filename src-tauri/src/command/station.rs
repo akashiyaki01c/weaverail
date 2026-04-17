@@ -7,13 +7,15 @@ use weaverail_model::{
 };
 
 #[tauri::command]
-pub async fn new_station_id() -> Result<StationId, String> {
-    Ok(StationId::new())
+pub async fn new_station_id(state: tauri::State<'_, Mutex<AppState>>) -> Result<StationId, String> {
+    let state = state.lock().expect("mutex lock error");
+    Ok(StationId::new(state.command_manager.root.id_issuer.next()))
 }
 
 #[tauri::command]
-pub async fn new_track_id() -> Result<TrackId, String> {
-    Ok(TrackId::new())
+pub async fn new_track_id(state: tauri::State<'_, Mutex<AppState>>) -> Result<TrackId, String> {
+    let state = state.lock().expect("mutex lock error");
+    Ok(TrackId::new(state.command_manager.root.id_issuer.next()))
 }
 
 #[tauri::command]

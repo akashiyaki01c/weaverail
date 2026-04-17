@@ -7,8 +7,9 @@ use weaverail_model::{
 };
 
 #[tauri::command]
-pub async fn new_train_type_id() -> Result<TrainTypeId, String> {
-    Ok(TrainTypeId::new())
+pub async fn new_train_type_id(state: tauri::State<'_, Mutex<AppState>>) -> Result<TrainTypeId, String> {
+    let state = state.lock().expect("mutex lock error");
+    Ok(TrainTypeId::new(state.command_manager.root.id_issuer.next()))
 }
 
 #[tauri::command]

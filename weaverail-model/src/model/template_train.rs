@@ -7,7 +7,6 @@
 use std::collections::hash_map::Entry;
 
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
     command::CommandError,

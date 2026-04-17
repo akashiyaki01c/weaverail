@@ -1,8 +1,9 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    id_issuer::IdIssuer,
     model::{
         DiagramRoot,
-        line::{Line, LineId, LineSegment},
+        line::{Line, LineId, LineSegment, LineSegmentId},
         station::StationId,
     },
 };
@@ -17,8 +18,12 @@ impl PushBackSegmentCommand {
     pub fn new(line_id: LineId, segment: LineSegment) -> Self {
         Self { line_id, segment }
     }
-    pub fn new_from_station_id(line: &Line, station_id: StationId) -> Self {
-        let segment = LineSegment::new(line.segments.last().unwrap().end_station, station_id);
+    pub fn new_from_station_id(line: &Line, station_id: StationId, issuer: &mut IdIssuer) -> Self {
+        let segment = LineSegment::new(
+            LineSegmentId::new(issuer.next()),
+            line.segments.last().unwrap().end_station,
+            station_id,
+        );
         Self {
             line_id: line.id,
             segment,
@@ -73,8 +78,12 @@ impl PushFrontSegmentCommand {
     pub fn new(line_id: LineId, segment: LineSegment) -> Self {
         Self { line_id, segment }
     }
-    pub fn new_from_station_id(line: &Line, station_id: StationId) -> Self {
-        let segment = LineSegment::new(station_id, line.segments.first().unwrap().start_station);
+    pub fn new_from_station_id(line: &Line, station_id: StationId, issuer: &mut IdIssuer) -> Self {
+        let segment = LineSegment::new(
+            LineSegmentId::new(issuer.next()),
+            station_id,
+            line.segments.first().unwrap().start_station,
+        );
         Self {
             line_id: line.id,
             segment,

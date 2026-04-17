@@ -42,9 +42,9 @@ pub fn make_node(
         HashMap::with_capacity(timetable.trains.len());
     let mut root_node = WeftNode {
         node_id: number_issuer.next(),
-        station_id: StationId::new(),
-        train_id: TrainId::new(),
-        segment_id: LineSegmentId::new(),
+        station_id: StationId::default(),
+        train_id: TrainId::default(),
+        segment_id: LineSegmentId::default(),
         edges: SmallVec::new(),
         node_type: NodeType::Root,
         stop_type: StopType::Pass,

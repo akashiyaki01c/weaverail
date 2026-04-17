@@ -13,9 +13,11 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let handle = app.handle();
-            app.manage(Mutex::new(AppState::new(Box::new(TauriEmitter::new(
-                handle.clone(),
-            )))));
+            let mut app_state = AppState::new(Box::new(TauriEmitter::new(handle.clone())));
+            app_state.command_manager = weaverail_model::test_data::diagram_root::get_test_data();
+            app_state.command_manager.emitter = Box::new(TauriEmitter::new(handle.clone()));
+
+            app.manage(Mutex::new(app_state));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

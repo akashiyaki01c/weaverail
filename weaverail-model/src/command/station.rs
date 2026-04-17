@@ -137,13 +137,19 @@ fn test_station_command() {
 
     let mut manager = CommandManager::new(Box::new(crate::command::EmptyEventEmitter));
     {
-        let command = AddStationCommand::new(Station::new("大阪梅田"));
+        let command = AddStationCommand::new(Station::new(
+            StationId::new(manager.root.id_issuer.next()),
+            "大阪梅田",
+        ));
         let _ = &manager.execute(Box::new(command));
         let root = &manager.root;
         println!("梅田追加: {:?}", root);
     }
     {
-        let command = AddStationCommand::new(Station::new("中津"));
+        let command = AddStationCommand::new(Station::new(
+            StationId::new(manager.root.id_issuer.next()),
+            "中津",
+        ));
         let _ = &manager.execute(Box::new(command));
         let root = &manager.root;
         println!("中津追加: {:?}", root);

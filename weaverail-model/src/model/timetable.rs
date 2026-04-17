@@ -4,18 +4,15 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
-    command::CommandError,
-    model::{
+    command::CommandError, model::{
         DiagramRoot, ExtensionProperty,
         line::LineSegmentId,
         segment_train_order::SegmentTrainOrder,
         train::{Train, TrainId},
         train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},
-    },
-    weaverail_id,
+    }, weaverail_id
 };
 
 weaverail_id!(TimetableId, "TABL");
@@ -37,9 +34,9 @@ pub struct Timetable {
     pub properties: ExtensionProperty,
 }
 impl Timetable {
-    pub fn new(name: &str) -> Self {
+    pub fn new(id: TimetableId, name: &str) -> Self {
         Self {
-            id: TimetableId::new(),
+            id,
             name: name.to_string(),
             ..Default::default()
         }

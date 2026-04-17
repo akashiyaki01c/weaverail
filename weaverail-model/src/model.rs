@@ -16,13 +16,13 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::model::{
+use crate::{id_issuer::IdIssuer, model::{
     line::{Line, LineId},
     station::{Station, StationId},
     template_train::{TemplateTrain, TemplateTrainId},
     timetable::{Timetable, TimetableId},
     train_type::{TrainType, TrainTypeId},
-};
+}};
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -60,6 +60,8 @@ pub struct DiagramRoot {
     pub timetables: HashMap<TimetableId, Timetable>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
+    /// ID発行
+    pub id_issuer: IdIssuer,
 }
 
 #[cfg(test)]
