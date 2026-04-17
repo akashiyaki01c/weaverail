@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
     model::{
         DiagramRoot,
         station::{Station, StationId},
@@ -24,7 +25,7 @@ impl Command for AddStationCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.add_station(self.station.clone())?;
-        emitter.emit("station::added", "");
+        emitter.emit(&EmitEventType::StationAdded.to_string(), "");
         Ok(())
     }
 
@@ -34,7 +35,7 @@ impl Command for AddStationCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.delete_station(self.station.id)?;
-        emitter.emit("station::removed", "");
+        emitter.emit(&EmitEventType::StationDeleted.to_string(), "");
         Ok(())
     }
 }
@@ -63,7 +64,7 @@ impl Command for RemoveStationCommand {
     ) -> Result<(), CommandError> {
         let sta = obj.delete_station(self.station_id)?;
         self.station = Some(sta);
-        emitter.emit("station::removed", "");
+        emitter.emit(&EmitEventType::StationDeleted.to_string(), "");
         Ok(())
     }
 
@@ -75,7 +76,7 @@ impl Command for RemoveStationCommand {
         if let Some(station) = self.station.clone() {
             obj.add_station(station)?;
         }
-        emitter.emit("station::added", "");
+        emitter.emit(&EmitEventType::StationAdded.to_string(), "");
         Ok(())
     }
 }
@@ -109,7 +110,7 @@ impl Command for RenameStationCommand {
             .ok_or(CommandError::TargetObjectNotFound)?;
         self.old_name = Some(station.name.to_string());
         station.name = self.new_name.clone();
-        emitter.emit("station::renamed", "");
+        emitter.emit(&EmitEventType::StationRenamed.to_string(), "");
         Ok(())
     }
 
@@ -125,7 +126,7 @@ impl Command for RenameStationCommand {
         if let Some(name) = &self.old_name {
             station.name = name.clone();
         }
-        emitter.emit("station::renamed", "");
+        emitter.emit(&EmitEventType::StationRenamed.to_string(), "");
         Ok(())
     }
 }

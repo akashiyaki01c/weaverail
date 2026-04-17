@@ -6,3 +6,4 @@ pub mod command;
 pub mod metadata;
 pub mod model;
 pub mod test_data;
+pub mod event;
