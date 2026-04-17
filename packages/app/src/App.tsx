@@ -2,10 +2,11 @@ import { useState } from "react";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
-import { StationId } from "@weaverail/types/bidings/StationId";
-import { Station } from "@weaverail/types/bidings/Station";
+import { Station, StationId } from "@weaverail/types";
+import { WeaverailApi } from "../../api";
 
 function App() {
+  const api = new WeaverailApi();
   const [newStationName, setNewStationName] = useState("");
   const [root, setRoot] = useState({});
 
@@ -13,10 +14,10 @@ function App() {
   const [redoable, setRedoable] = useState(false);
 
   listen<any>("station::added", async (event) => {
-    setRoot(await invoke("get_root"));
+    setRoot(await api.getRoot());
   });
   listen<any>("station::deleted", async (event) => {
-    setRoot(await invoke("get_root"));
+    setRoot(await api.getRoot());
   });
 
   return (
@@ -25,10 +26,10 @@ function App() {
         <button
           disabled={!undoable}
           onClick={async () => {
-            await invoke("undo");
-            const undoable = await invoke("undoable");
+            await api.undo();
+            const undoable = await api.undoable();
             setUndoable(undoable as boolean);
-            const redoable = await invoke("redoable");
+            const redoable = await api.redoable();
             setRedoable(redoable as boolean);
             console.log(undoable, redoable)
           }}
@@ -38,9 +39,9 @@ function App() {
         <button
           disabled={!redoable}
           onClick={async () => {
-            await invoke("redo");
-            setUndoable(await invoke("undoable"));
-            setRedoable(await invoke("redoable"));
+            await api.redo();
+            setUndoable(await api.undoable());
+            setRedoable(await api.redoable());
           }}
         >
           やり直す
@@ -58,18 +59,18 @@ function App() {
         </label>
         <button
           onClick={async () => {
-            const newId = await invoke("new_station_id", {}) as StationId;
+            const newId = await api.new_station_id();
             const station = {
               id: newId,
               name: newStationName,
               properties: {},
               tracks: {}
             } satisfies Station;
-            await invoke("add_station", { station });
+            await api.add_station(station);
 
-            const undoable = await invoke("undoable");
+            const undoable = await api.undoable();
             setUndoable(undoable as boolean);
-            const redoable = await invoke("redoable");
+            const redoable = await api.redoable();
             setRedoable(redoable as boolean);
             console.log(undoable, redoable)
           }}
