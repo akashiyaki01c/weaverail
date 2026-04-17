@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
@@ -13,12 +13,14 @@ function App() {
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
 
-  listen<any>("station::added", async (event) => {
-    setRoot(await api.getRoot());
-  });
-  listen<any>("station::deleted", async (event) => {
-    setRoot(await api.getRoot());
-  });
+  useEffect(() => {
+    listen<any>("station::added", async (event) => {
+      setRoot(await api.getRoot());
+    });
+    listen<any>("station::deleted", async (event) => {
+      setRoot(await api.getRoot());
+    });
+  }, []);
 
   return (
     <main className="container">
@@ -27,11 +29,8 @@ function App() {
           disabled={!undoable}
           onClick={async () => {
             await api.undo();
-            const undoable = await api.undoable();
-            setUndoable(undoable as boolean);
-            const redoable = await api.redoable();
-            setRedoable(redoable as boolean);
-            console.log(undoable, redoable)
+            setUndoable(await api.undoable());
+            setRedoable(await api.redoable());
           }}
         >
           元に戻す
@@ -64,7 +63,7 @@ function App() {
               id: newId,
               name: newStationName,
               properties: {},
-              tracks: {}
+              tracks: {},
             } satisfies Station;
             await api.add_station(station);
 
@@ -72,7 +71,7 @@ function App() {
             setUndoable(undoable as boolean);
             const redoable = await api.redoable();
             setRedoable(redoable as boolean);
-            console.log(undoable, redoable)
+            console.log(undoable, redoable);
           }}
         >
           追加
