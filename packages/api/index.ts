@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { DiagramRoot, Station, StationId } from "../types";
+import { StationApi } from "./station";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export class WeaverailApi {
@@ -18,12 +19,10 @@ export class WeaverailApi {
 	public async undoable(): Promise<boolean> {
 		return await invoke("undoable");
 	}
-	public async new_station_id(): Promise<StationId> {
-		return await invoke("new_station_id");
-	}
-	public async add_station(station: Station) {
-		return await invoke("add_station", { station });
-	}
 
-	constructor() { }
+	station: StationApi;
+
+	constructor() {
+		this.station = new StationApi();
+	}
 }

@@ -58,14 +58,14 @@ function App() {
         </label>
         <button
           onClick={async () => {
-            const newId = await api.new_station_id();
+            const newId = await api.station.new_station_id();
             const station = {
               id: newId,
               name: newStationName,
               properties: {},
               tracks: {},
             } satisfies Station;
-            await api.add_station(station);
+            await api.station.add_station(station);
 
             const undoable = await api.undoable();
             setUndoable(undoable as boolean);
