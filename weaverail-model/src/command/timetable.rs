@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, EventEmitter},
+    event::EmitEventType,
     model::{DiagramRoot, timetable::Timetable},
 };
 
@@ -21,7 +22,7 @@ impl Command for AddTimetableCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.add_timetable(self.timetable.clone())?;
-        emitter.emit("timetable::added", "");
+        emitter.emit(EmitEventType::TimetableAdded, "");
         Ok(())
     }
 
@@ -31,7 +32,7 @@ impl Command for AddTimetableCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.delete_timetable(self.timetable.id)?;
-        emitter.emit("timetable::removed", "");
+        emitter.emit(EmitEventType::TimetableDeleted, "");
 
         Ok(())
     }

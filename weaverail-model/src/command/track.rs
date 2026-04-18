@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
     model::{
         DiagramRoot,
         station::{StationId, Track},
@@ -26,7 +27,7 @@ impl Command for AddTrackCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.add_track(self.station_id, self.track.clone())?;
-        emitter.emit("track::added", "");
+        emitter.emit(EmitEventType::TrackAdded, "");
         Ok(())
     }
 
@@ -36,7 +37,7 @@ impl Command for AddTrackCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.delete_track(self.station_id, self.track.id)?;
-        emitter.emit("track::deleted", "");
+        emitter.emit(EmitEventType::TrackDeleted, "");
         Ok(())
     }
 }

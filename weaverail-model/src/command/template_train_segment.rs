@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
     model::{
         DiagramRoot,
         template_train::{TemplateTrainId, TemplateTrainSegment, TemplateTrainStation},
@@ -39,7 +40,7 @@ impl Command for PushBackTemplateTrainSegmentCommand {
         template_train
             .segments
             .push((self.template_segment.clone(), self.template_station.clone()));
-        emitter.emit("template_train_segment::pushed", "");
+        emitter.emit(EmitEventType::TemplateTrainSegmentPushed, "");
         Ok(())
     }
 
@@ -59,7 +60,7 @@ impl Command for PushBackTemplateTrainSegmentCommand {
             return Err(CommandError::Inconsistent);
         }
         template_train.segments.pop();
-        emitter.emit("template_train_segment::popped", "");
+        emitter.emit(EmitEventType::TemplateTrainSegmentPoped, "");
         Ok(())
     }
 }

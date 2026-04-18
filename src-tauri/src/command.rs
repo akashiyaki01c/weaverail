@@ -2,9 +2,7 @@ use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter};
 use weaverail_model::{
-    app::AppState,
-    command::{CommandError, EventEmitter},
-    model::DiagramRoot,
+    app::AppState, command::{CommandError, EventEmitter}, event::EmitEventType, model::DiagramRoot
 };
 
 pub mod line;
@@ -20,8 +18,8 @@ impl TauriEmitter {
     }
 }
 impl EventEmitter for TauriEmitter {
-    fn emit(&self, event: &str, payload: &str) {
-        let _ = self.handle.emit_filter(event, payload, |_| true);
+    fn emit(&self, event: EmitEventType, payload: &str) {
+        let _ = self.handle.emit_filter(&EmitEventType::to_string(&event), payload, |_| true);
     }
 }
 

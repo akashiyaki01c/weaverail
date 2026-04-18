@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
     id_issuer::IdIssuer,
     model::{
         DiagramRoot,
@@ -46,7 +47,7 @@ impl Command for PushBackSegmentCommand {
             return Err(CommandError::Inconsistent);
         }
         line.segments.push(self.segment.clone());
-        emitter.emit("segment::pushed", "");
+        emitter.emit(EmitEventType::SegmentPushed, "");
         Ok(())
     }
 
@@ -63,7 +64,7 @@ impl Command for PushBackSegmentCommand {
             return Err(CommandError::Inconsistent);
         }
         line.segments.pop();
-        emitter.emit("segment::popped", "");
+        emitter.emit(EmitEventType::SegmentPoped, "");
         Ok(())
     }
 }

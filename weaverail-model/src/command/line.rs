@@ -1,5 +1,6 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
     model::{
         DiagramRoot,
         line::{Line, LineId},
@@ -24,7 +25,7 @@ impl Command for AddLineCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.add_line(self.line.clone())?;
-        emitter.emit("line::added", "");
+        emitter.emit(EmitEventType::LineAdded, "");
         Ok(())
     }
 
@@ -34,7 +35,7 @@ impl Command for AddLineCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), super::CommandError> {
         obj.delete_line(self.line.id)?;
-        emitter.emit("line::removed", "");
+        emitter.emit(EmitEventType::LineDeleted, "");
 
         Ok(())
     }
@@ -65,7 +66,7 @@ impl Command for RemoveLineCommand {
     ) -> Result<(), CommandError> {
         let line = obj.delete_line(self.line_id)?;
         self.line = Some(line);
-        emitter.emit("line::removed", "");
+        emitter.emit(EmitEventType::LineDeleted, "");
         Ok(())
     }
 
@@ -77,7 +78,7 @@ impl Command for RemoveLineCommand {
         if let Some(line) = self.line.clone() {
             obj.add_line(line)?;
         }
-        emitter.emit("line::added", "");
+        emitter.emit(EmitEventType::LineAdded, "");
         Ok(())
     }
 }
@@ -111,7 +112,7 @@ impl Command for RenameLineCommand {
             .ok_or(CommandError::TargetObjectNotFound)?;
         self.old_name = Some(line.name.to_string());
         line.name = self.new_name.clone();
-        emitter.emit("line::renamed", "");
+        emitter.emit(EmitEventType::LineRenamed, "");
         Ok(())
     }
 
@@ -127,7 +128,7 @@ impl Command for RenameLineCommand {
         if let Some(name) = &self.old_name {
             line.name = name.clone();
         }
-        emitter.emit("line::renamed", "");
+        emitter.emit(EmitEventType::LineRenamed, "");
         Ok(())
     }
 }

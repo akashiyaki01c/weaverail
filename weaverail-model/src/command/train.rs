@@ -1,6 +1,5 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter},
-    model::{DiagramRoot, timetable::TimetableId, train::Train},
+    command::{Command, CommandError, EventEmitter}, event::EmitEventType, model::{DiagramRoot, timetable::TimetableId, train::Train}
 };
 
 /// 駅に列車を追加する操作
@@ -26,7 +25,7 @@ impl Command for AddTrainCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.add_train(self.timetable_id, self.train.clone())?;
-        emitter.emit("train::added", "");
+        emitter.emit(EmitEventType::TrainAdded, "");
         Ok(())
     }
 
@@ -36,7 +35,7 @@ impl Command for AddTrainCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.delete_train(self.timetable_id, self.train.id)?;
-        emitter.emit("train::deleted", "");
+        emitter.emit(EmitEventType::TrainDeleted, "");
         Ok(())
     }
 }

@@ -12,18 +12,18 @@ pub mod track;
 pub mod train;
 pub mod train_type;
 
-use crate::model::DiagramRoot;
+use crate::{event::EmitEventType, model::DiagramRoot};
 use serde::{Deserialize, Serialize};
 
 /// バックエンド側からフロントエンド側へのイベント通知を行う構造体
 pub trait EventEmitter: Send + Sync {
     /// フロントエンド側にイベント通知を行なう
-    fn emit(&self, event: &str, payload: &str);
+    fn emit(&self, event: EmitEventType, payload: &str);
 }
 /// フロントエンド側へのイベント通知を行わない空モジュール
 pub struct EmptyEventEmitter;
 impl EventEmitter for EmptyEventEmitter {
-    fn emit(&self, _event: &str, _payload: &str) {
+    fn emit(&self, _event: EmitEventType, _payload: &str) {
         // no-op
     }
 }

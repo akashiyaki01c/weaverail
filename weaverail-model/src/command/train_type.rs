@@ -1,9 +1,8 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter},
-    model::{
+    command::{Command, CommandError, EventEmitter}, event::EmitEventType, model::{
         DiagramRoot,
         train_type::{TrainType, TrainTypeId},
-    },
+    }
 };
 
 /// 列車種別の追加
@@ -23,7 +22,7 @@ impl Command for AddTrainTypeCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.add_train_type(self.train_type.clone())?;
-        emitter.emit("train_type::added", "");
+        emitter.emit(EmitEventType::TrainTypeAdded, "");
         Ok(())
     }
 
@@ -33,7 +32,7 @@ impl Command for AddTrainTypeCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.delete_train_type(self.train_type.id)?;
-        emitter.emit("train_type::removed", "");
+        emitter.emit(EmitEventType::TrainTypeDeleted, "");
         Ok(())
     }
 }
@@ -60,7 +59,7 @@ impl Command for RemoveTrainTypeCommand {
     ) -> Result<(), CommandError> {
         let train_type = obj.delete_train_type(self.train_type_id)?;
         self.train_type = Some(train_type);
-        emitter.emit("train_type::removed", "");
+        emitter.emit(EmitEventType::TrainTypeDeleted, "");
         Ok(())
     }
 
@@ -72,7 +71,7 @@ impl Command for RemoveTrainTypeCommand {
         if let Some(train_type) = self.train_type.clone() {
             obj.add_train_type(train_type)?;
         }
-        emitter.emit("train_type::added", "");
+        emitter.emit(EmitEventType::TrainTypeAdded, "");
         Ok(())
     }
 }

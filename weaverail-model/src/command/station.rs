@@ -25,7 +25,7 @@ impl Command for AddStationCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.add_station(self.station.clone())?;
-        emitter.emit(&EmitEventType::StationAdded.to_string(), "");
+        emitter.emit(EmitEventType::StationAdded, "");
         Ok(())
     }
 
@@ -35,7 +35,7 @@ impl Command for AddStationCommand {
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
         obj.delete_station(self.station.id)?;
-        emitter.emit(&EmitEventType::StationDeleted.to_string(), "");
+        emitter.emit(EmitEventType::StationDeleted, "");
         Ok(())
     }
 }
@@ -64,7 +64,7 @@ impl Command for RemoveStationCommand {
     ) -> Result<(), CommandError> {
         let sta = obj.delete_station(self.station_id)?;
         self.station = Some(sta);
-        emitter.emit(&EmitEventType::StationDeleted.to_string(), "");
+        emitter.emit(EmitEventType::StationDeleted, "");
         Ok(())
     }
 
@@ -76,7 +76,7 @@ impl Command for RemoveStationCommand {
         if let Some(station) = self.station.clone() {
             obj.add_station(station)?;
         }
-        emitter.emit(&EmitEventType::StationAdded.to_string(), "");
+        emitter.emit(EmitEventType::StationAdded, "");
         Ok(())
     }
 }
@@ -110,7 +110,7 @@ impl Command for RenameStationCommand {
             .ok_or(CommandError::TargetObjectNotFound)?;
         self.old_name = Some(station.name.to_string());
         station.name = self.new_name.clone();
-        emitter.emit(&EmitEventType::StationRenamed.to_string(), "");
+        emitter.emit(EmitEventType::StationRenamed, "");
         Ok(())
     }
 
@@ -126,7 +126,7 @@ impl Command for RenameStationCommand {
         if let Some(name) = &self.old_name {
             station.name = name.clone();
         }
-        emitter.emit(&EmitEventType::StationRenamed.to_string(), "");
+        emitter.emit(EmitEventType::StationRenamed, "");
         Ok(())
     }
 }
