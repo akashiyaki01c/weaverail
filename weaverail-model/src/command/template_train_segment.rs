@@ -33,13 +33,11 @@ impl Command for PushBackTemplateTrainSegmentCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        let template_train = obj
-            .template_trains
-            .get_mut(&self.template_train_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        template_train
-            .segments
-            .push((self.template_segment.clone(), self.template_station.clone()));
+        obj.push_back_template_segment(
+            self.template_train_id,
+            self.template_segment.clone(),
+            self.template_station.clone(),
+        )?;
         emitter.emit(EmitEventType::TemplateTrainSegmentPushed, "");
         Ok(())
     }
@@ -49,17 +47,9 @@ impl Command for PushBackTemplateTrainSegmentCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        let template_train = obj
-            .template_trains
-            .get_mut(&self.template_train_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        if !template_train.segments.is_empty()
-            && template_train.segments.last().unwrap().0.id != self.template_segment.id
-            && template_train.segments.last().unwrap().1.id != self.template_station.id
-        {
-            return Err(CommandError::Inconsistent);
-        }
-        template_train.segments.pop();
+        obj.pop_back_template_segment(
+            self.template_train_id,
+        )?;
         emitter.emit(EmitEventType::TemplateTrainSegmentPoped, "");
         Ok(())
     }

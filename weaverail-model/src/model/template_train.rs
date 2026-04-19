@@ -16,7 +16,6 @@ use crate::{
         station::{Station, StationId},
         time::Time,
         track::{Track, TrackId},
-        train::Train,
         train_type::{TrainType, TrainTypeId},
     },
     weaverail_id,
@@ -176,137 +175,6 @@ impl TemplateTrain {
             &self.segments.last().unwrap().1
         }
     }
-
-    /// テンプレート列車の末尾に駅間を追加する関数
-    pub fn push_back_segment(
-        &mut self,
-        template_segment_id: TemplateTrainSegmentId,
-        template_station_id: TemplateTrainStationId,
-        segment: &LineSegment,
-        is_reversed: bool,
-        stop_type: StopType,
-        running_time: Time,
-        track_id: TrackId,
-    ) -> Result<(), ModelError> {
-        let last_station = self.last_station().station_id;
-        let is_valid_station = if is_reversed {
-            segment.end_station == last_station
-        } else {
-            segment.start_station == last_station
-        };
-        if !is_valid_station {
-            return Err(ModelError::Error);
-        }
-
-        let last_station_id = if is_reversed {
-            segment.start_station
-        } else {
-            segment.end_station
-        };
-
-        let template_segment = TemplateTrainSegment {
-            id: template_segment_id,
-            segment_id: segment.id,
-            is_reversed,
-            running_time,
-        };
-        let template_station = TemplateTrainStation {
-            id: template_station_id,
-            station_id: last_station_id,
-            track_id,
-            stop_time: stop_type,
-        };
-        self.segments.push((template_segment, template_station));
-
-        Ok(())
-    }
-
-    /// テンプレート列車の先頭に駅間を追加する関数
-    pub fn push_front_segment(
-        &mut self,
-        template_segment_id: TemplateTrainSegmentId,
-        template_station_id: TemplateTrainStationId,
-        segment: &LineSegment,
-        is_reversed: bool,
-        stop_type: StopType,
-        running_time: Time,
-        track_id: TrackId,
-    ) -> Result<(), ModelError> {
-        let first_station = self.first_station().station_id;
-        let is_valid_station = if is_reversed {
-            segment.start_station == first_station
-        } else {
-            segment.end_station == first_station
-        };
-        if !is_valid_station {
-            return Err(ModelError::Error);
-        }
-
-        let first_station_id = if is_reversed {
-            segment.end_station
-        } else {
-            segment.start_station
-        };
-
-        let template_segment = TemplateTrainSegment {
-            id: template_segment_id,
-            segment_id: segment.id,
-            is_reversed,
-            running_time,
-        };
-        let template_station = TemplateTrainStation {
-            id: template_station_id,
-            station_id: first_station_id,
-            track_id,
-            stop_time: stop_type,
-        };
-        self.segments
-            .insert(0, (template_segment, template_station));
-
-        Ok(())
-    }
-
-    /// テンプレート列車の末尾の駅間を削除する関数
-    /// 列車からの参照がある場合はエラーを返す
-    pub fn pop_back_segment(&mut self, trains: &[&Train]) -> Result<(), ModelError> {
-        let last = self.last_station().station_id;
-        let is_referenced = trains
-            .iter()
-            .filter(|train| train.contain_template_train(self.id))
-            .any(|train| {
-                train
-                    .template_segments
-                    .iter()
-                    .any(|seg| seg.start_station_id == last || seg.end_station_id == last)
-            });
-        if is_referenced {
-            return Err(ModelError::ExternalReferenced);
-        }
-
-        self.segments.pop();
-        Ok(())
-    }
-
-    /// テンプレート列車の先頭の駅間を削除する関数
-    /// 列車からの参照がある場合はエラーを返す
-    pub fn pop_front_segment(&mut self, trains: &[&Train]) -> Result<(), ModelError> {
-        let front = self.first_station().station_id;
-        let is_referenced = trains
-            .iter()
-            .filter(|train| train.contain_template_train(self.id))
-            .any(|train| {
-                train
-                    .template_segments
-                    .iter()
-                    .any(|seg| seg.start_station_id == front || seg.end_station_id == front)
-            });
-        if is_referenced {
-            return Err(ModelError::ExternalReferenced);
-        }
-
-        self.segments.remove(0);
-        Ok(())
-    }
 }
 impl DiagramRoot {
     /// テンプレート列車を追加する関数
@@ -347,6 +215,126 @@ impl DiagramRoot {
         self.template_trains
             .values()
             .find(|template_train| template_train.name == template_train_name)
+    }
+
+    /// テンプレート列車の末尾に駅間を追加する関数
+    pub fn push_back_template_segment(
+        &mut self,
+        template_train_id: TemplateTrainId,
+        template_segment: TemplateTrainSegment,
+        template_station: TemplateTrainStation,
+    ) -> Result<(), ModelError> {
+        let (start_station_id, end_station_id) = {
+            let segment = template_segment.segment(self)?;
+            (segment.start_station, segment.end_station)
+        };
+        let template_train = self
+            .template_trains
+            .get_mut(&template_train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let last_station = template_train.last_station().station_id;
+        let is_valid_station = if template_segment.is_reversed {
+            end_station_id == last_station
+        } else {
+            start_station_id == last_station
+        };
+        if !is_valid_station {
+            return Err(ModelError::Error);
+        }
+
+        template_train
+            .segments
+            .push((template_segment, template_station));
+
+        Ok(())
+    }
+
+    /// テンプレート列車の先頭に駅間を追加する関数
+    pub fn push_front_template_segment(
+        &mut self,
+        template_train_id: TemplateTrainId,
+        template_segment: TemplateTrainSegment,
+        template_station: TemplateTrainStation,
+    ) -> Result<(), ModelError> {
+        let (start_station_id, end_station_id) = {
+            let segment = template_segment.segment(self)?;
+            (segment.start_station, segment.end_station)
+        };
+        let template_train = self
+            .template_trains
+            .get_mut(&template_train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let first_station = template_train.first_station().station_id;
+        let is_valid_station = if template_segment.is_reversed {
+            start_station_id == first_station
+        } else {
+            end_station_id == first_station
+        };
+        if !is_valid_station {
+            return Err(ModelError::Error);
+        }
+
+        template_train
+            .segments
+            .push((template_segment, template_station));
+
+        Ok(())
+    }
+
+    /// テンプレート列車の末尾の駅間を削除する関数
+    /// 列車からの参照がある場合はエラーを返す
+    pub fn pop_back_template_segment(
+        &mut self,
+        template_train_id: TemplateTrainId,
+    ) -> Result<(), ModelError> {
+        let template_train = self
+            .template_trains
+            .get_mut(&template_train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let last = template_train.last_station().station_id;
+        let is_referenced = self.trains
+            .values()
+            .filter(|train| train.contain_template_train(template_train.id))
+            .any(|train| {
+                train
+                    .template_segments
+                    .iter()
+                    .any(|seg| seg.start_station_id == last || seg.end_station_id == last)
+            });
+        if is_referenced {
+            return Err(ModelError::ExternalReferenced);
+        }
+
+        template_train.segments.pop();
+        Ok(())
+    }
+
+    /// テンプレート列車の先頭の駅間を削除する関数
+    /// 列車からの参照がある場合はエラーを返す
+    pub fn pop_front_template_segment(
+        &mut self,
+        template_train_id: TemplateTrainId,
+    ) -> Result<(), ModelError> {
+        let template_train = self
+            .template_trains
+            .get_mut(&template_train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let first = template_train.first_station().station_id;
+        let is_referenced = self.trains
+            .values()
+            .filter(|train| train.contain_template_train(template_train.id))
+            .any(|train| {
+                train
+                    .template_segments
+                    .iter()
+                    .any(|seg| seg.start_station_id == first || seg.end_station_id == first)
+            });
+        if is_referenced {
+            return Err(ModelError::ExternalReferenced);
+        }
+
+        template_train.segments.remove(0);
+        Ok(())
     }
 }
 
