@@ -10,4 +10,6 @@ pub enum ModelError {
 	DuplicateKey,
 	#[error("external referenced.")]
 	ExternalReferenced,
+	#[error("external referenced.")]
+	Error,
 }
