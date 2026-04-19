@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use weaverail_model::model::{
-    line::LineSegmentId, time::Time, timetable::Timetable, train::TrainId,
+    line_segment::LineSegmentId, time::Time, timetable::Timetable, train::TrainId,
 };
 
 use crate::{NodeType, WeftNode};

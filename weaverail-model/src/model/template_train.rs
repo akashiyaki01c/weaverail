@@ -11,12 +11,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     command::CommandError,
     model::{
-        DiagramRoot, ExtensionProperty,
-        line::{Line, LineSegmentId},
-        station::StationId,
-        time::Time,
-        track::TrackId,
-        train_type::TrainTypeId,
+        DiagramRoot, ExtensionProperty, line_segment::LineSegmentId, station::StationId, time::Time, track::TrackId, train_type::TrainTypeId
     },
     weaverail_id,
 };
@@ -45,13 +40,6 @@ impl TemplateTrain {
         self.segments
             .iter()
             .any(|segment| segment.0.segment_id == segment_id)
-    }
-
-    /// テンプレート列車が指定路線を参照しているか
-    pub fn contains_line(&self, line: &Line) -> bool {
-        line.segments
-            .iter()
-            .any(|segment| self.contains_segment(segment.id))
     }
 
     /// 全ての駅を取得する関数

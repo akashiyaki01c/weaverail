@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::LazyLock};
 use smallvec::SmallVec;
 use weaverail_model::model::{
     DiagramRoot,
-    line::LineSegmentId,
+    line_segment::LineSegmentId,
     station::StationId,
     template_train::StopType as TemplateTrainStopType,
     time::Time,

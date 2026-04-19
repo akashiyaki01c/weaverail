@@ -51,9 +51,9 @@ impl DiagramRoot {
     /// 路線から参照されている場合はエラーを返す
     pub fn delete_station(&mut self, station_id: StationId) -> Result<Station, CommandError> {
         if self
-            .lines
+            .segments
             .values()
-            .any(|line| line.contains_station(station_id))
+            .any(|segment| segment.contains_station(station_id))
         {
             return Err(CommandError::ExternalReference);
         }

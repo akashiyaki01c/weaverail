@@ -9,8 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     command::CommandError, model::{
-        DiagramRoot, ExtensionProperty,
-        station::{Station, StationId},
+        DiagramRoot, ExtensionProperty, line_segment::{LineSegment, LineSegmentId}, station::Station
     }, weaverail_id
 };
 
@@ -24,55 +23,18 @@ pub struct Line {
     /// 路線名 (例: "神明線")
     pub name: String,
     /// 路線に所属する駅間リスト
-    pub segments: Vec<LineSegment>,
+    pub segments: Vec<LineSegmentId>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
 impl Line {
-    pub fn new(id: LineId, name: &str, stations: &[LineSegment]) -> Self {
+    pub fn new(id: LineId, name: &str, stations: &[LineSegmentId]) -> Self {
         Self {
             id,
             name: name.to_string(),
             segments: stations.into(),
             ..Default::default()
         }
-    }
-
-    /// 路線が指定駅を参照しているか
-    pub fn contains_station(&self, station_id: StationId) -> bool {
-        self.segments
-            .iter()
-            .any(|segment| segment.contains_station(station_id))
-    }
-}
-
-weaverail_id!(LineSegmentId, "SGM_");
-
-/// Weaverail上の1つの路線に属する駅間を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
-pub struct LineSegment {
-    /// 識別ID
-    pub id: LineSegmentId,
-    /// 開始駅ID
-    pub start_station: StationId,
-    /// 終了駅ID
-    pub end_station: StationId,
-    /// 拡張プロパティ
-    pub properties: ExtensionProperty,
-}
-impl LineSegment {
-    pub fn new(id: LineSegmentId, start_station: StationId, end_station: StationId) -> Self {
-        Self {
-            id,
-            start_station,
-            end_station,
-            ..Default::default()
-        }
-    }
-
-    /// 駅間が指定駅を参照しているか
-    pub fn contains_station(&self, station_id: StationId) -> bool {
-        self.start_station == station_id || self.end_station == station_id
     }
 }
 
@@ -93,19 +55,6 @@ impl DiagramRoot {
     /// 指定IDの路線が存在しない場合はエラーを返す
     /// テンプレート列車から参照されている場合はエラーを返す
     pub fn delete_line(&mut self, line_id: LineId) -> Result<Line, CommandError> {
-        let line = self
-            .lines
-            .get(&line_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        let is_referenced = self
-            .template_trains
-            .values()
-            .any(|train| train.contains_line(line));
-
-        if is_referenced {
-            return Err(CommandError::ExternalReference);
-        }
-
         self.lines
             .remove(&line_id)
             .ok_or(CommandError::TargetObjectNotFound)
@@ -116,8 +65,12 @@ impl DiagramRoot {
         if line.segments.is_empty() {
             return Vec::new();
         }
-        let start_id = line.segments.first().unwrap().start_station;
-        let end_ids = line.segments.iter().map(|segment| segment.end_station);
+        let first_segment = self.segments.get(line.segments.first().unwrap()).unwrap();
+        let start_id = first_segment.start_station;
+        let end_ids = line.segments.iter().map(|segment_id| {
+            let segment = self.segments.get(segment_id).unwrap();
+            segment.end_station
+        });
         iter::once(start_id)
             .chain(end_ids)
             .map(|station_id| self.stations.get(&station_id).unwrap())
@@ -126,9 +79,8 @@ impl DiagramRoot {
 
     /// SegmentIdから駅間を取得する関数
     pub fn get_segment(&self, segment_id: LineSegmentId) -> Option<&LineSegment> {
-        self.lines
+        self.segments
             .values()
-            .flat_map(|line| &line.segments)
             .find(|segment| segment.id == segment_id)
     }
 
@@ -136,7 +88,7 @@ impl DiagramRoot {
     pub fn append_segment(
         &mut self,
         line_id: LineId,
-        segment: LineSegment,
+        segment: LineSegmentId,
     ) -> Result<(), CommandError> {
         let line = self
             .lines
@@ -145,11 +97,13 @@ impl DiagramRoot {
         if line.segments.is_empty() {
             line.segments.push(segment)
         } else {
-            let segment_end_id = line.segments.last().unwrap().end_station;
+            let last_segment = self.segments.get(line.segments.last().unwrap()).unwrap();
+            let segment = self.segments.get(&segment).unwrap();
+            let segment_end_id = last_segment.end_station;
             if segment_end_id != segment.start_station {
                 return Err(CommandError::Inconsistent);
             }
-            line.segments.push(segment)
+            line.segments.push(segment.id)
         }
 
         Ok(())
@@ -160,7 +114,7 @@ impl DiagramRoot {
         &self,
         start_station_name: &str,
         end_station_name: &str,
-    ) -> (&LineSegment, bool) {
+    ) -> (&LineSegmentId, bool) {
         let start_station = self.find_station_by_name(start_station_name).expect("").id;
         let end_station = self.find_station_by_name(end_station_name).expect("").id;
         let reversed_segment =
@@ -168,6 +122,7 @@ impl DiagramRoot {
                 .values()
                 .flat_map(|line| &line.segments)
                 .find(|segment| {
+                    let segment = self.segments.get(&segment).unwrap();
                     segment.start_station == start_station && segment.end_station == end_station
                 });
         let forward_segment = self
@@ -175,6 +130,7 @@ impl DiagramRoot {
             .values()
             .flat_map(|line| &line.segments)
             .find(|segment| {
+                let segment = self.segments.get(&segment).unwrap();
                 segment.start_station == end_station && segment.end_station == start_station
             });
         if forward_segment.is_some() {

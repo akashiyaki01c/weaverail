@@ -11,6 +11,7 @@ pub mod train;
 pub mod train_adjustment;
 pub mod train_type;
 pub mod track;
+pub mod line_segment;
 
 use std::collections::HashMap;
 
@@ -18,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{id_issuer::IdIssuer, model::{
-    line::{Line, LineId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId}
+    line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId}
 }};
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
@@ -49,6 +50,8 @@ pub struct DiagramRoot {
     pub stations: HashMap<StationId, Station>,
     /// 番線の集合
     pub tracks: HashMap<TrackId, Track>,
+    /// 駅間の集合
+    pub segments: HashMap<LineSegmentId, LineSegment>,
     /// 路線の集合
     pub lines: HashMap<LineId, Line>,
     /// 列車種別の集合

@@ -8,7 +8,7 @@ use crate::{
     weaverail_id,
 };
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::hash_map::Entry;
 use weaverail_object::WeaverailDNA;
 
 weaverail_id!(TrackId, "TRC_");

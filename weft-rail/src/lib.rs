@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use smallvec::SmallVec;
 use weaverail_model::model::{
-    DiagramRoot, line::LineSegmentId, station::StationId, time::Time, timetable::TimetableId,
+    DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time, timetable::TimetableId,
     train::TrainId,
 };
 
@@ -171,7 +171,7 @@ fn weave_test() {
         .map(|v| {
             let start = v[0];
             let end = v[1];
-            let segment = test_data.root.find_segment_by_name(start, end).0.id;
+            let segment = *test_data.root.find_segment_by_name(start, end).0;
             (segment, trains[1].id, trains[3].id)
         })
         .collect(),

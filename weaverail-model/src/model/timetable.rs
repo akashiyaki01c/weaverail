@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     command::CommandError, model::{
         DiagramRoot, ExtensionProperty,
-        line::LineSegmentId,
+        line_segment::LineSegmentId,
         segment_train_order::SegmentTrainOrder,
         train::{Train, TrainId},
         train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},

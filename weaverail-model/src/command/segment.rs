@@ -4,7 +4,8 @@ use crate::{
     id_issuer::IdIssuer,
     model::{
         DiagramRoot,
-        line::{Line, LineId, LineSegment, LineSegmentId},
+        line::{Line, LineId},
+        line_segment::{LineSegment, LineSegmentId},
         station::StationId,
     },
 };
@@ -19,10 +20,16 @@ impl PushBackSegmentCommand {
     pub fn new(line_id: LineId, segment: LineSegment) -> Self {
         Self { line_id, segment }
     }
-    pub fn new_from_station_id(line: &Line, station_id: StationId, issuer: &mut IdIssuer) -> Self {
+    pub fn new_from_station_id(
+        root: &DiagramRoot,
+        line: &Line,
+        station_id: StationId,
+        issuer: &mut IdIssuer,
+    ) -> Self {
+        let segment = root.segments.get(line.segments.last().unwrap()).unwrap();
         let segment = LineSegment::new(
             LineSegmentId::new(issuer.next()),
-            line.segments.last().unwrap().end_station,
+            segment.end_station,
             station_id,
         );
         Self {
@@ -41,12 +48,18 @@ impl Command for PushBackSegmentCommand {
             .lines
             .get_mut(&self.line_id)
             .ok_or(CommandError::TargetObjectNotFound)?;
-        if !line.segments.is_empty()
-            && line.segments.last().unwrap().end_station != self.segment.start_station
-        {
+        let segment = line.segments.last();
+        if segment.is_none() {
+            obj.segments.insert(self.segment.id, self.segment.clone());
+            line.segments.push(self.segment.id);
+            return Ok(());
+        }
+        let last_segment = obj.segments.get(line.segments.last().unwrap()).unwrap();
+        if !line.segments.is_empty() && last_segment.end_station != self.segment.start_station {
             return Err(CommandError::Inconsistent);
         }
-        line.segments.push(self.segment.clone());
+        obj.segments.insert(self.segment.id, self.segment.clone());
+        line.segments.push(self.segment.id);
         emitter.emit(EmitEventType::SegmentPushed, "");
         Ok(())
     }
@@ -60,7 +73,8 @@ impl Command for PushBackSegmentCommand {
             .lines
             .get_mut(&self.line_id)
             .ok_or(CommandError::TargetObjectNotFound)?;
-        if !line.segments.is_empty() && line.segments.last().unwrap().id != self.segment.id {
+        let last_segment = obj.segments.get(line.segments.last().unwrap()).unwrap();
+        if !line.segments.is_empty() && last_segment.id != self.segment.id {
             return Err(CommandError::Inconsistent);
         }
         line.segments.pop();
@@ -79,11 +93,17 @@ impl PushFrontSegmentCommand {
     pub fn new(line_id: LineId, segment: LineSegment) -> Self {
         Self { line_id, segment }
     }
-    pub fn new_from_station_id(line: &Line, station_id: StationId, issuer: &mut IdIssuer) -> Self {
+    pub fn new_from_station_id(
+        root: &DiagramRoot,
+        line: &Line,
+        station_id: StationId,
+        issuer: &mut IdIssuer,
+    ) -> Self {
+        let first_segment = root.segments.get(line.segments.first().unwrap()).unwrap();
         let segment = LineSegment::new(
             LineSegmentId::new(issuer.next()),
             station_id,
-            line.segments.first().unwrap().start_station,
+            first_segment.start_station,
         );
         Self {
             line_id: line.id,
