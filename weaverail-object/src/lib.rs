@@ -1,7 +1,7 @@
 extern crate proc_macro;
 use proc_macro::TokenStream;
-use syn::{Data, DeriveInput, Fields, parse_macro_input};
 use quote::quote;
+use syn::{Data, DeriveInput, Fields, parse_macro_input};
 
 #[proc_macro_derive(WeaverailDNA)]
 pub fn derive_weaverail_dna(item: TokenStream) -> TokenStream {
@@ -15,7 +15,7 @@ pub fn derive_weaverail_dna(item: TokenStream) -> TokenStream {
                     let field_iter = fields.named.iter().map(|f| {
                         let field_name = &f.ident; // フィールド名 (name, mileage等)
                         let field_type = &f.ty;    // 型 (String, f64等)
-                        
+
                         // ここで各フィールドに対してやりたい処理を書く
                         quote! {
                             println!("DNA Field: {} (Type: {})", stringify!(#field_name), stringify!(#field_type));

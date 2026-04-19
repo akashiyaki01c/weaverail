@@ -10,11 +10,13 @@ pub struct IdIssuer {
 }
 impl IdIssuer {
     pub fn new() -> Self {
-        Self { current: Cell::new(0) }
+        Self {
+            current: Cell::new(0),
+        }
     }
 
     pub fn next(&self) -> WeaverailId {
-		let value = self.current.get();
+        let value = self.current.get();
         let result = WeaverailId(value);
         self.current.set(value + 1);
         result

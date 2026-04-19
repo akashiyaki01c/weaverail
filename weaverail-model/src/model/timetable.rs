@@ -6,11 +6,12 @@ use std::collections::{HashMap, hash_map::Entry};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    command::CommandError, model::{
-        DiagramRoot, ExtensionProperty,
-        line_segment::LineSegmentId,
+    command::CommandError,
+    model::{
+        DiagramRoot, ExtensionProperty, line_segment::LineSegmentId,
         segment_train_order::SegmentTrainOrder,
-    }, weaverail_id
+    },
+    weaverail_id,
 };
 
 weaverail_id!(TimetableId, "TBL_");

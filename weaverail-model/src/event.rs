@@ -11,71 +11,71 @@
 )]
 pub enum EmitEventType {
     /// 駅が追加された
-	#[strum(serialize = "station::added")]
+    #[strum(serialize = "station::added")]
     StationAdded,
-	/// 駅が削除された
-	#[strum(serialize = "station::deleted")]
+    /// 駅が削除された
+    #[strum(serialize = "station::deleted")]
     StationDeleted,
-	/// 駅名が変更された
+    /// 駅名が変更された
     #[strum(serialize = "station::renamed")]
-	StationRenamed,
+    StationRenamed,
 
     /// 番線が追加された
-	#[strum(serialize = "track::added")]
+    #[strum(serialize = "track::added")]
     TrackAdded,
     /// 番線が削除された
-	#[strum(serialize = "track::deleted")]
+    #[strum(serialize = "track::deleted")]
     TrackDeleted,
 
     /// 路線が追加された
-	#[strum(serialize = "line::added")]
+    #[strum(serialize = "line::added")]
     LineAdded,
     /// 路線が削除された
-	#[strum(serialize = "line::deleted")]
+    #[strum(serialize = "line::deleted")]
     LineDeleted,
     /// 路線名が変更された
     #[strum(serialize = "line::renamed")]
-	LineRenamed,
+    LineRenamed,
 
     /// 駅間が追加された
     #[strum(serialize = "segment::pushed")]
-	SegmentPushed,
+    SegmentPushed,
     /// 駅間が削除された
     #[strum(serialize = "segment::poped")]
-	SegmentPoped,
+    SegmentPoped,
 
     /// 列車種別が追加された
     #[strum(serialize = "train_type::added")]
-	TrainTypeAdded,
+    TrainTypeAdded,
     /// 列車種別が削除された
-	#[strum(serialize = "train_type::deleted")]
+    #[strum(serialize = "train_type::deleted")]
     TrainTypeDeleted,
 
     /// テンプレート列車が追加された
     #[strum(serialize = "template_train::added")]
-	TemplateTrainAdded,
+    TemplateTrainAdded,
     /// テンプレート列車が削除された
     #[strum(serialize = "template_train::deleted")]
-	TemplateTrainDeleted,
+    TemplateTrainDeleted,
 
     /// テンプレート列車の駅間が追加された
     #[strum(serialize = "template_train_segment::pushed")]
-	TemplateTrainSegmentPushed,
+    TemplateTrainSegmentPushed,
     /// テンプレート列車の駅間が削除された
     #[strum(serialize = "template_train_segment::poped")]
-	TemplateTrainSegmentPoped,
+    TemplateTrainSegmentPoped,
 
     /// 時刻表が追加された
     #[strum(serialize = "timetable::added")]
-	TimetableAdded,
+    TimetableAdded,
     /// 時刻表が削除された
     #[strum(serialize = "timetable::deleted")]
-	TimetableDeleted,
+    TimetableDeleted,
 
     /// 列車が追加された
     #[strum(serialize = "train::added")]
-	TrainAdded,
+    TrainAdded,
     /// 列車が削除された
     #[strum(serialize = "train::deleted")]
-	TrainDeleted,
+    TrainDeleted,
 }

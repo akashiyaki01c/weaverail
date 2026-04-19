@@ -6,7 +6,9 @@ use std::collections::hash_map::Entry;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    error::ModelError, model::{DiagramRoot, ExtensionProperty}, weaverail_id
+    error::ModelError,
+    model::{DiagramRoot, ExtensionProperty},
+    weaverail_id,
 };
 
 weaverail_id!(TrainTypeId, "TYP_");

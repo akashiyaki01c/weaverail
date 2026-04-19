@@ -1,7 +1,9 @@
 use std::sync::Mutex;
 
 use weaverail_model::{
-    app::AppState, command::line::{AddLineCommand, RemoveLineCommand}, model::line::{Line, LineId}
+    app::AppState,
+    command::line::{AddLineCommand, RemoveLineCommand},
+    model::line::{Line, LineId},
 };
 
 #[tauri::command]

@@ -292,7 +292,8 @@ impl DiagramRoot {
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
         let last = template_train.last_station().station_id;
-        let is_referenced = self.trains
+        let is_referenced = self
+            .trains
             .values()
             .filter(|train| train.contain_template_train(template_train.id))
             .any(|train| {
@@ -320,7 +321,8 @@ impl DiagramRoot {
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
         let first = template_train.first_station().station_id;
-        let is_referenced = self.trains
+        let is_referenced = self
+            .trains
             .values()
             .filter(|train| train.contain_template_train(template_train.id))
             .any(|train| {

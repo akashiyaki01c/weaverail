@@ -1,5 +1,7 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter}, event::EmitEventType, model::{DiagramRoot, timetable::TimetableId, train::Train}
+    command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
+    model::{DiagramRoot, timetable::TimetableId, train::Train},
 };
 
 /// 駅に列車を追加する操作

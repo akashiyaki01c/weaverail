@@ -1,9 +1,7 @@
 use crate::{
     command::{Command, CommandError, EventEmitter},
     event::EmitEventType,
-    model::{
-        DiagramRoot, track::Track,
-    },
+    model::{DiagramRoot, track::Track},
 };
 
 /// 駅に番線を追加する操作

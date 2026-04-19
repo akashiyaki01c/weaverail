@@ -65,11 +65,13 @@ impl DiagramRoot {
     /// 指定IDの番線が存在しない場合はエラーを返す
     /// テンプレート列車から参照されている場合はエラーを返す
     pub fn delete_track(&mut self, track_id: TrackId) -> Result<Track, ModelError> {
-        if self.template_trains.values().any(|train| {
-			train.contains_track(track_id)
-		}) {
-			return Err(ModelError::ExternalReferenced);
-		}
+        if self
+            .template_trains
+            .values()
+            .any(|train| train.contains_track(track_id))
+        {
+            return Err(ModelError::ExternalReferenced);
+        }
         self.tracks
             .remove(&track_id)
             .ok_or(ModelError::ObjectNotFound)

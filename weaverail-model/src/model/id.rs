@@ -30,7 +30,6 @@ impl std::fmt::Debug for WeaverailId {
 #[macro_export]
 macro_rules! weaverail_id {
     ($name: ident, $id: expr) => {
-
         #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default)]
         pub struct $name(pub $crate::model::id::WeaverailId);
 

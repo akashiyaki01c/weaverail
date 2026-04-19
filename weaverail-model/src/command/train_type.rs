@@ -1,8 +1,10 @@
 use crate::{
-    command::{Command, CommandError, EventEmitter}, event::EmitEventType, model::{
+    command::{Command, CommandError, EventEmitter},
+    event::EmitEventType,
+    model::{
         DiagramRoot,
         train_type::{TrainType, TrainTypeId},
-    }
+    },
 };
 
 /// 列車種別の追加

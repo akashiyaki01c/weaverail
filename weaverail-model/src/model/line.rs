@@ -56,7 +56,10 @@ impl Line {
     }
 
     /// 最初の駅間を取得する関数
-    pub fn first_segment<'a>(&self, root: &'a DiagramRoot) -> Result<Option<&'a LineSegment>, ModelError> {
+    pub fn first_segment<'a>(
+        &self,
+        root: &'a DiagramRoot,
+    ) -> Result<Option<&'a LineSegment>, ModelError> {
         if let Some(segment_id) = self.segments.first() {
             if let Some(segment) = root.segments.get(segment_id) {
                 Ok(Some(segment))
@@ -69,7 +72,10 @@ impl Line {
     }
 
     /// 最後の駅間を取得する関数
-    pub fn last_segment<'a>(&self, root: &'a DiagramRoot) -> Result<Option<&'a LineSegment>, ModelError> {
+    pub fn last_segment<'a>(
+        &self,
+        root: &'a DiagramRoot,
+    ) -> Result<Option<&'a LineSegment>, ModelError> {
         if let Some(segment_id) = self.segments.last() {
             if let Some(segment) = root.segments.get(segment_id) {
                 Ok(Some(segment))

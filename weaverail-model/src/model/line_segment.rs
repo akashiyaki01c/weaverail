@@ -76,18 +76,22 @@ impl DiagramRoot {
     /// 路線から参照されている場合はエラーを返す
     /// テンプレート列車から参照されている場合はエラーを返す
     pub fn delete_segment(&mut self, segment_id: LineSegmentId) -> Result<LineSegment, ModelError> {
-        if self.lines.values().any(|line| {
-            line.segments.contains(&segment_id)
-        }) {
+        if self
+            .lines
+            .values()
+            .any(|line| line.segments.contains(&segment_id))
+        {
             return Err(ModelError::ExternalReferenced);
         }
-		if self.template_trains.values().any(|train| {
-			train.contains_segment(segment_id)
-		}) {
-			return Err(ModelError::ExternalReferenced);
-		}
+        if self
+            .template_trains
+            .values()
+            .any(|train| train.contains_segment(segment_id))
+        {
+            return Err(ModelError::ExternalReferenced);
+        }
 
-		self.segments
+        self.segments
             .remove(&segment_id)
             .ok_or(ModelError::ObjectNotFound)
     }

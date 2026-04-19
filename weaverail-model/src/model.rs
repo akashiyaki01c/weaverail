@@ -2,24 +2,34 @@
 
 pub mod id;
 pub mod line;
+pub mod line_segment;
 pub mod segment_train_order;
 pub mod station;
 pub mod template_train;
 pub mod time;
 pub mod timetable;
+pub mod track;
 pub mod train;
 pub mod train_type;
-pub mod track;
-pub mod line_segment;
 
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{id_issuer::IdIssuer, model::{
-    line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId}
-}};
+use crate::{
+    id_issuer::IdIssuer,
+    model::{
+        line::{Line, LineId},
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId},
+        timetable::{Timetable, TimetableId},
+        track::{Track, TrackId},
+        train::{Train, TrainId},
+        train_type::{TrainType, TrainTypeId},
+    },
+};
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

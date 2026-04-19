@@ -47,9 +47,7 @@ impl Command for PushBackTemplateTrainSegmentCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.pop_back_template_segment(
-            self.template_train_id,
-        )?;
+        obj.pop_back_template_segment(self.template_train_id)?;
         emitter.emit(EmitEventType::TemplateTrainSegmentPoped, "");
         Ok(())
     }
