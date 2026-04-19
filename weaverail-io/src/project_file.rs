@@ -69,9 +69,12 @@ pub fn write_file(
 #[test]
 fn write_read() {
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let start = std::time::Instant::now();
     let path = PathBuf::from("./test.wvr");
     let _ = write_file(&path, &test_data.root, &test_data.metadata);
+    let duration = start.elapsed();
+    println!("write_time: {}us", duration.as_micros());
     let data = read_file(&path);
     let data = data.unwrap();
-    println!("{:?}", data);
+    // println!("{:?}", data);
 }
