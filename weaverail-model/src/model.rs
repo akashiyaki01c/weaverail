@@ -8,7 +8,6 @@ pub mod template_train;
 pub mod time;
 pub mod timetable;
 pub mod train;
-pub mod train_adjustment;
 pub mod train_type;
 pub mod track;
 pub mod line_segment;
