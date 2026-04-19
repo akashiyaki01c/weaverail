@@ -8,3 +8,4 @@ pub mod model;
 pub mod test_data;
 pub mod event;
 pub mod id_issuer;
+pub mod error;

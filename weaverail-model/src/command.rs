@@ -12,8 +12,10 @@ pub mod track;
 pub mod train;
 pub mod train_type;
 
-use crate::{event::EmitEventType, model::DiagramRoot};
+use crate::{error::ModelError, event::EmitEventType, model::DiagramRoot};
 use serde::{Deserialize, Serialize};
+use strum::Display;
+use thiserror::Error;
 
 /// バックエンド側からフロントエンド側へのイベント通知を行う構造体
 pub trait EventEmitter: Send + Sync {
@@ -45,8 +47,10 @@ pub trait Command: Send + Sync {
 }
 
 /// コマンドのエラー一覧
-#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize, Error, Display)]
 pub enum CommandError {
+    /// モデルのエラー
+    ModelError(#[from] ModelError),
     /// 対象オブジェクトが見つからない
     TargetObjectNotFound,
     /// オブジェクトのキーが重複している

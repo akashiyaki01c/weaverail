@@ -3,7 +3,7 @@
 //!   - Track (列車番線)
 
 use crate::{
-    command::CommandError,
+    error::ModelError,
     model::{DiagramRoot, ExtensionProperty},
     weaverail_id,
 };
@@ -35,31 +35,41 @@ impl Station {
 
 impl DiagramRoot {
     /// 駅を追加する関数
+    /// 計算オーダは `O(1)`
     /// 既に同一IDの駅が存在している場合はエラーを返す
-    pub fn add_station(&mut self, station: Station) -> Result<(), CommandError> {
+    pub fn add_station(&mut self, station: Station) -> Result<(), ModelError> {
         match self.stations.entry(station.id) {
             Entry::Vacant(entry) => {
                 entry.insert(station);
                 Ok(())
             }
-            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+            Entry::Occupied(_) => Err(ModelError::DuplicateKey),
         }
     }
 
     /// 駅を削除する関数
+    /// 計算オーダは `O(segments.len + track.len)`
     /// 指定IDの駅が存在しない場合はエラーを返す
-    /// 路線から参照されている場合はエラーを返す
-    pub fn delete_station(&mut self, station_id: StationId) -> Result<Station, CommandError> {
+    /// 駅間から参照されている場合はエラーを返す
+    /// 番線から参照されている場合はエラーを返す
+    pub fn delete_station(&mut self, station_id: StationId) -> Result<Station, ModelError> {
         if self
             .segments
             .values()
             .any(|segment| segment.contains_station(station_id))
         {
-            return Err(CommandError::ExternalReference);
+            return Err(ModelError::ExternalReferenced);
+        }
+        if self
+            .tracks
+            .values()
+            .any(|track| track.station_id == station_id)
+        {
+            return Err(ModelError::ExternalReferenced);
         }
         self.stations
             .remove(&station_id)
-            .ok_or(CommandError::TargetObjectNotFound)
+            .ok_or(ModelError::ObjectNotFound)
     }
 
     /// 駅名から駅を検索する関数

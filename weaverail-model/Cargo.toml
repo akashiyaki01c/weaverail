@@ -16,3 +16,4 @@ zstd = "0.13.3"
 base64 = "0.22.1"
 strum = { version = "0.27", features = ["strum_macros", "derive"] }
 weaverail-object = { path = "../weaverail-object" }
+thiserror = "2.0.18"

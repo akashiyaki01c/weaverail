@@ -8,9 +8,14 @@ use std::iter;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    command::CommandError, model::{
-        DiagramRoot, ExtensionProperty, line_segment::{LineSegment, LineSegmentId}, station::Station
-    }, weaverail_id
+    command::CommandError,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty,
+        line_segment::{LineSegment, LineSegmentId},
+        station::Station,
+    },
+    weaverail_id,
 };
 
 weaverail_id!(LineId, "LIN_");
@@ -36,28 +41,43 @@ impl Line {
             ..Default::default()
         }
     }
+
+    /// 駅間リストを取得する関数
+    /// 計算量は `O(segments.len())`
+    pub fn segments<'a>(&self, root: &'a DiagramRoot) -> Result<Vec<&'a LineSegment>, ModelError> {
+        self.segments
+            .iter()
+            .map(|id| {
+                root.segments
+                    .get(id)
+                    // IDが見つからない場合は、自前のModelErrorを返す
+                    .ok_or_else(|| ModelError::ObjectNotFound)
+            })
+            .collect()
+    }
 }
 
 impl DiagramRoot {
     /// 路線を追加する関数
+    /// 計算オーダは`O(1)`
     /// 既に同一IDの路線が存在している場合はエラーを返す
-    pub fn add_line(&mut self, line: Line) -> Result<(), CommandError> {
+    pub fn add_line(&mut self, line: Line) -> Result<(), ModelError> {
         match self.lines.entry(line.id) {
             Entry::Vacant(entry) => {
                 entry.insert(line);
                 Ok(())
             }
-            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+            Entry::Occupied(_) => Err(ModelError::DuplicateKey),
         }
     }
 
     /// 路線を削除する関数
+    /// 計算オーダは`O(1)`
     /// 指定IDの路線が存在しない場合はエラーを返す
-    /// テンプレート列車から参照されている場合はエラーを返す
-    pub fn delete_line(&mut self, line_id: LineId) -> Result<Line, CommandError> {
+    pub fn delete_line(&mut self, line_id: LineId) -> Result<Line, ModelError> {
         self.lines
             .remove(&line_id)
-            .ok_or(CommandError::TargetObjectNotFound)
+            .ok_or(ModelError::ObjectNotFound)
     }
 
     /// 路線に所属する駅を取得する関数

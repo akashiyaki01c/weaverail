@@ -1,6 +1,15 @@
+use std::collections::hash_map::Entry;
+
 use serde::{Deserialize, Serialize};
 
-use crate::{model::{ExtensionProperty, station::StationId}, weaverail_id};
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty,
+        station::{Station, StationId},
+    },
+    weaverail_id,
+};
 
 weaverail_id!(LineSegmentId, "SGM_");
 
@@ -26,8 +35,60 @@ impl LineSegment {
         }
     }
 
+    /// 開始駅を取得する関数
+    /// 計算量は `O(1)`
+    pub fn start_station<'a>(&self, root: &'a DiagramRoot) -> Result<&'a Station, ModelError> {
+        root.stations
+            .get(&self.start_station)
+            .ok_or(ModelError::ObjectNotFound)
+    }
+
+    /// 終了駅を取得する関数
+    /// 計算量は `O(1)`
+    pub fn end_station<'a>(&self, root: &'a DiagramRoot) -> Result<&'a Station, ModelError> {
+        root.stations
+            .get(&self.end_station)
+            .ok_or(ModelError::ObjectNotFound)
+    }
+
     /// 駅間が指定駅を参照しているか
     pub fn contains_station(&self, station_id: StationId) -> bool {
         self.start_station == station_id || self.end_station == station_id
+    }
+}
+impl DiagramRoot {
+    /// 駅間を追加する関数
+    /// 計算オーダは `O(1)`
+    /// 既に同一IDの駅間が存在している場合はエラーを返す
+    pub fn add_segment(&mut self, segment: LineSegment) -> Result<(), ModelError> {
+        match self.segments.entry(segment.id) {
+            Entry::Vacant(entry) => {
+                entry.insert(segment);
+                Ok(())
+            }
+            Entry::Occupied(_) => Err(ModelError::DuplicateKey),
+        }
+    }
+
+    /// 駅間を削除する関数
+    /// 計算オーダは `O(segments.len + template_trains.len)`
+    /// 指定IDの駅が存在しない場合はエラーを返す
+    /// 路線から参照されている場合はエラーを返す
+    /// テンプレート列車から参照されている場合はエラーを返す
+    pub fn delete_segment(&mut self, segment_id: LineSegmentId) -> Result<LineSegment, ModelError> {
+        if self.lines.values().any(|line| {
+            line.segments.contains(&segment_id)
+        }) {
+            return Err(ModelError::ExternalReferenced);
+        }
+		if self.template_trains.values().any(|train| {
+			train.contains_segment(segment_id)
+		}) {
+			return Err(ModelError::ExternalReferenced);
+		}
+
+		self.segments
+            .remove(&segment_id)
+            .ok_or(ModelError::ObjectNotFound)
     }
 }

@@ -9,9 +9,14 @@ use std::collections::hash_map::Entry;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    command::CommandError,
+    error::ModelError,
     model::{
-        DiagramRoot, ExtensionProperty, line_segment::LineSegmentId, station::StationId, time::Time, track::TrackId, train_type::TrainTypeId
+        DiagramRoot, ExtensionProperty,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        time::Time,
+        track::{Track, TrackId},
+        train_type::{TrainType, TrainTypeId},
     },
     weaverail_id,
 };
@@ -35,6 +40,14 @@ pub struct TemplateTrain {
     pub properties: ExtensionProperty,
 }
 impl TemplateTrain {
+    /// 列車種別を取得する関数
+    /// 計算量は `O(1)`
+    pub fn train_type<'a>(&self, root: &'a DiagramRoot) -> Result<&'a TrainType, ModelError> {
+        root.train_types
+            .get(&self.train_type_id)
+            .ok_or(ModelError::ObjectNotFound)
+    }
+
     /// テンプレート列車が指定駅間を参照しているか
     pub fn contains_segment(&self, segment_id: LineSegmentId) -> bool {
         self.segments
@@ -67,6 +80,12 @@ impl TemplateTrain {
         stations
             .iter()
             .any(|station| station.station_id == station_id)
+    }
+
+    /// 指定の駅が含まれているか
+    pub fn contains_track(&self, track_id: TrackId) -> bool {
+        let stations = self.get_stations();
+        stations.iter().any(|station| station.track_id == track_id)
     }
 
     /// 指定の駅が何番目にあるか
@@ -144,28 +163,34 @@ impl TemplateTrain {
 impl DiagramRoot {
     /// テンプレート列車を追加する関数
     /// 既に同一IDのテンプレート列車が存在している場合はエラーを返す
-    pub fn add_template_train(
-        &mut self,
-        template_train: TemplateTrain,
-    ) -> Result<(), CommandError> {
+    pub fn add_template_train(&mut self, template_train: TemplateTrain) -> Result<(), ModelError> {
         match self.template_trains.entry(template_train.id) {
             Entry::Vacant(entry) => {
                 entry.insert(template_train);
                 Ok(())
             }
-            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+            Entry::Occupied(_) => Err(ModelError::DuplicateKey),
         }
     }
 
     /// テンプレート列車を削除する関数
+    /// 計算オーダは `O(template_trains.len)`
     /// 指定IDのテンプレート列車が存在しない場合はエラーを返す
+    /// 列車から参照されている場合はエラーを返す
     pub fn delete_template_train(
         &mut self,
         template_train_id: TemplateTrainId,
-    ) -> Result<TemplateTrain, CommandError> {
+    ) -> Result<TemplateTrain, ModelError> {
+        if self
+            .trains
+            .values()
+            .any(|train| train.contain_template_train(template_train_id))
+        {
+            return Err(ModelError::ExternalReferenced);
+        }
         self.template_trains
             .remove(&template_train_id)
-            .ok_or(CommandError::TargetObjectNotFound)
+            .ok_or(ModelError::ObjectNotFound)
     }
 
     /// テンプレート列車名からテンプレート列車を検索する関数
@@ -191,6 +216,15 @@ pub struct TemplateTrainSegment {
     /// 基準運転時分
     pub running_time: Time,
 }
+impl TemplateTrainSegment {
+    /// 駅間を取得する関数
+    /// 計算量は `O(1)`
+    pub fn segment<'a>(&self, root: &'a DiagramRoot) -> Result<&'a LineSegment, ModelError> {
+        root.segments
+            .get(&self.segment_id)
+            .ok_or(ModelError::ObjectNotFound)
+    }
+}
 
 weaverail_id!(TemplateTrainStationId, "TST_");
 
@@ -205,6 +239,22 @@ pub struct TemplateTrainStation {
     pub track_id: TrackId,
     /// 停車時間
     pub stop_time: StopType,
+}
+impl TemplateTrainStation {
+    /// 駅を取得する関数
+    /// 計算量は `O(1)`
+    pub fn station<'a>(&self, root: &'a DiagramRoot) -> Result<&'a Station, ModelError> {
+        root.stations
+            .get(&self.station_id)
+            .ok_or(ModelError::ObjectNotFound)
+    }
+    /// 番線を取得する関数
+    /// 計算量は `O(1)`
+    pub fn track<'a>(&self, root: &'a DiagramRoot) -> Result<&'a Track, ModelError> {
+        root.tracks
+            .get(&self.track_id)
+            .ok_or(ModelError::ObjectNotFound)
+    }
 }
 
 /// テンプレート列車の停車種別を表す列挙体
