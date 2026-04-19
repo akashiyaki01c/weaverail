@@ -163,16 +163,16 @@ impl TemplateTrain {
     }
 
     /// 先頭の駅を返す関数
-    pub fn first_station(&self) -> &TemplateTrainStation {
-        &self.start_station
+    pub fn first_station(&self) -> Result<&TemplateTrainStation, ModelError> {
+        Ok(&self.start_station)
     }
 
     /// 末尾の駅を返す関数
-    pub fn last_station(&self) -> &TemplateTrainStation {
+    pub fn last_station(&self) -> Result<&TemplateTrainStation, ModelError> {
         if self.segments.is_empty() {
-            &self.start_station
+            Ok(&self.start_station)
         } else {
-            &self.segments.last().unwrap().1
+            Ok(&self.segments.last().ok_or(ModelError::Empty)?.1)
         }
     }
 }
@@ -232,7 +232,7 @@ impl DiagramRoot {
             .template_trains
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        let last_station = template_train.last_station().station_id;
+        let last_station = template_train.last_station()?.station_id;
         let is_valid_station = if template_segment.is_reversed {
             end_station_id == last_station
         } else {
@@ -264,7 +264,7 @@ impl DiagramRoot {
             .template_trains
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        let first_station = template_train.first_station().station_id;
+        let first_station = template_train.first_station()?.station_id;
         let is_valid_station = if template_segment.is_reversed {
             start_station_id == first_station
         } else {
@@ -291,7 +291,7 @@ impl DiagramRoot {
             .template_trains
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        let last = template_train.last_station().station_id;
+        let last = template_train.last_station()?.station_id;
         let is_referenced = self
             .trains
             .values()
@@ -320,7 +320,7 @@ impl DiagramRoot {
             .template_trains
             .get_mut(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        let first = template_train.first_station().station_id;
+        let first = template_train.first_station()?.station_id;
         let is_referenced = self
             .trains
             .values()

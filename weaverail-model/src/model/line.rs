@@ -8,17 +8,23 @@ use std::iter;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    command::CommandError,
     error::ModelError,
     model::{
         DiagramRoot, ExtensionProperty,
         line_segment::{LineSegment, LineSegmentId},
-        station::Station,
+        station::{Station, StationId},
     },
     weaverail_id,
 };
 
 weaverail_id!(LineId, "LIN_");
+
+/// 駅間への参照を表す構造体
+#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+pub struct SegmentRef {
+    pub segment_id: LineSegmentId,
+    pub is_reversed: bool,
+}
 
 /// Weaverail上の1つの路線を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -28,12 +34,12 @@ pub struct Line {
     /// 路線名 (例: "神明線")
     pub name: String,
     /// 路線に所属する駅間リスト
-    pub segments: Vec<LineSegmentId>,
+    pub segments: Vec<SegmentRef>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
 impl Line {
-    pub fn new(id: LineId, name: &str, stations: &[LineSegmentId]) -> Self {
+    pub fn new(id: LineId, name: &str, stations: &[SegmentRef]) -> Self {
         Self {
             id,
             name: name.to_string(),
@@ -47,7 +53,11 @@ impl Line {
     pub fn segments<'a>(&self, root: &'a DiagramRoot) -> Result<Vec<&'a LineSegment>, ModelError> {
         self.segments
             .iter()
-            .map(|id| root.segments.get(id).ok_or(ModelError::ObjectNotFound))
+            .map(|id| {
+                root.segments
+                    .get(&id.segment_id)
+                    .ok_or(ModelError::ObjectNotFound)
+            })
             .collect()
     }
 
@@ -55,10 +65,10 @@ impl Line {
     pub fn first_segment<'a>(
         &self,
         root: &'a DiagramRoot,
-    ) -> Result<Option<&'a LineSegment>, ModelError> {
+    ) -> Result<Option<(&'a LineSegment, bool)>, ModelError> {
         if let Some(segment_id) = self.segments.first() {
-            if let Some(segment) = root.segments.get(segment_id) {
-                Ok(Some(segment))
+            if let Some(segment) = root.segments.get(&segment_id.segment_id) {
+                Ok(Some((segment, segment_id.is_reversed)))
             } else {
                 Err(ModelError::ObjectNotFound)
             }
@@ -71,12 +81,40 @@ impl Line {
     pub fn last_segment<'a>(
         &self,
         root: &'a DiagramRoot,
-    ) -> Result<Option<&'a LineSegment>, ModelError> {
+    ) -> Result<Option<(&'a LineSegment, bool)>, ModelError> {
         if let Some(segment_id) = self.segments.last() {
-            if let Some(segment) = root.segments.get(segment_id) {
-                Ok(Some(segment))
+            if let Some(segment) = root.segments.get(&segment_id.segment_id) {
+                Ok(Some((segment, segment_id.is_reversed)))
             } else {
                 Err(ModelError::ObjectNotFound)
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// 先頭の駅IDを返す関数
+    pub fn first_station_id(&self, root: &DiagramRoot) -> Result<Option<StationId>, ModelError> {
+        let segment = self.first_segment(root)?;
+        if let Some(segment) = segment {
+            if segment.1 {
+                Ok(Some(segment.0.end_station))
+            } else {
+                Ok(Some(segment.0.start_station))
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
+    /// 末尾の駅IDを返す関数
+    pub fn last_station_id(&self, root: &DiagramRoot) -> Result<Option<StationId>, ModelError> {
+        let segment = self.last_segment(root)?;
+        if let Some(segment) = segment {
+            if segment.1 {
+                Ok(Some(segment.0.start_station))
+            } else {
+                Ok(Some(segment.0.end_station))
             }
         } else {
             Ok(None)
@@ -112,10 +150,13 @@ impl DiagramRoot {
         if line.segments.is_empty() {
             return Vec::new();
         }
-        let first_segment = self.segments.get(line.segments.first().unwrap()).unwrap();
+        let first_segment = self
+            .segments
+            .get(&line.segments.first().unwrap().segment_id)
+            .unwrap();
         let start_id = first_segment.start_station;
         let end_ids = line.segments.iter().map(|segment_id| {
-            let segment = self.segments.get(segment_id).unwrap();
+            let segment = self.segments.get(&segment_id.segment_id).unwrap();
             segment.end_station
         });
         iter::once(start_id)
@@ -131,28 +172,102 @@ impl DiagramRoot {
             .find(|segment| segment.id == segment_id)
     }
 
-    /// 路線の末尾に駅を追加する
-    pub fn append_segment(
+    /// 路線の末尾に駅間を追加する関数
+    pub fn push_back_line_segment(
         &mut self,
         line_id: LineId,
-        segment: LineSegmentId,
-    ) -> Result<(), CommandError> {
+        segment_id: LineSegmentId,
+        is_reversed: bool,
+    ) -> Result<(), ModelError> {
+        let (start_station_id, end_station_id) = {
+            let segment = self
+                .segments
+                .get(&segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            (segment.start_station, segment.end_station)
+        };
+        let line: &Line = self.lines.get(&line_id).ok_or(ModelError::ObjectNotFound)?;
+        let last_station = line.last_station_id(self)?;
+        let line: &mut Line = self
+            .lines
+            .get_mut(&line_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+
+        if let Some(last_station) = last_station {
+            let is_valid = if is_reversed {
+                end_station_id == last_station
+            } else {
+                start_station_id == last_station
+            };
+            if !is_valid {
+                return Err(ModelError::Error);
+            }
+        }
+        line.segments.push(SegmentRef {
+            segment_id,
+            is_reversed,
+        });
+        Ok(())
+    }
+
+    /// 路線の先頭に駅間を追加する関数
+    pub fn push_front_line_segment(
+        &mut self,
+        line_id: LineId,
+        segment_id: LineSegmentId,
+        is_reversed: bool,
+    ) -> Result<(), ModelError> {
+        let (start_station_id, end_station_id) = {
+            let segment = self
+                .segments
+                .get(&segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            (segment.start_station, segment.end_station)
+        };
+        let line: &Line = self.lines.get(&line_id).ok_or(ModelError::ObjectNotFound)?;
+        let first_station = line.first_station_id(self)?;
+        let line: &mut Line = self
+            .lines
+            .get_mut(&line_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+
+        if let Some(last_station) = first_station {
+            let is_valid = if is_reversed {
+                start_station_id == last_station
+            } else {
+                end_station_id == last_station
+            };
+            if !is_valid {
+                return Err(ModelError::Error);
+            }
+        }
+        line.segments.insert(
+            0,
+            SegmentRef {
+                segment_id,
+                is_reversed,
+            },
+        );
+        Ok(())
+    }
+
+    /// 路線の末尾の駅間を削除する関数
+    pub fn pop_back_line_segment(&mut self, line_id: LineId) -> Result<(), ModelError> {
         let line = self
             .lines
             .get_mut(&line_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        if line.segments.is_empty() {
-            line.segments.push(segment)
-        } else {
-            let last_segment = self.segments.get(line.segments.last().unwrap()).unwrap();
-            let segment = self.segments.get(&segment).unwrap();
-            let segment_end_id = last_segment.end_station;
-            if segment_end_id != segment.start_station {
-                return Err(CommandError::Inconsistent);
-            }
-            line.segments.push(segment.id)
-        }
+            .ok_or(ModelError::ObjectNotFound)?;
+        line.segments.pop();
+        Ok(())
+    }
 
+    /// 路線の先頭の駅間を削除する関数
+    pub fn pop_front_line_segment(&mut self, line_id: LineId) -> Result<(), ModelError> {
+        let line = self
+            .lines
+            .get_mut(&line_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        line.segments.remove(0);
         Ok(())
     }
 
@@ -161,7 +276,7 @@ impl DiagramRoot {
         &self,
         start_station_name: &str,
         end_station_name: &str,
-    ) -> (&LineSegmentId, bool) {
+    ) -> &SegmentRef {
         let start_station = self.find_station_by_name(start_station_name).expect("").id;
         let end_station = self.find_station_by_name(end_station_name).expect("").id;
         let reversed_segment =
@@ -169,7 +284,7 @@ impl DiagramRoot {
                 .values()
                 .flat_map(|line| &line.segments)
                 .find(|segment| {
-                    let segment = self.segments.get(segment).unwrap();
+                    let segment = self.segments.get(&segment.segment_id).unwrap();
                     segment.start_station == start_station && segment.end_station == end_station
                 });
         let forward_segment = self
@@ -177,13 +292,13 @@ impl DiagramRoot {
             .values()
             .flat_map(|line| &line.segments)
             .find(|segment| {
-                let segment = self.segments.get(segment).unwrap();
+                let segment = self.segments.get(&segment.segment_id).unwrap();
                 segment.start_station == end_station && segment.end_station == start_station
             });
         if let Some(forward_segment) = forward_segment {
-            (forward_segment, false)
+            forward_segment
         } else {
-            (reversed_segment.unwrap(), false)
+            reversed_segment.unwrap()
         }
     }
 }

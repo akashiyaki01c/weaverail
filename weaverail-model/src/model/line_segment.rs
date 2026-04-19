@@ -79,7 +79,7 @@ impl DiagramRoot {
         if self
             .lines
             .values()
-            .any(|line| line.segments.contains(&segment_id))
+            .any(|line| line.segments.iter().any(|seg| seg.segment_id == segment_id))
         {
             return Err(ModelError::ExternalReferenced);
         }

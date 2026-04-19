@@ -12,4 +12,6 @@ pub enum ModelError {
     ExternalReferenced,
     #[error("external referenced.")]
     Error,
+    #[error("empty")]
+    Empty,
 }
