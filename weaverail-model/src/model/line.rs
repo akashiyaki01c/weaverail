@@ -47,11 +47,7 @@ impl Line {
     pub fn segments<'a>(&self, root: &'a DiagramRoot) -> Result<Vec<&'a LineSegment>, ModelError> {
         self.segments
             .iter()
-            .map(|id| {
-                root.segments
-                    .get(id)
-                    .ok_or_else(|| ModelError::ObjectNotFound)
-            })
+            .map(|id| root.segments.get(id).ok_or(ModelError::ObjectNotFound))
             .collect()
     }
 
@@ -173,7 +169,7 @@ impl DiagramRoot {
                 .values()
                 .flat_map(|line| &line.segments)
                 .find(|segment| {
-                    let segment = self.segments.get(&segment).unwrap();
+                    let segment = self.segments.get(segment).unwrap();
                     segment.start_station == start_station && segment.end_station == end_station
                 });
         let forward_segment = self
@@ -181,11 +177,11 @@ impl DiagramRoot {
             .values()
             .flat_map(|line| &line.segments)
             .find(|segment| {
-                let segment = self.segments.get(&segment).unwrap();
+                let segment = self.segments.get(segment).unwrap();
                 segment.start_station == end_station && segment.end_station == start_station
             });
-        if forward_segment.is_some() {
-            (forward_segment.unwrap(), false)
+        if let Some(forward_segment) = forward_segment {
+            (forward_segment, false)
         } else {
             (reversed_segment.unwrap(), false)
         }

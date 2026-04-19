@@ -10,7 +10,7 @@ pub(crate) fn get_time_result(
     nodes: Vec<&WeftNode>,
     times: &Vec<Time>,
 ) -> Vec<ResultWeftTrain> {
-    let timetable = diagram_root.timetables.get(&timetable_id).unwrap();
+    let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = diagram_root
         .trains
         .values()
@@ -26,7 +26,7 @@ pub(crate) fn get_time_result(
     for train in diagram_root
         .trains
         .values()
-        .filter(|train| trains.contains(&train))
+        .filter(|train| trains.contains(train))
     {
         let mut result_train = ResultWeftTrain {
             train_id: train.id,

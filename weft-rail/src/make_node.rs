@@ -14,7 +14,7 @@ use weaverail_model::model::{
 use crate::{NodeId, NodeType, StopType, WeftNode};
 type NodeKey = (TrainId, LineSegmentId, NodeType);
 
-static DUMMY_NODE: LazyLock<WeftNode> = LazyLock::new(|| WeftNode::default());
+static DUMMY_NODE: LazyLock<WeftNode> = LazyLock::new(WeftNode::default);
 
 struct NumberIssuer {
     current: usize,
@@ -55,7 +55,7 @@ pub fn make_node(
     };
 
     // 列車の生時刻の取得
-    for train in root.trains.values().filter(|train| trains.contains(&train)) {
+    for train in root.trains.values().filter(|train| trains.contains(train)) {
         let nodes = make_train_node(root, train, &mut root_node, &mut number_issuer);
         result.insert(train.id, nodes);
     }

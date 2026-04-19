@@ -48,26 +48,20 @@ pub(crate) struct WeftNode {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Default)]
 pub enum StopType {
+    #[default]
     Stop,
     Pass,
 }
-impl Default for StopType {
-    fn default() -> Self {
-        Self::Stop
-    }
-}
 
 #[derive(PartialEq, Clone, Debug, Eq, Hash, Copy)]
+#[derive(Default)]
 pub(crate) enum NodeType {
+    #[default]
     Arrival,
     Departure,
     Root,
-}
-impl Default for NodeType {
-    fn default() -> Self {
-        Self::Arrival
-    }
 }
 
 #[derive(Clone, Debug)]
