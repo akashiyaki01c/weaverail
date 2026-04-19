@@ -51,7 +51,11 @@ pub fn make_node(
     };
 
     // 列車の生時刻の取得
-    for train in timetable.trains.values() {
+    for train in root
+        .trains
+        .values()
+        .filter(|train| timetable.trains.contains(&train.id))
+    {
         let nodes = make_train_node(root, train, &mut root_node, &mut number_issuer);
         result.insert(train.id, nodes);
     }

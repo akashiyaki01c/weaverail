@@ -18,7 +18,11 @@ pub(crate) fn get_time_result(
         node_map.insert((node.train_id, node.station_id, node.node_type), *node);
     }
 
-    for train in timetable.trains.values() {
+    for train in diagram_root
+        .trains
+        .values()
+        .filter(|train| timetable.trains.contains(&train.id))
+    {
         let mut result_train = ResultWeftTrain {
             train_id: train.id,
             times: vec![],

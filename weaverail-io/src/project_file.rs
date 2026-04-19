@@ -74,7 +74,10 @@ fn write_read() {
     let _ = write_file(&path, &test_data.root, &test_data.metadata);
     let duration = start.elapsed();
     println!("write_time: {}us", duration.as_micros());
+    let start = std::time::Instant::now();
     let data = read_file(&path);
+    let duration = start.elapsed();
+    println!("read_time: {}us", duration.as_micros());
     let data = data.unwrap();
     // println!("{:?}", data);
 }

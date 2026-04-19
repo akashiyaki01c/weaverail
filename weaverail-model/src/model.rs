@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{id_issuer::IdIssuer, model::{
-    line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId}
+    line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId}
 }};
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
@@ -60,6 +60,8 @@ pub struct DiagramRoot {
     pub template_trains: HashMap<TemplateTrainId, TemplateTrain>,
     /// 時刻表の集合
     pub timetables: HashMap<TimetableId, Timetable>,
+    /// 列車の集合
+    pub trains: HashMap<TrainId, Train>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
     /// ID発行

@@ -43,11 +43,7 @@ impl DiagramRoot {
         timetable_id: TimetableId,
         train: Train,
     ) -> Result<(), CommandError> {
-        let station = self
-            .timetables
-            .get_mut(&timetable_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        match station.trains.entry(train.id) {
+        match self.trains.entry(train.id) {
             Entry::Vacant(entry) => {
                 entry.insert(train);
                 Ok(())
@@ -63,11 +59,7 @@ impl DiagramRoot {
         timetable_id: TimetableId,
         train_id: TrainId,
     ) -> Result<Train, CommandError> {
-        let timetable = self
-            .timetables
-            .get_mut(&timetable_id)
-            .ok_or(CommandError::TargetObjectNotFound)?;
-        timetable
+        self
             .trains
             .remove(&train_id)
             .ok_or(CommandError::TargetObjectNotFound)

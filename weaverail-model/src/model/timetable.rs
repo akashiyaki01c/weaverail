@@ -1,7 +1,7 @@
 //! Weaverail上の「時刻表」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
 //! - Timetable (時刻表)
 
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::{HashMap, HashSet, hash_map::Entry};
 
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +10,7 @@ use crate::{
         DiagramRoot, ExtensionProperty,
         line_segment::LineSegmentId,
         segment_train_order::SegmentTrainOrder,
-        train::{Train, TrainId},
+        train::TrainId,
         train_adjustment::{TrainsAdjustment, TrainsAdjustmentId},
     }, weaverail_id
 };
@@ -25,7 +25,7 @@ pub struct Timetable {
     /// 時刻表名
     pub name: String,
     /// 時刻表に含まれる列車
-    pub trains: HashMap<TrainId, Train>,
+    pub trains: HashSet<TrainId>,
     /// 時間調整
     pub adjustments: HashMap<TrainsAdjustmentId, TrainsAdjustment>,
     /// 駅間の列車順序
