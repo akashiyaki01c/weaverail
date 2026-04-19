@@ -13,8 +13,9 @@ use crate::{
     model::{
         DiagramRoot, ExtensionProperty,
         line::{Line, LineSegmentId},
-        station::{StationId, TrackId},
+        station::StationId,
         time::Time,
+        track::TrackId,
         train_type::TrainTypeId,
     },
     weaverail_id,

@@ -2,8 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     model::{
-        station::{StationId, TrackId},
-        train::TrainId,
+        station::StationId, track::TrackId, train::TrainId
     },
     weaverail_id,
 };

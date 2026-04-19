@@ -10,6 +10,7 @@ pub mod timetable;
 pub mod train;
 pub mod train_adjustment;
 pub mod train_type;
+pub mod track;
 
 use std::collections::HashMap;
 
@@ -17,11 +18,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{id_issuer::IdIssuer, model::{
-    line::{Line, LineId},
-    station::{Station, StationId},
-    template_train::{TemplateTrain, TemplateTrainId},
-    timetable::{Timetable, TimetableId},
-    train_type::{TrainType, TrainTypeId},
+    line::{Line, LineId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId}
 }};
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
@@ -50,6 +47,8 @@ impl ExtensionProperty {
 pub struct DiagramRoot {
     /// 駅の集合
     pub stations: HashMap<StationId, Station>,
+    /// 番線の集合
+    pub tracks: HashMap<TrackId, Track>,
     /// 路線の集合
     pub lines: HashMap<LineId, Line>,
     /// 列車種別の集合

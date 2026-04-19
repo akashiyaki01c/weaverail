@@ -2,8 +2,7 @@ use crate::{
     command::{Command, CommandError, EventEmitter},
     event::EmitEventType,
     model::{
-        DiagramRoot,
-        station::{StationId, Track},
+        DiagramRoot, track::Track,
     },
 };
 
@@ -12,12 +11,11 @@ use crate::{
 /// IDが重複した場合エラー
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct AddTrackCommand {
-    station_id: StationId,
     track: Track,
 }
 impl AddTrackCommand {
-    pub fn new(station_id: StationId, track: Track) -> Self {
-        Self { station_id, track }
+    pub fn new(track: Track) -> Self {
+        Self { track }
     }
 }
 impl Command for AddTrackCommand {
@@ -26,7 +24,7 @@ impl Command for AddTrackCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.add_track(self.station_id, self.track.clone())?;
+        obj.add_track(self.track.clone())?;
         emitter.emit(EmitEventType::TrackAdded, "");
         Ok(())
     }
@@ -36,7 +34,7 @@ impl Command for AddTrackCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.delete_track(self.station_id, self.track.id)?;
+        obj.delete_track(self.track.id)?;
         emitter.emit(EmitEventType::TrackDeleted, "");
         Ok(())
     }
