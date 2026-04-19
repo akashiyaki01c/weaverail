@@ -4,9 +4,82 @@ use crate::{
     model::{
         DiagramRoot,
         line::LineId,
-        line_segment::LineSegmentId,
+        line_segment::{LineSegment, LineSegmentId},
     },
 };
+
+/// プロジェクトに駅間を追加する操作
+/// ID重複時にエラーを返す
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct AddSegmentCommand {
+    segment: LineSegment,
+}
+impl AddSegmentCommand {
+    pub fn new(segment: LineSegment) -> Self {
+        Self { segment }
+    }
+}
+impl Command for AddSegmentCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        obj.add_segment(self.segment.clone())?;
+        emitter.emit(EmitEventType::StationAdded, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        obj.delete_segment(self.segment.id)?;
+        emitter.emit(EmitEventType::StationDeleted, "");
+        Ok(())
+    }
+}
+
+/// プロジェクトから駅間を削除する操作
+/// 対象駅が存在しない場合はエラーを返す
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct RemoveSegmentCommand {
+    segment_id: LineSegmentId,
+    segment: Option<LineSegment>,
+}
+impl RemoveSegmentCommand {
+    pub fn new(segment_id: LineSegmentId) -> Self {
+        Self {
+            segment_id,
+            segment: None,
+        }
+    }
+}
+impl Command for RemoveSegmentCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let sta = obj.delete_segment(self.segment_id)?;
+        self.segment = Some(sta);
+        emitter.emit(EmitEventType::StationDeleted, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        if let Some(segment) = self.segment.clone() {
+            obj.add_segment(segment)?;
+        }
+        emitter.emit(EmitEventType::StationAdded, "");
+        Ok(())
+    }
+}
 
 /// 路線の末尾に駅間を追加する操作
 #[derive(Clone, PartialEq, Debug, Default)]
