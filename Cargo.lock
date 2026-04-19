@@ -4666,7 +4666,17 @@ dependencies = [
  "strum",
  "ts-rs",
  "uuid",
+ "weaverail-object",
  "zstd",
+]
+
+[[package]]
+name = "weaverail-object"
+version = "0.2.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
