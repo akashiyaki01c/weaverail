@@ -24,8 +24,6 @@ pub struct Timetable {
     pub id: TimetableId,
     /// 時刻表名
     pub name: String,
-    /// 時刻表に含まれる列車
-    pub trains: HashSet<TrainId>,
     /// 時間調整
     pub adjustments: HashMap<TrainsAdjustmentId, TrainsAdjustment>,
     /// 駅間の列車順序

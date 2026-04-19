@@ -8,8 +8,8 @@ use std::collections::HashMap;
 
 use smallvec::SmallVec;
 use weaverail_model::model::{
-    DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time, timetable::TimetableId,
-    train::TrainId,
+    DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time,
+    timetable::TimetableId, train::TrainId,
 };
 
 use crate::{
@@ -154,7 +154,12 @@ fn weave_test() {
     let duration = start.elapsed();
     println!("get_time: {}ms", duration.as_millis());
 
-    let mut trains: Vec<&Train> = timetable.trains.values().collect();
+    let mut trains: Vec<&Train> = test_data
+        .root
+        .trains
+        .values()
+        .filter(|train| train.timetable_id == timetable_id)
+        .collect();
     trains.sort_by(|a, b| a.start_departure_time.cmp(&b.start_departure_time));
 
     let change_type: UpdateType = UpdateType::ChangeTrainOrder(

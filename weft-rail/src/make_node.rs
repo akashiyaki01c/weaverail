@@ -38,8 +38,12 @@ pub fn make_node(
 ) -> (WeftNode, HashMap<TrainId, Vec<WeftNode>>) {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
-    let mut result: HashMap<TrainId, Vec<WeftNode>> =
-        HashMap::with_capacity(timetable.trains.len());
+    let trains: Vec<&Train> = root
+        .trains
+        .values()
+        .filter(|train| train.timetable_id == timetable_id)
+        .collect();
+    let mut result: HashMap<TrainId, Vec<WeftNode>> = HashMap::with_capacity(trains.len());
     let mut root_node = WeftNode {
         node_id: number_issuer.next(),
         station_id: StationId::default(),
@@ -51,11 +55,7 @@ pub fn make_node(
     };
 
     // 列車の生時刻の取得
-    for train in root
-        .trains
-        .values()
-        .filter(|train| timetable.trains.contains(&train.id))
-    {
+    for train in root.trains.values().filter(|train| trains.contains(&train)) {
         let nodes = make_train_node(root, train, &mut root_node, &mut number_issuer);
         result.insert(train.id, nodes);
     }

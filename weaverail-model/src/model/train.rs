@@ -20,6 +20,8 @@ weaverail_id!(TrainId, "TRA_");
 pub struct Train {
     /// 識別ID
     pub id: TrainId,
+    /// 時刻表ID
+    pub timetable_id: TimetableId,
     /// テンプレート列車ID
     pub template_segments: Vec<TemplateSegment>,
     /// 開始駅の出発時刻
@@ -28,9 +30,10 @@ pub struct Train {
     pub properties: ExtensionProperty,
 }
 impl Train {
-    pub fn new(id: TrainId) -> Self {
+    pub fn new(id: TrainId, timetable_id: TimetableId) -> Self {
         Self {
             id,
+            timetable_id,
             ..Default::default()
         }
     }
@@ -40,7 +43,6 @@ impl DiagramRoot {
     /// 既に同一IDの列車が存在している場合はエラーを返す
     pub fn add_train(
         &mut self,
-        timetable_id: TimetableId,
         train: Train,
     ) -> Result<(), CommandError> {
         match self.trains.entry(train.id) {
@@ -56,7 +58,6 @@ impl DiagramRoot {
     /// 指定IDの番線が存在しない場合はエラーを返す
     pub fn delete_train(
         &mut self,
-        timetable_id: TimetableId,
         train_id: TrainId,
     ) -> Result<Train, CommandError> {
         self

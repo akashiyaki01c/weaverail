@@ -24,7 +24,7 @@ impl Command for AddTrainCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.add_train(self.timetable_id, self.train.clone())?;
+        obj.add_train(self.train.clone())?;
         emitter.emit(EmitEventType::TrainAdded, "");
         Ok(())
     }
@@ -34,7 +34,7 @@ impl Command for AddTrainCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        obj.delete_train(self.timetable_id, self.train.id)?;
+        obj.delete_train(self.train.id)?;
         emitter.emit(EmitEventType::TrainDeleted, "");
         Ok(())
     }

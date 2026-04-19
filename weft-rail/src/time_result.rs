@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use weaverail_model::model::{DiagramRoot, time::Time, timetable::TimetableId};
+use weaverail_model::model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train};
 
 use crate::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftNode};
 
@@ -11,7 +11,12 @@ pub(crate) fn get_time_result(
     times: &Vec<Time>,
 ) -> Vec<ResultWeftTrain> {
     let timetable = diagram_root.timetables.get(&timetable_id).unwrap();
-    let mut result = Vec::with_capacity(timetable.trains.len());
+    let trains: Vec<&Train> = diagram_root
+        .trains
+        .values()
+        .filter(|train| train.timetable_id == timetable_id)
+        .collect();
+    let mut result = Vec::with_capacity(trains.len());
 
     let mut node_map = HashMap::with_capacity(nodes.len());
     for node in &nodes {
@@ -21,7 +26,7 @@ pub(crate) fn get_time_result(
     for train in diagram_root
         .trains
         .values()
-        .filter(|train| timetable.trains.contains(&train.id))
+        .filter(|train| trains.contains(&train))
     {
         let mut result_train = ResultWeftTrain {
             train_id: train.id,
