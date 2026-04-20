@@ -11,6 +11,7 @@ use weaverail_model::{
 pub mod line;
 pub mod station;
 pub mod train_type;
+pub mod data;
 
 pub struct TauriEmitter {
     handle: AppHandle,
@@ -26,16 +27,6 @@ impl EventEmitter for TauriEmitter {
             .handle
             .emit_filter(&EmitEventType::to_string(&event), payload, |_| true);
     }
-}
-
-#[tauri::command]
-pub async fn get_root(state: tauri::State<'_, Mutex<AppState>>) -> Result<DiagramRoot, String> {
-    Ok(state
-        .lock()
-        .expect("mutex lock error")
-        .command_manager
-        .root
-        .clone())
 }
 
 #[tauri::command]

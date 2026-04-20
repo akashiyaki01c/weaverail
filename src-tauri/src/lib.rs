@@ -21,7 +21,15 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crate::command::get_root,
+            crate::command::data::get_root,
+            crate::command::data::get_stations,
+            crate::command::data::get_tracks,
+            crate::command::data::get_segments,
+            crate::command::data::get_lines,
+            crate::command::data::get_train_types,
+            crate::command::data::get_template_trains,
+            crate::command::data::get_timetables,
+            crate::command::data::get_trains,
             crate::command::redo,
             crate::command::undo,
             crate::command::redoable,
