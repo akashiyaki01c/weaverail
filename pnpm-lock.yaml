@@ -17,6 +17,16 @@ importers:
       '@tauri-apps/api':
         specifier: ^2.10.1
         version: 2.10.1
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
 
   packages/app:
     dependencies:
@@ -32,6 +42,9 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.5.3
+      '@weaverail/api':
+        specifier: workspace:*
+        version: link:../api
       '@weaverail/types':
         specifier: workspace:*
         version: link:../types

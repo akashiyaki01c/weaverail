@@ -14,11 +14,14 @@ function App() {
   const [redoable, setRedoable] = useState(false);
 
   useEffect(() => {
+    (async () => {
+      setRoot(await api.data.getRoot());
+    })();
     listen<any>("station::added", async (event) => {
-      setRoot(await api.getRoot());
+      setRoot(await api.data.getRoot());
     });
     listen<any>("station::deleted", async (event) => {
-      setRoot(await api.getRoot());
+      setRoot(await api.data.getRoot());
     });
   }, []);
 
@@ -28,9 +31,9 @@ function App() {
         <button
           disabled={!undoable}
           onClick={async () => {
-            await api.undo();
-            setUndoable(await api.undoable());
-            setRedoable(await api.redoable());
+            await api.ops.undo();
+            setUndoable(await api.ops.undoable());
+            setRedoable(await api.ops.redoable());
           }}
         >
           元に戻す
@@ -38,9 +41,9 @@ function App() {
         <button
           disabled={!redoable}
           onClick={async () => {
-            await api.redo();
-            setUndoable(await api.undoable());
-            setRedoable(await api.redoable());
+            await api.ops.redo();
+            setUndoable(await api.ops.undoable());
+            setRedoable(await api.ops.redoable());
           }}
         >
           やり直す
@@ -58,18 +61,18 @@ function App() {
         </label>
         <button
           onClick={async () => {
-            const newId = await api.station.new_station_id();
+            const newId = await api.ops.station.new_station_id();
             const station = {
               id: newId,
               name: newStationName,
               properties: {},
               tracks: {},
             } satisfies Station;
-            await api.station.add_station(station);
+            await api.ops.station.add_station(station);
 
-            const undoable = await api.undoable();
+            const undoable = await api.ops.undoable();
             setUndoable(undoable as boolean);
-            const redoable = await api.redoable();
+            const redoable = await api.ops.redoable();
             setRedoable(redoable as boolean);
             console.log(undoable, redoable);
           }}

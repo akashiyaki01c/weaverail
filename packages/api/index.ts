@@ -1,28 +1,18 @@
-import { invoke } from "@tauri-apps/api/core";
-import { DiagramRoot, Station, StationId } from "../types";
-import { StationApi } from "./station";
+import { WeaverailDataApi } from "./data";
+import { WeaverailOpsApi } from "./ops";
 
-/** WeaverailのAPI群を表すオブジェクト */
+export * from "./ops";
+
+export interface WeaverailExtension {
+	registerView(slot: "siderbar" | "main" | "inspector", component: React.ReactNode): void;
+}
+
 export class WeaverailApi {
-	public async getRoot(): Promise<DiagramRoot> {
-		return await invoke("get_root");
-	}
-	public async redo() {
-		await invoke("redo");
-	}
-	public async undo() {
-		await invoke("undo");
-	}
-	public async redoable(): Promise<boolean> {
-		return await invoke("redoable");
-	}
-	public async undoable(): Promise<boolean> {
-		return await invoke("undoable");
-	}
-
-	station: StationApi;
+	ops: WeaverailOpsApi;
+	data: WeaverailDataApi;
 
 	constructor() {
-		this.station = new StationApi();
+		this.ops = new WeaverailOpsApi();
+		this.data = new WeaverailDataApi();
 	}
 }

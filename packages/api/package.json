@@ -9,6 +9,11 @@
   "main": "index.ts",
   "packageManager": "pnpm@10.32.0",
   "dependencies": {
-    "@tauri-apps/api": "^2.10.1"
+    "@tauri-apps/api": "^2.10.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14"
   }
 }
