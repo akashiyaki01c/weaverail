@@ -2,8 +2,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { DiagramRoot } from "../types";
 import { StationApi } from "./station";
 
+export interface WeaverailOpsApi {
+	getRoot(): Promise<DiagramRoot>;
+	redo(): void;
+	undo(): void;
+	redoable(): Promise<boolean>;
+	undoable(): Promise<boolean> ;
+	readonly station: StationApi;
+}
+
 /** WeaverailのAPI群を表すオブジェクト */
-export class WeaverailOpsApi {
+export class WeaverailOpsApiObject {
 	public async getRoot(): Promise<DiagramRoot> {
 		return await invoke("get_root");
 	}
@@ -20,7 +29,7 @@ export class WeaverailOpsApi {
 		return await invoke("undoable");
 	}
 
-	station: StationApi;
+	readonly station: StationApi;
 
 	constructor() {
 		this.station = new StationApi();

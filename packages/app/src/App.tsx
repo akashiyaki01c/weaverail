@@ -3,10 +3,10 @@ import "./App.css";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import { Station, StationId } from "@weaverail/types";
-import { WeaverailApi } from "../../api";
+import { WeaverailApi, WeaverailApiObject } from "../../api";
 
 function App() {
-  const api = new WeaverailApi();
+  const api: WeaverailApi = new WeaverailApiObject();
   const [newStationName, setNewStationName] = useState("");
   const [root, setRoot] = useState({});
 

@@ -2,12 +2,25 @@ import { invoke } from "@tauri-apps/api/core";
 import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train } from "../types";
 
 /** WeaverailのAPI群を表すオブジェクト */
-export class WeaverailDataApi {
+export interface WeaverailDataApi {
+	getRoot(): Promise<{ [key in StationId]: Station }>;
+	getStations(): Promise<{ [key in StationId]: Station }>;
+	getTracks(): Promise<{ [key in TrackId]: Track }>;
+	getSegments(): Promise<{ [key in LineSegmentId]: LineSegment }>;
+	getLines(): Promise<{ [key in LineId]: Line }>;
+	getTrainTypes(): Promise<{ [key in TrainTypeId]: TrainType }>;
+	getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }>;
+	getTimetables(): Promise<{ [key in TimetableId]: Timetable }>;
+	getTrains(): Promise<{ [key in TrainId]: Train }>;
+}
+
+/** WeaverailのAPI群を表すオブジェクト */
+export class WeaverailDataApiObject implements WeaverailDataApi {
 
 	async getRoot(): Promise<{ [key in StationId]: Station }> {
 		return await invoke("get_root");
 	}
-	
+
 	async getStations(): Promise<{ [key in StationId]: Station }> {
 		return await invoke("get_stations");
 	}
