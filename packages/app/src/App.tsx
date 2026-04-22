@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import "./App.css";
-import {
-  useExtensionManager,
-  useExtensionPanels,
-} from "@weaverail/extensions";
+import { useExtensionManager, useExtensionPanels } from "@weaverail/extensions";
 import { CoreExtensions } from "@weaverail/core-extensions";
 
 function App() {
@@ -15,10 +11,10 @@ function App() {
     manager.addExtension(new CoreExtensions(), api);
   }, []);
 
-  console.log(manager)
+  console.log(manager);
 
   return (
-    
+    <div className="outer">
       <main className="container">
         <div className="main-area">
           めいｎ
@@ -38,7 +34,7 @@ function App() {
           ))}
         </aside>
       </main>
-    
+    </div>
   );
 }
 
