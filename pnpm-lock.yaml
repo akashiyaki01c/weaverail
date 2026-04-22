@@ -17,6 +17,9 @@ importers:
       '@tauri-apps/api':
         specifier: ^2.10.1
         version: 2.10.1
+      '@weaverail/types':
+        specifier: workspace:*
+        version: link:../types
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -73,6 +76,8 @@ importers:
       vite:
         specifier: ^7.0.4
         version: 7.3.1
+
+  packages/extensions: {}
 
   packages/types: {}
 

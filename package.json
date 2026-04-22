@@ -8,10 +8,5 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
-  },
-  "workspaces": [
-    "packages/api",
-    "packages/app",
-    "packages/types"
-  ]
+  }
 }

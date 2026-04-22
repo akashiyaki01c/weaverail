@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/core";
-import { Station, StationId } from "@weaverail/types";
+import { Station } from "@weaverail/types";
 import { WeaverailApi, WeaverailApiObject } from "../../api";
 
 function App() {

@@ -1,4 +1,4 @@
 allowBuilds:
   esbuild: false
 packages:
-  - 'packages/*'
+  - 'packages/**'

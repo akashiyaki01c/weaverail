@@ -3,12 +3,7 @@ import { WeaverailOpsApi, WeaverailOpsApiObject } from "./ops";
 import { WeaverailUiApi, WeaverailUiApiObject } from "./ui";
 
 export * from "./data";
-export * from "./extensions";
 export * from "./ops";
-
-export interface WeaverailExtension {
-	registerView(slot: "siderbar" | "main" | "inspector", component: React.ReactNode): void;
-}
 
 export interface WeaverailApi {
 	readonly ops: WeaverailOpsApi;
