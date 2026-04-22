@@ -33,6 +33,9 @@ importers:
 
   packages/app:
     dependencies:
+      '@aptre/flex-layout':
+        specifier: ^0.6.4
+        version: 0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@mantine/core':
         specifier: ^9.0.2
         version: 9.0.2(@mantine/hooks@9.0.2(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -106,16 +109,28 @@ importers:
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.1.6
+        version: 19.2.3(@types/react@19.2.14)
       '@weaverail/api':
         specifier: workspace:*
         version: link:../api
       react:
         specifier: ^19.2.5
         version: 19.2.5
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.2.4(react@19.2.5)
 
   packages/types: {}
 
 packages:
+
+  '@aptre/flex-layout@0.6.4':
+    resolution: {integrity: sha512-ROKbbJSoDGv1wbLcQq6VryPtWsqZBIF3R2z5q9hRpBjdltC7/71i2e4erpKqn2gTFckZrjuXssIHTdHMs60/Ag==}
+    peerDependencies:
+      react: ^19.2.5
+      react-dom: ^19.2.5
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -927,6 +942,11 @@ packages:
 
 snapshots:
 
+  '@aptre/flex-layout@0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
   '@babel/code-frame@7.29.0':
     dependencies:
       '@babel/helper-validator-identifier': 7.28.5
@@ -1448,6 +1468,11 @@ snapshots:
   react-dom@19.2.4(react@19.2.4):
     dependencies:
       react: 19.2.4
+      scheduler: 0.27.0
+
+  react-dom@19.2.4(react@19.2.5):
+    dependencies:
+      react: 19.2.5
       scheduler: 0.27.0
 
   react-number-format@5.4.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
