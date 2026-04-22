@@ -14,8 +14,10 @@
     "@mantine/hooks": "^9.0.2",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
-    "@weaverail/types": "workspace:*",
     "@weaverail/api": "workspace:*",
+    "@weaverail/core-extensions": "workspace:*",
+    "@weaverail/extensions": "workspace:*",
+    "@weaverail/types": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

@@ -48,6 +48,12 @@ importers:
       '@weaverail/api':
         specifier: workspace:*
         version: link:../api
+      '@weaverail/core-extensions':
+        specifier: workspace:*
+        version: link:../core-extensions
+      '@weaverail/extensions':
+        specifier: workspace:*
+        version: link:../extensions
       '@weaverail/types':
         specifier: workspace:*
         version: link:../types
@@ -77,7 +83,35 @@ importers:
         specifier: ^7.0.4
         version: 7.3.1
 
-  packages/extensions: {}
+  packages/core-extensions:
+    dependencies:
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@weaverail/api':
+        specifier: workspace:*
+        version: link:../api
+      '@weaverail/extensions':
+        specifier: workspace:*
+        version: link:../extensions
+      '@weaverail/types':
+        specifier: workspace:*
+        version: link:../types
+      react:
+        specifier: ^19.2.5
+        version: 19.2.5
+
+  packages/extensions:
+    dependencies:
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@weaverail/api':
+        specifier: workspace:*
+        version: link:../api
+      react:
+        specifier: ^19.2.5
+        version: 19.2.5
 
   packages/types: {}
 
@@ -779,6 +813,10 @@ packages:
     resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
     engines: {node: '>=0.10.0'}
 
+  react@19.2.5:
+    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
+    engines: {node: '>=0.10.0'}
+
   rollup@4.60.0:
     resolution: {integrity: sha512-yqjxruMGBQJ2gG4HtjZtAfXArHomazDHoFwFFmZZl0r7Pdo7qCIXKqKHZc8yeoMgzJJ+pO6pEEHa+V7uzWlrAQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -1447,6 +1485,8 @@ snapshots:
       '@types/react': 19.2.14
 
   react@19.2.4: {}
+
+  react@19.2.5: {}
 
   rollup@4.60.0:
     dependencies:
