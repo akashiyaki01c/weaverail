@@ -9,7 +9,7 @@ import {
   TabNode,
 } from "flexlayout-react";
 import { InitLayout } from "./initLayout";
-import { CoreExtensions } from "@weaverail/core-extensions";
+import { CoreExtensions, StationViewerExtension } from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
 
 const FlexLayout = Layout as any;
@@ -75,6 +75,7 @@ function App() {
     });
 
     manager.addExtension(new CoreExtensions());
+    manager.addExtension(new StationViewerExtension());
 
     return () => {
       unbindPanelRegistered();

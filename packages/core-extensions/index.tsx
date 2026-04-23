@@ -1,6 +1,8 @@
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "../api";
 
+export * from "./StationViewer";
+
 export class CoreExtensions implements WeaverailExtension {
 	id: string = "weaverail.core-extensions";
 	metadata = { name: "コア拡張機能", description: "" };

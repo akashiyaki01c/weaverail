@@ -25,5 +25,5 @@ export interface Panel {
 	/** 配置場所 */
 	slot: WeaverailSlot;
 	/** 描画関数（Reactコンポーネントを返す） */
-	render: () => React.ReactNode;
+	render:  () => React.ReactNode;
 }
