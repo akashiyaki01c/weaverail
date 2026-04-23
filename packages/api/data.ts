@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train } from "@weaverail/types";
+import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain } from "@weaverail/types";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export interface WeaverailDataApi {
@@ -50,6 +50,10 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 	}
 
 	async getTrains(): Promise<{ [key in TrainId]: Train }> {
+		return await invoke("get_trains");
+	}
+
+	async weave(): Promise<ResultWeftTrain[]> {
 		return await invoke("get_trains");
 	}
 

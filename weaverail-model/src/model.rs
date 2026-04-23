@@ -79,6 +79,8 @@ pub struct DiagramRoot {
 
 #[cfg(test)]
 mod tests {
+    use crate::result_weft::ResultWeftTrain;
+
     use super::*;
     use ts_rs::{Config, TS};
 
@@ -86,5 +88,6 @@ mod tests {
     fn export_types() {
         let cfg = Config::new();
         DiagramRoot::export_all(&cfg).expect("TS export failed");
+        ResultWeftTrain::export_all(&cfg).expect("TS export failed");
     }
 }

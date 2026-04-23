@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use weaverail_model::model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train};
+use weaverail_model::{model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train}, result_weft::ResultWeftTime};
 
-use crate::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftNode};
+use crate::{NodeType, ResultWeftTrain, StopType, WeftNode};
 
 pub(crate) fn get_time_result(
     diagram_root: &DiagramRoot,
@@ -42,9 +42,9 @@ pub(crate) fn get_time_result(
             let departure_segment_id = departure_node.map(|id| id.segment_id);
             let stop_type: StopType = {
                 if let Some(id) = arrival_node {
-                    id.stop_type
+                    id.stop_type.clone()
                 } else if let Some(id) = departure_node {
-                    id.stop_type
+                    id.stop_type.clone()
                 } else {
                     panic!()
                 }

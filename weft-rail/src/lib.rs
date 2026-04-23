@@ -7,10 +7,10 @@ pub(crate) mod update_node;
 use std::collections::HashMap;
 
 use smallvec::SmallVec;
-use weaverail_model::model::{
+use weaverail_model::{model::{
     DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time,
     timetable::TimetableId, train::TrainId,
-};
+}, result_weft::{ResultWeftTrain, StopType}};
 
 use crate::{
     make_node::{get_node_by_nodeid, make_node},
@@ -47,14 +47,6 @@ pub(crate) struct WeftNode {
     pub node_type: NodeType,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-#[derive(Default)]
-pub enum StopType {
-    #[default]
-    Stop,
-    Pass,
-}
-
 #[derive(PartialEq, Clone, Debug, Eq, Hash, Copy)]
 #[derive(Default)]
 pub(crate) enum NodeType {
@@ -62,23 +54,6 @@ pub(crate) enum NodeType {
     Arrival,
     Departure,
     Root,
-}
-
-#[derive(Clone, Debug)]
-pub struct ResultWeftTrain {
-    pub train_id: TrainId,
-    pub times: Vec<ResultWeftTime>,
-}
-
-#[derive(Clone, Debug)]
-pub struct ResultWeftTime {
-    pub train_id: TrainId,
-    pub before_segment_id: Option<LineSegmentId>,
-    pub next_segment_id: Option<LineSegmentId>,
-    pub station_id: StationId,
-    pub arrival_time: Option<Time>,
-    pub departure_time: Option<Time>,
-    pub stop_type: StopType,
 }
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {

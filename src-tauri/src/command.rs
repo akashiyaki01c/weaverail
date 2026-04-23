@@ -5,13 +5,13 @@ use weaverail_model::{
     app::AppState,
     command::{CommandError, EventEmitter},
     event::EmitEventType,
-    model::DiagramRoot,
 };
 
 pub mod line;
 pub mod station;
 pub mod train_type;
 pub mod data;
+pub mod weave;
 
 pub struct TauriEmitter {
     handle: AppHandle,

@@ -44,6 +44,7 @@ pub fn run() {
             crate::command::train_type::new_train_type_id,
             crate::command::train_type::add_train_type,
             crate::command::train_type::remove_train_type,
+            crate::command::weave::weave
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

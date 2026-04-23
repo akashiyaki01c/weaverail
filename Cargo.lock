@@ -4641,6 +4641,7 @@ dependencies = [
  "tauri-plugin-opener",
  "uuid",
  "weaverail-model",
+ "weft-rail",
 ]
 
 [[package]]

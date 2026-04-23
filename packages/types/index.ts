@@ -31,6 +31,6 @@ export * from "./bindings/TrainId";
 export * from "./bindings/TemplateSegment";
 
 export * from "./bindings/SegmentTrainOrder";
-export * from "./bindings/TrainsAdjustment";
-export * from "./bindings/TrainsAdjustmentId";
-export * from "./bindings/TrainsAdjustmentType";
+
+export * from "./bindings/ResultWeftTime";
+export * from "./bindings/ResultWeftTrain";
