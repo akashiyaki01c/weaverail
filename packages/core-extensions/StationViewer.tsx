@@ -3,7 +3,7 @@ import { WeaverailApi } from "../api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useState } from "react";
 import { Station } from "@weaverail/types";
-import { List, Table } from "@mantine/core";
+import { Table } from "@mantine/core";
 
 function StationViewer() {
   const { manager } = useExtensionManager();
