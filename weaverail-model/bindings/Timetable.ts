@@ -3,10 +3,6 @@ import type { ExtensionProperty } from "./ExtensionProperty";
 import type { LineSegmentId } from "./LineSegmentId";
 import type { SegmentTrainOrder } from "./SegmentTrainOrder";
 import type { TimetableId } from "./TimetableId";
-import type { Train } from "./Train";
-import type { TrainId } from "./TrainId";
-import type { TrainsAdjustment } from "./TrainsAdjustment";
-import type { TrainsAdjustmentId } from "./TrainsAdjustmentId";
 
 /**
  * Weaverail上の1つの時刻表を表す構造体
@@ -20,14 +16,6 @@ id: TimetableId,
  * 時刻表名
  */
 name: string, 
-/**
- * 時刻表に含まれる列車
- */
-trains: { [key in TrainId]: Train }, 
-/**
- * 時間調整
- */
-adjustments: { [key in TrainsAdjustmentId]: TrainsAdjustment }, 
 /**
  * 駅間の列車順序
  */

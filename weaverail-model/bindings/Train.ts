@@ -2,6 +2,7 @@
 import type { ExtensionProperty } from "./ExtensionProperty";
 import type { TemplateSegment } from "./TemplateSegment";
 import type { Time } from "./Time";
+import type { TimetableId } from "./TimetableId";
 import type { TrainId } from "./TrainId";
 
 /**
@@ -12,6 +13,10 @@ export type Train = {
  * 識別ID
  */
 id: TrainId, 
+/**
+ * 時刻表ID
+ */
+timetable_id: TimetableId, 
 /**
  * テンプレート列車ID
  */
