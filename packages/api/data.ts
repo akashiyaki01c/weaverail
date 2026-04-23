@@ -12,6 +12,7 @@ export interface WeaverailDataApi {
 	getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }>;
 	getTimetables(): Promise<{ [key in TimetableId]: Timetable }>;
 	getTrains(): Promise<{ [key in TrainId]: Train }>;
+	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
 }
 
 /** WeaverailのAPI群を表すオブジェクト */
@@ -53,8 +54,8 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 		return await invoke("get_trains");
 	}
 
-	async weave(): Promise<ResultWeftTrain[]> {
-		return await invoke("get_trains");
+	async weave(timetableId: TimetableId): Promise<ResultWeftTrain[]> {
+		return await invoke("weave", { timetableId });
 	}
 
 	constructor() {

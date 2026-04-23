@@ -14,6 +14,7 @@ import {
   StationViewerExtension,
 } from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
+import { DiagramViewerExtension } from "@weaverail/core-extensions/DiagramViewer";
 
 const FlexLayout = Layout as any;
 
@@ -74,6 +75,7 @@ function App() {
 
     manager.addExtension(new CoreExtensions());
     manager.addExtension(new StationViewerExtension());
+    manager.addExtension(new DiagramViewerExtension());
 
     return () => {
       unbindPanelRegistered();
