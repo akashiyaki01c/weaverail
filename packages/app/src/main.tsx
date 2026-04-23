@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { ExtensionProvider } from "./ExtensionContext";
+import "@mantine/core/styles.css"
 
 const theme = createTheme({
   fontFamily: "Roboto, Source Han Sans, sans-serif",

@@ -9,7 +9,10 @@ import {
   TabNode,
 } from "flexlayout-react";
 import { InitLayout } from "./initLayout";
-import { CoreExtensions, StationViewerExtension } from "@weaverail/core-extensions";
+import {
+  CoreExtensions,
+  StationViewerExtension,
+} from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
 
 const FlexLayout = Layout as any;
@@ -23,19 +26,14 @@ function App() {
       console.log(payload);
       setModel((currentModel) => {
         if (payload.slot === "main") {
-          currentModel.doAction(
-            Actions.addNode(
-              {
-                type: "tab",
-                component: payload.panelId,
-                id: payload.panelId,
-              },
-              "main",
-              DockLocation.CENTER,
-              -1,
-            ),
-          );
-          return Model.fromJson(currentModel.toJson());
+          const json = currentModel.toJson();
+          json.layout.children[0].children.push({
+            type: "tab",
+            component: payload.panelId,
+            id: payload.panelId,
+            children: [],
+          });
+          return Model.fromJson(json);
         } else {
           // border
           const json = currentModel.toJson();
