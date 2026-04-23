@@ -1,19 +1,18 @@
+export interface UiEventMap {
+	"extension-added": { id: string };
+	"panel-registered": { panelId: string, slot: WeaverailSlot, name: string };
+	"open-tab": { id: string; name: string; component: string };
+	"close-tab": { id: string };
+}
+
+export type UiListener<K extends keyof UiEventMap> = (payload: UiEventMap[K]) => void;
+
 export interface WeaverailUiApi {
 	registerPanel(panel: Panel): void;
 
 	getPanels(slot: WeaverailSlot): Panel[];
-}
 
-export class WeaverailUiApiObject implements WeaverailUiApi {
-	panels: Panel[] = [];
-
-	registerPanel(panel: Panel): void {
-		this.panels.push(panel);
-	}
-
-	getPanels(slot: WeaverailSlot): Panel[] {
-		return [...this.panels.filter(v => v.slot === slot)];
-	}
+	getPanelById(id: string): Panel;
 }
 
 export type WeaverailSlot = 'sidebar' | 'main' | 'inspector' | 'toolbar' | 'bottom';

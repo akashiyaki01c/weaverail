@@ -1,9 +1,10 @@
 import { WeaverailDataApi, WeaverailDataApiObject } from "./data";
 import { WeaverailOpsApi, WeaverailOpsApiObject } from "./ops";
-import { WeaverailUiApi, WeaverailUiApiObject } from "./ui";
+import { WeaverailUiApi } from "./ui";
 
 export * from "./data";
 export * from "./ops";
+export * from "./ui";
 
 export interface WeaverailApi {
 	readonly ops: WeaverailOpsApi;
@@ -16,9 +17,9 @@ export class WeaverailApiObject implements WeaverailApi {
 	readonly data: WeaverailDataApi;
 	readonly ui: WeaverailUiApi;
 
-	constructor() {
+	constructor(ui: WeaverailUiApi) {
 		this.ops = new WeaverailOpsApiObject();
 		this.data = new WeaverailDataApiObject();
-		this.ui = new WeaverailUiApiObject();
+		this.ui = ui;
 	}
 }

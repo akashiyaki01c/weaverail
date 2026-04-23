@@ -33,9 +33,6 @@ importers:
 
   packages/app:
     dependencies:
-      '@aptre/flex-layout':
-        specifier: ^0.6.4
-        version: 0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@mantine/core':
         specifier: ^9.0.2
         version: 9.0.2(@mantine/hooks@9.0.2(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -60,6 +57,9 @@ importers:
       '@weaverail/types':
         specifier: workspace:*
         version: link:../types
+      flexlayout-react:
+        specifier: ^0.8.19
+        version: 0.8.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: ^19.1.0
         version: 19.2.4
@@ -125,12 +125,6 @@ importers:
   packages/types: {}
 
 packages:
-
-  '@aptre/flex-layout@0.6.4':
-    resolution: {integrity: sha512-ROKbbJSoDGv1wbLcQq6VryPtWsqZBIF3R2z5q9hRpBjdltC7/71i2e4erpKqn2gTFckZrjuXssIHTdHMs60/Ag==}
-    peerDependencies:
-      react: ^19.2.5
-      react-dom: ^19.2.5
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -728,6 +722,12 @@ packages:
       picomatch:
         optional: true
 
+  flexlayout-react@0.8.19:
+    resolution: {integrity: sha512-OC8PvAZ7ElYutiSQhLbuycpzxXdIQuyREozWGu8Wx3+6G4r3ctBMUiSYEVKICgiW1wLOPwvZOSpOFqddG3eoVg==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -941,11 +941,6 @@ packages:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
 snapshots:
-
-  '@aptre/flex-layout@0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
-    dependencies:
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
 
   '@babel/code-frame@7.29.0':
     dependencies:
@@ -1431,6 +1426,11 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
       picomatch: 4.0.3
+
+  flexlayout-react@0.8.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   fsevents@2.3.3:
     optional: true

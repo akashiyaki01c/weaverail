@@ -21,6 +21,14 @@ export class CoreExtensions implements WeaverailExtension {
 				return <>さぶだよ〜(拡張機能側)</>
 			}
 		})
+		api.ui.registerPanel({
+			id: "weaverail.core-extensions.toolbar2-panel",
+			label: "",
+			slot: "sidebar",
+			render: function (): React.ReactNode {
+				return <>さぶ2だよ〜(拡張機能側)</>
+			}
+		})
 	}
 	destroy(): void {
 	

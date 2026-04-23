@@ -1,13 +1,14 @@
-import { WeaverailApi, WeaverailApiObject } from "@weaverail/api";
-import { WeaverailSlot } from "@weaverail/api/ui";
 import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+  WeaverailApi,
+  WeaverailDataApiObject,
+  WeaverailOpsApiObject,
+} from "@weaverail/api";
+import {
+  Panel,
+  UiEventMap,
+  UiListener,
+  WeaverailSlot,
+} from "@weaverail/api/ui";
 
 /**
  * Weaverailの拡張機能に要求する機能をまとめたインタフェース
@@ -34,79 +35,72 @@ export interface WeaverailExtension {
 export class ExtensionManager {
   // 拡張機能一覧
   private extensions: Map<string, WeaverailExtension> = new Map();
-  private listeners = new Set<() => void>();
+  private panels: Panel[] = [];
+  // イベント購読
+  private listeners = new Map<string, Function[]>();
+  private _api: WeaverailApi;
 
-  addExtension(extension: WeaverailExtension, api: WeaverailApi) {
+  constructor() {
+    const manager = this;
+    this._api = {
+      ops: new WeaverailOpsApiObject(),
+      data: new WeaverailDataApiObject(),
+      ui: {
+        registerPanel: function (panel: Panel): void {
+          if (manager.panels.some(v => v.id === panel.id))
+            return;
+          manager.panels.push(panel);
+          manager.dispatch("panel-registered", {
+            panelId: panel.id,
+            slot: panel.slot,
+            name: panel.label
+          });
+        },
+        getPanels: function (slot: WeaverailSlot): Panel[] {
+          return manager.panels.filter((v) => v.slot === slot);
+        },
+        getPanelById(id): Panel {
+          return manager.panels.find(v => v.id === id)!
+        },
+      },
+    } satisfies WeaverailApi;
+  }
+
+  public get api(): WeaverailApi {
+    return this._api;
+  }
+
+  addExtension(extension: WeaverailExtension) {
     if (this.extensions.has(extension.id)) {
       return;
     }
-    extension.init(api);
+    extension.init(this.api);
     this.extensions.set(extension.id, extension);
-    this.notify();
+    this.dispatch("extension-added", {
+      id: extension.id,
+    });
   }
-  subscribe(callback: () => void) {
-    this.listeners.add(callback);
 
+  on<K extends keyof UiEventMap>(event: K, listener: UiListener<K>) {
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event)?.push(listener);
+
+    // 解除用関数（useEffectのクリーンアップ等で使う）
     return () => {
-      this.listeners.delete(callback);
+      this.listeners.set(
+        event,
+        this.listeners.get(event)!.filter((l) => l !== listener),
+      );
     };
   }
-  private notify() {
-    console.log("notify");
-    this.listeners.forEach((callback) => callback());
+
+  dispatch<K extends keyof UiEventMap>(event: K, payload: UiEventMap[K]) {
+    const targets = this.listeners.get(event);
+    console.log(event, targets)
+    if (targets) {
+      targets.forEach((listener) => listener(payload));
+    }
   }
 }
-
-/** WeaverailAPIを使用するためのReact hook */
-export const useWeaverail = () => {
-  const [api, _] = useState<WeaverailApi>(new WeaverailApiObject());
-  return api;
-};
-
-const ExtensionContext = createContext<{
-  manager: ExtensionManager;
-  api: WeaverailApi;
-  version: number;
-} | null>(null);
-export const ExtensionProvider = ({ children }: { children: ReactNode }) => {
-  const [manager] = useState(() => {
-    const m = new ExtensionManager();
-    m.subscribe(() => setVersion((v) => v + 1));
-    return m;
-  });
-  const api = useWeaverail();
-  const [version, setVersion] = useState(0);
-
-  return (
-    <ExtensionContext.Provider value={{ manager, api, version }}>
-      {children}
-    </ExtensionContext.Provider>
-  );
-};
-
-export const useExtensionPanels = (slot: WeaverailSlot) => {
-  const ctx = useContext(ExtensionContext);
-  const { api, version } = useExtensionManager();
-  if (!ctx) return [];
-
-  // ctx.version が変わるたびに、ここが再評価される
-  return useMemo(() => {
-    return ctx.api.ui.getPanels(slot);
-  }, [api, slot, version]);
-};
-
-export const useExtensionManager = () => {
-  const context = useContext(ExtensionContext);
-
-  if (!context) {
-    throw new Error(
-      "useExtensionManager must be used within an ExtensionProvider",
-    );
-  }
-
-  return {
-    manager: context.manager,
-    api: context.api,
-    version: context.version,
-  };
-};
