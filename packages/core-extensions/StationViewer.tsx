@@ -3,6 +3,7 @@ import { WeaverailApi } from "../api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useState } from "react";
 import { Station } from "@weaverail/types";
+import { List, Table } from "@mantine/core";
 
 function StationViewer() {
   const { manager } = useExtensionManager();
@@ -20,10 +21,27 @@ function StationViewer() {
 
     const element = stations[key];
 
-    components.push(<div key={element.id}>{element.name} ({element.id})</div>);
+    components.push(
+      <Table.Tr key={element.id}>
+        <Table.Td>{element.name}</Table.Td>
+		<Table.Td>{element.id}</Table.Td>
+      </Table.Tr>,
+    );
   }
 
-  return <div>{components}</div>;
+  return (
+    <Table>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>#</Table.Th>
+		  <Table.Th>駅名</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+	  <Table.Tbody>
+		{components}
+	  </Table.Tbody>
+    </Table>
+  );
 }
 
 export class StationViewerExtension implements WeaverailExtension {
@@ -31,9 +49,9 @@ export class StationViewerExtension implements WeaverailExtension {
   metadata = { name: "コア拡張機能", description: "" };
   init(api: WeaverailApi) {
     api.ui.registerPanel({
-      id: "weaverail.station-viewer.sidebar-panel",
+      id: "weaverail.station-viewer.main-panel",
       label: "",
-      slot: "sidebar",
+      slot: "main",
       render: function (): React.ReactNode {
         return <StationViewer />;
       },
