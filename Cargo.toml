@@ -1,5 +1,5 @@
 [workspace]
-members = ["src-tauri", "weaverail-io", "weaverail-model", "weaverail-object", "weft-rail"]
+members = ["src-tauri", "warp-rail", "weaverail-io", "weaverail-model", "weaverail-object", "weft-rail"]
 resolver = "3"
 
 [workspace.package]

@@ -1,5 +1,6 @@
 //! Weaverail上で用いられる全てのデータ構造を定義するモジュール
 
+pub mod diagram_view_settings;
 pub mod id;
 pub mod line;
 pub mod line_segment;

@@ -9,11 +9,11 @@ use serde::{Deserialize, Serialize};
 pub struct Time(u32);
 
 impl Time {
-    pub fn new(hour: u32, minute: u32, second: u32) -> Self {
+    pub const fn new(hour: u32, minute: u32, second: u32) -> Self {
         Self(hour * 60 * 60 + minute * 60 + second)
     }
 
-    pub fn new_from_total_second(second: u32) -> Self {
+    pub const fn new_from_total_second(second: u32) -> Self {
         Self(second)
     }
 

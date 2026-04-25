@@ -1,0 +1,11 @@
+[package]
+name = "warp-rail"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+weaverail-model = { path = "../weaverail-model" }
+serde = { version = "1.0.228", features = ["derive"] }

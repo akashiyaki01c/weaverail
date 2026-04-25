@@ -338,6 +338,18 @@ impl DiagramRoot {
         template_train.segments.remove(0);
         Ok(())
     }
+
+    pub fn get_template_segments(&self, id: LineSegmentId) -> Vec<&TemplateTrainSegment> {
+        let mut result = vec![];
+        for train in self.template_trains.values() {
+            for segment in &train.segments {
+                if segment.0.segment_id == id {
+                    result.push(&segment.0)
+                }
+            }
+        }
+        result
+    }
 }
 
 weaverail_id!(TemplateTrainSegmentId, "TSG_");

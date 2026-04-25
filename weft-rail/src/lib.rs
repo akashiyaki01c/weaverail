@@ -3,6 +3,7 @@ pub(crate) mod ripple;
 pub(crate) mod sort;
 pub(crate) mod time_result;
 pub(crate) mod update_node;
+pub mod svg;
 
 use std::collections::HashMap;
 
