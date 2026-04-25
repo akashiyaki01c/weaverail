@@ -1,9 +1,9 @@
-pub(crate) mod make_node;
-pub(crate) mod ripple;
-pub(crate) mod sort;
+pub mod make_node;
+pub mod ripple;
+pub mod sort;
 pub mod svg;
-pub(crate) mod time_result;
-pub(crate) mod update_node;
+pub mod time_result;
+pub mod update_node;
 
 use std::collections::HashMap;
 
@@ -25,7 +25,7 @@ use crate::{
 
 /// グラフのノードの識別子を表す
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy, Debug)]
-pub(crate) struct NodeId(usize);
+pub struct NodeId(usize);
 impl NodeId {
     pub fn new(value: usize) -> Self {
         Self(value)
@@ -34,7 +34,7 @@ impl NodeId {
 
 /// 列車時刻を計算するためのグラフのノードを表す
 #[derive(Clone, Debug, Default)]
-pub(crate) struct WeftNode {
+pub struct WeftNode {
     /// ノードの識別子
     pub node_id: NodeId,
     /// 駅ID
@@ -52,7 +52,7 @@ pub(crate) struct WeftNode {
 }
 
 #[derive(PartialEq, Clone, Debug, Eq, Hash, Copy, Default)]
-pub(crate) enum NodeType {
+pub enum NodeType {
     #[default]
     Arrival,
     Departure,

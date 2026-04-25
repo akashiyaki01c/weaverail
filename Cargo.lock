@@ -4500,6 +4500,7 @@ version = "0.2.0"
 dependencies = [
  "serde",
  "weaverail-model",
+ "weft-rail",
 ]
 
 [[package]]
@@ -4648,6 +4649,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-opener",
  "uuid",
+ "warp-rail",
  "weaverail-model",
  "weft-rail",
 ]

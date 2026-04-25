@@ -5,7 +5,7 @@ use crate::{NodeId, WeftNode};
 /// ノードを整列する関数
 /// 計算量は O(|V|+|E|)
 /// アルゴリズムは Kahn (1962) のトポロジカルソートを使用
-pub(crate) fn sort_node<'a>(nodes: &'a Vec<&'a WeftNode>) -> Vec<&'a WeftNode> {
+pub fn sort_node<'a>(nodes: &'a Vec<&'a WeftNode>) -> Vec<&'a WeftNode> {
     let count = nodes.len();
     // 入次数
     let mut num_input: Vec<usize> = vec![0; count];

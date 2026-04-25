@@ -3,7 +3,7 @@ use weaverail_model::model::time::Time;
 use crate::WeftNode;
 
 /// ノードを実際に計算する関数
-pub(crate) fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
+pub fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
     let mut times = vec![Time::new(0, 0, 0); sorted_nodes.len()];
 
     for node in sorted_nodes {
