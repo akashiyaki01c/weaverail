@@ -1,9 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
-import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain } from "@weaverail/types";
+import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, DiagramViewSettings, ResultSvg, DiagramRoot, Time } from "@weaverail/types";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export interface WeaverailDataApi {
-	getRoot(): Promise<{ [key in StationId]: Station }>;
+	getRoot(): Promise<DiagramRoot>;
 	getStations(): Promise<{ [key in StationId]: Station }>;
 	getTracks(): Promise<{ [key in TrackId]: Track }>;
 	getSegments(): Promise<{ [key in LineSegmentId]: LineSegment }>;
@@ -12,13 +12,14 @@ export interface WeaverailDataApi {
 	getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }>;
 	getTimetables(): Promise<{ [key in TimetableId]: Timetable }>;
 	getTrains(): Promise<{ [key in TrainId]: Train }>;
+	getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettings, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg>;
 	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
 }
 
 /** WeaverailのAPI群を表すオブジェクト */
 export class WeaverailDataApiObject implements WeaverailDataApi {
 
-	async getRoot(): Promise<{ [key in StationId]: Station }> {
+	async getRoot(): Promise<DiagramRoot> {
 		return await invoke("get_root");
 	}
 
@@ -56,6 +57,10 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 
 	async weave(timetableId: TimetableId): Promise<ResultWeftTrain[]> {
 		return await invoke("weave", { timetableId });
+	}
+
+	async getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettings, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg> {
+		return await invoke("get_svg", { timetableId, viewSettings, settings, startTime, endTime });
 	}
 
 	constructor() {

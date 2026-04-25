@@ -9,8 +9,9 @@ use weaverail_model::{
         station::StationId,
         time::Time,
         timetable::TimetableId,
-        train::{Train, TrainId},
+        train::Train,
     },
+    result_svg::{ResultSvg, ResultSvgTrain},
 };
 use weft_rail::WeftNode;
 
@@ -64,20 +65,6 @@ pub fn warp_coords(
     result
 }
 
-pub struct ResultSvg {
-    pub trains: Vec<ResultSvgTrain>,
-}
-
-pub struct ResultSvgTrain {
-    pub train_id: TrainId,
-    pub segments: Vec<ResultSvgSegment>,
-}
-
-pub struct ResultSvgSegment {
-    pub segment_id: LineSegmentId,
-    pub path_string: String,
-}
-
 fn get_coord(
     root: &DiagramRoot,
     coords: &HashMap<LineSegmentId, ResultWarpCoords>,
@@ -109,6 +96,8 @@ pub fn get_svg(
     times: &Vec<Time>,
     coords: &HashMap<LineSegmentId, ResultWarpCoords>,
     settings: DiagramLogicalConvert,
+    start_time: Time,
+    end_time: Time,
 ) -> ResultSvg {
     let trains: Vec<&Train> = root
         .trains
@@ -118,8 +107,6 @@ pub fn get_svg(
     let mut result = Vec::new();
 
     for train in trains {
-        let mut segments = vec![];
-
         let mut node_indexes = vec![];
         for i in 0..nodes.len() {
             let node = nodes[i];
@@ -134,34 +121,92 @@ pub fn get_svg(
             values.push((nodes[index], times[index]));
         }
 
+        let mut strs = vec![];
         for v in values.windows(2) {
             let before = v[0];
             let current = v[1];
 
+            if before.1 < start_time && current.1 < start_time {
+                continue;
+            }
+            if before.1 > end_time && current.1 > end_time {
+                break;
+            }
+
             let before_y = get_coord(root, coords, before.0.segment_id, before.0.station_id);
             let current_y = get_coord(root, coords, current.0.segment_id, current.0.station_id);
 
-            let before_coord = DiagramLogicalCoord::new(before_y, before.1.total_second() as f64);
+            let before_coord = DiagramLogicalCoord::new(before.1.total_second() as f64, before_y);
             let current_coord =
-                DiagramLogicalCoord::new(current_y, current.1.total_second() as f64);
+                DiagramLogicalCoord::new(current.1.total_second() as f64, current_y, );
 
             let before_coord = settings.convert(before_coord);
             let current_coord = settings.convert(current_coord);
 
-            segments.push(ResultSvgSegment {
-                segment_id: before.0.segment_id,
-                path_string: format!(
+            if strs.is_empty() {
+                strs.push(format!(
                     "M {},{} L {},{}",
                     before_coord.x, before_coord.y, current_coord.x, current_coord.y
-                ),
-            })
+                ));
+            } else {
+                strs.push(format!(
+                    "L {},{} L {},{}",
+                    before_coord.x, before_coord.y, current_coord.x, current_coord.y
+                ));
+            }
         }
 
         result.push(ResultSvgTrain {
             train_id: train.id,
-            segments,
+            path_string: strs.join(" "),
         });
     }
 
     ResultSvg { trains: result }
+}
+
+#[test]
+fn test() {
+    let test_data = weaverail_model::test_data::diagram_root::get_test_data().root;
+    let timetable_id = test_data.timetables.iter().next().unwrap().0.clone();
+
+    let settings = test_data
+        .diagram_view_settings
+        .iter()
+        .next()
+        .unwrap()
+        .1
+        .clone();
+
+    let nodes: (
+        WeftNode,
+        HashMap<weaverail_model::model::train::TrainId, Vec<WeftNode>>,
+    ) = weft_rail::make_node::make_node(&test_data, timetable_id);
+    let converted_nodes: Vec<&WeftNode> =
+        weft_rail::make_node::get_node_by_nodeid(&nodes.0, &nodes.1);
+    let node_array: Vec<&WeftNode> = weft_rail::sort::sort_node(&converted_nodes);
+    let times: Vec<Time> = weft_rail::ripple::ripple_time(&node_array);
+
+    let coords = warp_coords(&test_data, &settings);
+
+    let convert = DiagramLogicalConvert {
+        scale_x: 1.0,
+        scale_y: 1.0,
+        offset_x: 0.0,
+        offset_y: 0.0,
+    };
+
+    println!(
+        "{:?}",
+        get_svg(
+            &test_data,
+            timetable_id,
+            &converted_nodes,
+            &times,
+            &coords,
+            convert,
+            Time::new(0, 0, 0),
+            Time::new(24, 0, 0)
+        )
+    );
 }

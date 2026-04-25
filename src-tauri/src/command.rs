@@ -1,11 +1,24 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use tauri::{AppHandle, Emitter};
-use warp_rail::{ResultSvg, warp_coords};
+use warp_rail::warp_coords;
 use weaverail_model::{
-    app::AppState, command::{CommandError, EventEmitter}, diagram_logical_coord::DiagramLogicalConvert, event::EmitEventType, model::{DiagramRoot, diagram_view_settings::DiagramViewSettings, time::Time, timetable::TimetableId, train::TrainId}
+    app::AppState,
+    command::{CommandError, EventEmitter},
+    diagram_logical_coord::DiagramLogicalConvert,
+    event::EmitEventType,
+    model::{
+        diagram_view_settings::DiagramViewSettings, time::Time,
+        timetable::TimetableId, train::TrainId,
+    },
+    result_svg::ResultSvg,
 };
-use weft_rail::{WeftNode, make_node::{get_node_by_nodeid, make_node}, ripple::ripple_time, sort::sort_node};
+use weft_rail::{
+    WeftNode,
+    make_node::{get_node_by_nodeid, make_node},
+    ripple::ripple_time,
+    sort::sort_node,
+};
 
 pub mod data;
 pub mod line;
@@ -69,12 +82,14 @@ pub async fn redoable(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
 
 #[tauri::command]
 pub async fn get_svg(
-    root: &DiagramRoot,
+    state: tauri::State<'_, Mutex<AppState>>,
     timetable_id: TimetableId,
     view_settings: DiagramViewSettings,
     settings: DiagramLogicalConvert,
+    start_time: Time,
+    end_time: Time,
 ) -> Result<ResultSvg, CommandError> {
-    
+    let root = &state.lock().expect("mutex lock error").command_manager.root;
     let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) = make_node(root, timetable_id);
     let converted_nodes: Vec<&WeftNode> = get_node_by_nodeid(&nodes.0, &nodes.1);
     let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
@@ -89,5 +104,7 @@ pub async fn get_svg(
         &times,
         &coords,
         settings,
+        start_time,
+        end_time
     ))
 }

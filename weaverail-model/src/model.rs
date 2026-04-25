@@ -21,14 +21,7 @@ use serde_json::Value;
 use crate::{
     id_issuer::IdIssuer,
     model::{
-        line::{Line, LineId},
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        template_train::{TemplateTrain, TemplateTrainId},
-        timetable::{Timetable, TimetableId},
-        track::{Track, TrackId},
-        train::{Train, TrainId},
-        train_type::{TrainType, TrainTypeId},
+        diagram_view_settings::{DiagramViewSettings, DiagramViewSettingsId}, line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId}
     },
 };
 
@@ -72,6 +65,8 @@ pub struct DiagramRoot {
     pub timetables: HashMap<TimetableId, Timetable>,
     /// 列車の集合
     pub trains: HashMap<TrainId, Train>,
+    /// ダイヤグラムの表示設定の集合
+    pub diagram_view_settings: HashMap<DiagramViewSettingsId, DiagramViewSettings>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
     /// ID発行

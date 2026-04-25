@@ -2,35 +2,69 @@ import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useState } from "react";
-import { ResultWeftTrain } from "@weaverail/types";
+import { ResultSvg, ResultWeftTrain } from "@weaverail/types";
 
 function DiagramViewer() {
-	const { manager } = useExtensionManager();
-	const [trains, setTrains] = useState<ResultWeftTrain[]>([]);
-	useEffect(() => {
-		(async () => {
-			const timetables = await manager.api.data.getTimetables();
-			console.log(timetables);
-			const key = Object.keys(timetables)[0];
-			setTrains(await manager.api.data.weave(Number.parseInt(key)));
-		})();
-	}, []);
+  const { manager } = useExtensionManager();
+  const [trains, setTrains] = useState<ResultWeftTrain[]>([]);
+  const [svg, setSvg] = useState<ResultSvg>();
 
-	return <>{JSON.stringify(trains)}</>;
+  useEffect(() => {
+    (async () => {
+      const root = await manager.api.data.getRoot();
+      console.log(root);
+      const timetableId = Object.keys(root.timetables)[0];
+      setTrains(await manager.api.data.weave(timetableId));
+
+      const diagramViewSettingsId = Object.keys(root.diagram_view_settings)[0];
+      const diagramViewSettings =
+        root.diagram_view_settings[diagramViewSettingsId];
+
+      setSvg(
+        await manager.api.data.getSvg(
+          timetableId,
+          diagramViewSettings,
+          {
+            scale_x: 1,
+            scale_y: 1,
+            offset_x: 0,
+            offset_y: 0,
+          },
+          12 * 60 * 60,
+          12 * 60 * 60 + 30 * 60,
+        ),
+      );
+    })();
+  }, []);
+
+  return (
+    <>
+      <svg width={24 * 60 * 60} height={10000}>
+        {svg?.trains.map((t) => (
+          <path
+            stroke="black"
+            fill="none"
+            key={`${t.train_id}/}`}
+            d={t.path_string}
+          ></path>
+        ))}
+      </svg>
+    </>
+  );
 }
 
 export class DiagramViewerExtension implements WeaverailExtension {
   id: string = "weaverail.core.diagram-viewer";
   metadata = { name: "コア拡張機能", description: "" };
   init(api: WeaverailApi) {
-	api.ui.registerPanel({
-	  id: "weaverail.diagram-viewer.main-panel",
-	  label: "",
-	  slot: "main",
-	  render: function (): React.ReactNode {
-		return <DiagramViewer />;
-	  },
-	});
+    api.ui.registerPanel({
+      id: "weaverail.diagram-viewer.main-panel",
+      label: "",
+      slot: "main",
+      render: function (): React.ReactNode {
+        return <DiagramViewer />;
+      },
+    });
   }
   destroy(): void {}
 }

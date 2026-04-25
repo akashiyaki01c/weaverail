@@ -32,5 +32,16 @@ export * from "./bindings/TemplateSegment";
 
 export * from "./bindings/SegmentTrainOrder";
 
+export * from "./bindings/DiagramViewSettings";
+export * from "./bindings/DiagramViewSettingsId";
+export * from "./bindings/DiagramViewSegment";
+
 export * from "./bindings/ResultWeftTime";
 export * from "./bindings/ResultWeftTrain";
+
+export * from "./bindings/ResultSvg";
+export * from "./bindings/ResultSvgTrain";
+export * from "./bindings/ResultSvgSegment";
+
+export * from "./bindings/DiagramLogicalConvert";
+export * from "./bindings/DiagramLogicalCoord";
