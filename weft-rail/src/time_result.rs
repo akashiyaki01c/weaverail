@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use weaverail_model::{model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train}, result_weft::ResultWeftTime};
+use weaverail_model::{
+    model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train},
+    result_weft::ResultWeftTime,
+};
 
 use crate::{NodeType, ResultWeftTrain, StopType, WeftNode};
 

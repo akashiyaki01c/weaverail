@@ -1,7 +1,3 @@
-pub struct SvgOptions {
+pub struct SvgOptions {}
 
-}
-
-pub fn to_svg() {
-
-}
+pub fn to_svg() {}

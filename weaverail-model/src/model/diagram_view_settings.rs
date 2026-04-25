@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{model::{DiagramRoot, line::SegmentRef}, weaverail_id};
+use crate::{model::line::SegmentRef, weaverail_id};
 
 weaverail_id!(DiagramViewSettingsId, "DVS_");
 

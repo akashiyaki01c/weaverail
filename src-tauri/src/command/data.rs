@@ -3,7 +3,15 @@ use std::{collections::HashMap, sync::Mutex};
 use weaverail_model::{
     app::AppState,
     model::{
-        DiagramRoot, line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId}
+        DiagramRoot,
+        line::{Line, LineId},
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId},
+        timetable::{Timetable, TimetableId},
+        track::{Track, TrackId},
+        train::{Train, TrainId},
+        train_type::{TrainType, TrainTypeId},
     },
 };
 
@@ -120,4 +128,3 @@ pub async fn get_trains(
         .trains
         .clone())
 }
-

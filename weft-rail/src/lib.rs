@@ -1,17 +1,20 @@
 pub(crate) mod make_node;
 pub(crate) mod ripple;
 pub(crate) mod sort;
+pub mod svg;
 pub(crate) mod time_result;
 pub(crate) mod update_node;
-pub mod svg;
 
 use std::collections::HashMap;
 
 use smallvec::SmallVec;
-use weaverail_model::{model::{
-    DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time,
-    timetable::TimetableId, train::TrainId,
-}, result_weft::{ResultWeftTrain, StopType}};
+use weaverail_model::{
+    model::{
+        DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time,
+        timetable::TimetableId, train::TrainId,
+    },
+    result_weft::{ResultWeftTrain, StopType},
+};
 
 use crate::{
     make_node::{get_node_by_nodeid, make_node},
@@ -48,8 +51,7 @@ pub(crate) struct WeftNode {
     pub node_type: NodeType,
 }
 
-#[derive(PartialEq, Clone, Debug, Eq, Hash, Copy)]
-#[derive(Default)]
+#[derive(PartialEq, Clone, Debug, Eq, Hash, Copy, Default)]
 pub(crate) enum NodeType {
     #[default]
     Arrival,
