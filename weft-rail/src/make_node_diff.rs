@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use weaverail_model::model::{
@@ -14,9 +12,6 @@ use weaverail_model::model::{
 use weaverail_model::result_weft::StopType;
 
 use crate::{NodeId, NodeType, WeftNode};
-
-
-type NodeKey = (TrainId, LineSegmentId, NodeType);
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
 pub struct LookupNodeKey(u128);

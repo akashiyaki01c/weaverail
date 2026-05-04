@@ -19,7 +19,7 @@ use weaverail_model::{
 };
 
 use crate::{
-    make_node::{get_node_by_nodeid, make_node}, make_node_diff::WeftTempObj, ripple::ripple_time, sort::sort_node, time_result::get_time_result
+    make_node::{get_node_by_nodeid, make_node}, ripple::ripple_time, sort::sort_node, time_result::get_time_result
 };
 
 /// グラフのノードの識別子を表す

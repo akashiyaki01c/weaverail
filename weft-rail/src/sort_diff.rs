@@ -1,6 +1,6 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 
-use crate::{NodeId, make_node_diff::WeftTempObj};
+use crate::make_node_diff::WeftTempObj;
 
 pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
     let count = tmp_obj.nodes.len();
