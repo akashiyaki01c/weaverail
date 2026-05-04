@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 
 /// Weaverail上の識別子を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Default, Eq, Hash, Copy, Serialize, Deserialize)]
-pub struct WeaverailId(pub u16);
+pub struct WeaverailId(pub u32);
 impl WeaverailId {
-    pub fn new(id: u16) -> Self {
+    pub fn new(id: u32) -> Self {
         Self(id)
     }
     pub fn to_string(&self) -> String {
@@ -60,7 +60,7 @@ macro_rules! weaverail_id {
                 let id = &s[..4];
                 let uuid = &s[4..];
 
-                let number = u16::from_str(uuid);
+                let number = u32::from_str(uuid);
                 if let Ok(number) = number {
                     if id != $id {
                         return Err(serde::de::Error::custom("type is invalid"));
