@@ -1,11 +1,12 @@
 pub mod make_node;
+pub mod make_node_diff;
 pub mod ripple;
+pub mod ripple_diff;
 pub mod sort;
+pub mod sort_diff;
 pub mod svg;
 pub mod time_result;
 pub mod update_node;
-pub mod make_node_diff;
-pub mod sort_diff;
 
 use std::collections::HashMap;
 
@@ -19,7 +20,10 @@ use weaverail_model::{
 };
 
 use crate::{
-    make_node::{get_node_by_nodeid, make_node}, ripple::ripple_time, sort::sort_node, time_result::get_time_result
+    make_node::{get_node_by_nodeid, make_node},
+    ripple::ripple_time,
+    sort::sort_node,
+    time_result::get_time_result,
 };
 
 /// グラフのノードの識別子を表す
@@ -179,8 +183,7 @@ fn weave_test_diff() {
     let timetable = test_data.root.timetables.get(&timetable_id).unwrap();
 
     let start = std::time::Instant::now();
-    let mut nodes: WeftTempObj =
-        make_node_diff::make_node(&test_data.root, timetable_id);
+    let mut nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
     let duration = start.elapsed();
     println!("make_node: {}us", duration.as_micros());
 
@@ -188,4 +191,9 @@ fn weave_test_diff() {
     let node_array: Vec<usize> = sort_diff::sort_node(&nodes);
     let duration = start.elapsed();
     println!("sort_node: {}us", duration.as_micros());
+
+    let start = std::time::Instant::now();
+    let time: Vec<Time> = ripple_diff::ripple_node_diff(&nodes, &node_array);
+    let duration = start.elapsed();
+    println!("ripple_node: {}us", duration.as_micros());
 }
