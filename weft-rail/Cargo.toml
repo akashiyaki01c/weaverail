@@ -12,3 +12,6 @@ weaverail-model = { path = "../weaverail-model" }
 uuid = { version = "1.22.0", features = ["serde", "v4"] }
 smallvec = "1.15.1"
 rustc-hash = "2.1.2"
+
+[dev-dependencies]
+criterion = { version = "0.8.2", features = ["html_reports"] }

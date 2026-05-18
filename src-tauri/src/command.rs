@@ -14,10 +14,7 @@ use weaverail_model::{
     result_svg::ResultSvg,
 };
 use weft_rail::{
-    WeftNode,
-    make_node::{get_node_by_nodeid, make_node},
-    ripple::ripple_time,
-    sort::sort_node,
+    WeftNode, make_node::{get_node_by_nodeid, make_node}, make_node_diff, ripple::ripple_time, ripple_diff::ripple_node_diff, sort_diff
 };
 
 pub mod data;
@@ -89,22 +86,26 @@ pub async fn get_svg(
     start_time: Time,
     end_time: Time,
 ) -> Result<ResultSvg, CommandError> {
+    let start = std::time::Instant::now();
     let root = &state.lock().expect("mutex lock error").command_manager.root;
-    let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) = make_node(root, timetable_id);
-    let converted_nodes: Vec<&WeftNode> = get_node_by_nodeid(&nodes.0, &nodes.1);
-    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
-    let times: Vec<Time> = ripple_time(&node_array);
+    let nodes = make_node_diff::make_node(root, timetable_id);
+    let node_array = sort_diff::sort_node(&nodes);
+    let times: Vec<Time> = ripple_node_diff(&nodes, &node_array);
 
     let coords = warp_coords(&root, &view_settings);
-
-    Ok(warp_rail::get_svg(
+    let result = warp_rail::get_svg(
         root,
         timetable_id,
-        &converted_nodes,
+        &nodes,
+        &node_array,
         &times,
         &coords,
         settings,
         start_time,
         end_time
-    ))
+    );
+    let duration = start.elapsed();
+    println!("calc-svg: {}us", duration.as_micros());
+
+    Ok(result)
 }

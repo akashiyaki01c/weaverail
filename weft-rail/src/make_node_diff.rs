@@ -14,7 +14,7 @@ use weaverail_model::result_weft::StopType;
 use crate::{NodeId, NodeType, WeftNode};
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
-pub struct LookupNodeKey(u128);
+pub struct LookupNodeKey(u64);
 impl LookupNodeKey {
     pub fn new(train_id: TrainId, segment_id: LineSegmentId, node_type: NodeType) -> Self {
         let raw_train_id = train_id.0.0;
@@ -24,7 +24,7 @@ impl LookupNodeKey {
             NodeType::Departure => 2,
             NodeType::Root => 3,
         };
-        Self((raw_node_type as u128) << 64 | (raw_segment_id as u128) << 32 | raw_train_id as u128)
+        Self((raw_node_type as u64) << 62 | (raw_segment_id as u64) << 31 | raw_train_id as u64)
     }
 }
 
@@ -84,9 +84,10 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
     result.lookup.shrink_to(result.nodes.len());
     for i in 0..result.nodes.len() {
         let node = &result.nodes[i];
-        result
-            .lookup
-            .insert(LookupNodeKey::new(node.train_id, node.segment_id, node.node_type), i);
+        result.lookup.insert(
+            LookupNodeKey::new(node.train_id, node.segment_id, node.node_type),
+            i,
+        );
     }
     connect_hatsuhatsu_edge(timetable, &mut result);
     connect_chakuchaku_edge(timetable, &mut result);
@@ -143,7 +144,7 @@ fn add_train_node(
                     .push((departure_node.node_id, Time::new(0, 0, 0))),
             }
             tmp_obj.nodes.push(departure_node);
-            before_node_index += 1;
+            before_node_index = tmp_obj.nodes.len() - 1;
 
             let arrival_node = WeftNode {
                 node_id: issuer.next(),
@@ -157,8 +158,12 @@ fn add_train_node(
                     TemplateTrainStopType::Pass => StopType::Pass,
                 },
             };
+            tmp_obj.nodes[before_node_index]
+                .edges
+                .push((arrival_node.node_id, template_segment.running_time));
+
             tmp_obj.nodes.push(arrival_node);
-            before_node_index += 1;
+            before_node_index = tmp_obj.nodes.len() - 1;
         }
     }
 }
@@ -170,11 +175,19 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
-                .get(&LookupNodeKey::new(before_tid, orders.segment_id, NodeType::Departure))
+                .get(&LookupNodeKey::new(
+                    before_tid,
+                    orders.segment_id,
+                    NodeType::Departure,
+                ))
                 .unwrap();
             let current_node_index = *tmp_obj
                 .lookup
-                .get(&LookupNodeKey::new(current_tid, orders.segment_id, NodeType::Departure))
+                .get(&LookupNodeKey::new(
+                    current_tid,
+                    orders.segment_id,
+                    NodeType::Departure,
+                ))
                 .unwrap();
             let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
             tmp_obj.nodes[before_node_index]
@@ -191,11 +204,19 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
-                .get(&LookupNodeKey::new(before_tid, orders.segment_id, NodeType::Arrival))
+                .get(&LookupNodeKey::new(
+                    before_tid,
+                    orders.segment_id,
+                    NodeType::Arrival,
+                ))
                 .unwrap();
             let current_node_index = *tmp_obj
                 .lookup
-                .get(&LookupNodeKey::new(current_tid, orders.segment_id, NodeType::Arrival))
+                .get(&LookupNodeKey::new(
+                    current_tid,
+                    orders.segment_id,
+                    NodeType::Arrival,
+                ))
                 .unwrap();
             let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
             tmp_obj.nodes[before_node_index]

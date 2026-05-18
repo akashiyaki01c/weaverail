@@ -4,8 +4,8 @@ pub mod ripple;
 pub mod ripple_diff;
 pub mod sort;
 pub mod sort_diff;
-pub mod svg;
 pub mod time_result;
+pub mod time_result_diff;
 pub mod update_node;
 
 use std::collections::HashMap;
@@ -19,12 +19,7 @@ use weaverail_model::{
     result_weft::{ResultWeftTrain, StopType},
 };
 
-use crate::{
-    make_node::{get_node_by_nodeid, make_node},
-    ripple::ripple_time,
-    sort::sort_node,
-    time_result::get_time_result,
-};
+use crate::{make_node_diff::WeftTempObj, time_result_diff::get_time_result_diff};
 
 /// グラフのノードの識別子を表す
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy, Debug)]
@@ -64,31 +59,34 @@ pub enum NodeType {
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
     let start = std::time::Instant::now();
-    let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) = make_node(root, timetable_id);
-    let converted_nodes: Vec<&WeftNode> = get_node_by_nodeid(&nodes.0, &nodes.1);
+    let mut nodes: WeftTempObj = make_node_diff::make_node(&root, timetable_id);
     let duration = start.elapsed();
-    println!("make_node: {}ms", duration.as_millis());
+    println!("make_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
+    let node_array: Vec<usize> = sort_diff::sort_node(&nodes);
     let duration = start.elapsed();
-    println!("sort_node: {}ms", duration.as_millis());
+    println!("sort_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let times: Vec<Time> = ripple_time(&node_array);
+    let time: Vec<Time> = ripple_diff::ripple_node_diff(&nodes, &node_array);
     let duration = start.elapsed();
-    println!("ripple_node: {}ms", duration.as_millis());
+    println!("ripple_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let result: Vec<ResultWeftTrain> = get_time_result(root, timetable_id, node_array, &times);
+    let result: Vec<ResultWeftTrain> = get_time_result_diff(&root, timetable_id, &nodes, &time);
     let duration = start.elapsed();
-    println!("get_time: {}ms", duration.as_millis());
+    println!("get_time: {}us", duration.as_micros());
 
     result
 }
 
 #[test]
 fn weave_test() {
+    use crate::make_node::{get_node_by_nodeid, make_node};
+    use crate::ripple::ripple_time;
+    use crate::sort::sort_node;
+    use crate::time_result::get_time_result;
     use crate::update_node::UpdateType;
     use crate::update_node::update_node;
     use weaverail_model::model::train::Train;
@@ -165,7 +163,7 @@ fn weave_test() {
     let duration = start.elapsed();
     println!("update_node: {}us", duration.as_micros());
 
-    // println!("{:?}", result);
+    println!("{:?}", result);
 }
 
 #[test]
@@ -196,4 +194,73 @@ fn weave_test_diff() {
     let time: Vec<Time> = ripple_diff::ripple_node_diff(&nodes, &node_array);
     let duration = start.elapsed();
     println!("ripple_node: {}us", duration.as_micros());
+
+    println!("{:?}", time);
+
+    let start = std::time::Instant::now();
+    let result: Vec<ResultWeftTrain> =
+        get_time_result_diff(&test_data.root, timetable_id, &nodes, &time);
+    let duration = start.elapsed();
+    println!("get_time: {}us", duration.as_micros());
+
+    // println!("{:?}", result);
+}
+
+#[test]
+fn make_node_test() {
+    // 前処理 開始
+    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let timetable_id = test_data
+        .root
+        .timetables
+        .values()
+        .find(|_| true)
+        .unwrap()
+        .id;
+    let timetable = test_data.root.timetables.get(&timetable_id).unwrap();
+    // 前処理 終了
+
+    let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) =
+        make_node::make_node(&test_data.root, timetable_id);
+    let converted_nodes: Vec<&WeftNode> = make_node::get_node_by_nodeid(&nodes.0, &nodes.1);
+    let node_array: Vec<&WeftNode> = sort::sort_node(&converted_nodes);
+
+    let diff_nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
+    let diff_node_array: Vec<usize> = sort_diff::sort_node(&diff_nodes);
+
+    assert!(node_array.len() == diff_node_array.len());
+
+    for i in 0..node_array.len() {
+        let node = node_array[i];
+        let diff_node = &diff_nodes.nodes[diff_node_array[i]];
+        assert!(node.node_id == diff_node.node_id);
+    }
+
+    let ripple: Vec<Time> = ripple::ripple_time(&node_array);
+    let diff_ripple = ripple_diff::ripple_node_diff(&diff_nodes, &diff_node_array);
+
+    assert!(ripple.len() == diff_ripple.len());
+    for i in 0..ripple.len() {
+        assert!(ripple[i] == diff_ripple[i]);
+    }
+
+    let result: Vec<ResultWeftTrain> =
+        time_result::get_time_result(&test_data.root, timetable_id, node_array, &ripple);
+    let diff_result: Vec<ResultWeftTrain> =
+        get_time_result_diff(&test_data.root, timetable_id, &diff_nodes, &diff_ripple);
+
+    assert!(result.len() == diff_result.len());
+    for i in 0..result.len() {
+        let train = &result[i];
+        let diff_train = &diff_result[i];
+        assert!(train.train_id == diff_train.train_id);
+        assert!(train.times.len() == diff_train.times.len());
+        for j in 0..train.times.len() {
+            let time = &train.times[j];
+            let diff_time = &diff_train.times[j];
+            assert!(time.arrival_time == diff_time.arrival_time);
+            assert!(time.departure_time == diff_time.departure_time);
+        }
+    }
+    
 }

@@ -13,7 +13,7 @@ use weaverail_model::{
     },
     result_svg::{ResultSvg, ResultSvgTrain},
 };
-use weft_rail::WeftNode;
+use weft_rail::{WeftNode, make_node_diff::WeftTempObj};
 
 const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);
 
@@ -92,7 +92,8 @@ fn get_coord(
 pub fn get_svg(
     root: &DiagramRoot,
     timetable_id: TimetableId,
-    nodes: &Vec<&WeftNode>,
+    obj: &WeftTempObj,
+    node_array: &Vec<usize>,
     times: &Vec<Time>,
     coords: &HashMap<LineSegmentId, ResultWarpCoords>,
     settings: DiagramLogicalConvert,
@@ -108,17 +109,17 @@ pub fn get_svg(
 
     for train in trains {
         let mut node_indexes = vec![];
-        for i in 0..nodes.len() {
-            let node = nodes[i];
+        for i in 0..node_array.len() {
+            let actual_index = node_array[i];
+            let node = &obj.nodes[actual_index];
             if node.train_id == train.id {
-                node_indexes.push(i);
+                node_indexes.push(actual_index);
             }
         }
 
         let mut values = vec![];
-        for i in 0..node_indexes.len() {
-            let index = node_indexes[i];
-            values.push((nodes[index], times[index]));
+        for &index in &node_indexes {
+            values.push((&obj.nodes[index], times[index]));
         }
 
         let mut strs = vec![];
@@ -138,7 +139,7 @@ pub fn get_svg(
 
             let before_coord = DiagramLogicalCoord::new(before.1.total_second() as f64, before_y);
             let current_coord =
-                DiagramLogicalCoord::new(current.1.total_second() as f64, current_y, );
+                DiagramLogicalCoord::new(current.1.total_second() as f64, current_y);
 
             let before_coord = settings.convert(before_coord);
             let current_coord = settings.convert(current_coord);
@@ -163,50 +164,4 @@ pub fn get_svg(
     }
 
     ResultSvg { trains: result }
-}
-
-#[test]
-fn test() {
-    let test_data = weaverail_model::test_data::diagram_root::get_test_data().root;
-    let timetable_id = test_data.timetables.iter().next().unwrap().0.clone();
-
-    let settings = test_data
-        .diagram_view_settings
-        .iter()
-        .next()
-        .unwrap()
-        .1
-        .clone();
-
-    let nodes: (
-        WeftNode,
-        HashMap<weaverail_model::model::train::TrainId, Vec<WeftNode>>,
-    ) = weft_rail::make_node::make_node(&test_data, timetable_id);
-    let converted_nodes: Vec<&WeftNode> =
-        weft_rail::make_node::get_node_by_nodeid(&nodes.0, &nodes.1);
-    let node_array: Vec<&WeftNode> = weft_rail::sort::sort_node(&converted_nodes);
-    let times: Vec<Time> = weft_rail::ripple::ripple_time(&node_array);
-
-    let coords = warp_coords(&test_data, &settings);
-
-    let convert = DiagramLogicalConvert {
-        scale_x: 1.0,
-        scale_y: 1.0,
-        offset_x: 0.0,
-        offset_y: 0.0,
-    };
-
-    println!(
-        "{:?}",
-        get_svg(
-            &test_data,
-            timetable_id,
-            &converted_nodes,
-            &times,
-            &coords,
-            convert,
-            Time::new(0, 0, 0),
-            Time::new(24, 0, 0)
-        )
-    );
 }

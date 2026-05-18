@@ -6,7 +6,6 @@ import { ResultSvg, ResultWeftTrain } from "@weaverail/types";
 
 function DiagramViewer() {
   const { manager } = useExtensionManager();
-  const [trains, setTrains] = useState<ResultWeftTrain[]>([]);
   const [svg, setSvg] = useState<ResultSvg>();
 
   useEffect(() => {
@@ -14,7 +13,6 @@ function DiagramViewer() {
       const root = await manager.api.data.getRoot();
       console.log(root);
       const timetableId = Object.keys(root.timetables)[0];
-      setTrains(await manager.api.data.weave(timetableId));
 
       const diagramViewSettingsId = Object.keys(root.diagram_view_settings)[0];
       const diagramViewSettings =
