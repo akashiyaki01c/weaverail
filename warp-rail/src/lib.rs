@@ -1,34 +1,30 @@
 use std::collections::HashMap;
+use std::fmt::Write;
 
 use weaverail_model::{
     diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord},
     model::{
         DiagramRoot,
-        diagram_view_settings::{DiagramViewSegment, DiagramViewSettings},
+        diagram_view_settings::{DiagramViewSegment, DiagramViewSettingsId},
         line_segment::LineSegmentId,
         station::StationId,
         time::Time,
         timetable::TimetableId,
-        train::Train,
+        train::{Train, TrainId},
     },
     result_svg::{ResultSvg, ResultSvgTrain},
+    result_warp::ResultWarpCoords,
 };
-use weft_rail::{WeftNode, make_node_diff::WeftTempObj};
+use weft_rail::make_node_diff::WeftTempObj;
 
 const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);
-
-pub struct ResultWarpCoords {
-    pub upper_y: f64,
-    pub lower_y: f64,
-    pub segment_id: LineSegmentId,
-    pub is_reversed: bool,
-}
 
 /// ダイヤグラム上のY座標を求める
 pub fn warp_coords(
     root: &DiagramRoot,
-    settings: &DiagramViewSettings,
+    settings_id: DiagramViewSettingsId,
 ) -> HashMap<LineSegmentId, ResultWarpCoords> {
+    let settings = root.diagram_view_settings.get(&settings_id).expect("");
     let mut result = HashMap::new();
     let mut current_y: f64 = 0.0;
     for segment in &settings.segments {
@@ -93,75 +89,85 @@ pub fn get_svg(
     root: &DiagramRoot,
     timetable_id: TimetableId,
     obj: &WeftTempObj,
-    node_array: &Vec<usize>,
-    times: &Vec<Time>,
+    node_array: &[usize],
+    times: &[Time],
     coords: &HashMap<LineSegmentId, ResultWarpCoords>,
     settings: DiagramLogicalConvert,
     start_time: Time,
     end_time: Time,
 ) -> ResultSvg {
-    let trains: Vec<&Train> = root
+    let mut nodes_by_train: HashMap<TrainId, Vec<usize>> = HashMap::new();
+    for &actual_index in node_array {
+        let train_id = obj.nodes[actual_index].train_id;
+        nodes_by_train
+            .entry(train_id)
+            .or_default()
+            .push(actual_index);
+    }
+
+    let result = root
         .trains
         .values()
         .filter(|train| train.timetable_id == timetable_id)
+        .map(|train| {
+            let node_indexes = nodes_by_train
+                .get(&train.id)
+                .map(|v| v.as_slice())
+                .unwrap_or(&[]);
+
+            let mut path = String::with_capacity(node_indexes.len() * 32);
+
+            for window in node_indexes.windows(2) {
+                let (bi, ci) = (window[0], window[1]);
+                let (before_node, before_time): (&_, _) = (&obj.nodes[bi], times[bi]);
+                let (current_node, current_time): (&_, _) = (&obj.nodes[ci], times[ci]);
+
+                if before_time < start_time && current_time < start_time {
+                    continue;
+                }
+                if before_time > end_time && current_time > end_time {
+                    break;
+                }
+
+                let before_y =
+                    get_coord(root, coords, before_node.segment_id, before_node.station_id);
+                let current_y = get_coord(
+                    root,
+                    coords,
+                    current_node.segment_id,
+                    current_node.station_id,
+                );
+
+                let before_coord = settings.convert(DiagramLogicalCoord::new(
+                    before_time.total_second() as f64,
+                    before_y,
+                ));
+                let current_coord = settings.convert(DiagramLogicalCoord::new(
+                    current_time.total_second() as f64,
+                    current_y,
+                ));
+
+                if before_coord == current_coord {
+                    continue;
+                }
+
+                if path.is_empty() {
+                    let _ = write!(
+                        path,
+                        "M {},{} L {},{}",
+                        before_coord.x, before_coord.y, current_coord.x, current_coord.y
+                    );
+                } else {
+                    let _ = write!(path, " L {},{}", current_coord.x, current_coord.y);
+                }
+            }
+
+            ResultSvgTrain {
+                train_id: train.id,
+                path_string: path,
+            }
+        })
         .collect();
-    let mut result = Vec::new();
-
-    for train in trains {
-        let mut node_indexes = vec![];
-        for i in 0..node_array.len() {
-            let actual_index = node_array[i];
-            let node = &obj.nodes[actual_index];
-            if node.train_id == train.id {
-                node_indexes.push(actual_index);
-            }
-        }
-
-        let mut values = vec![];
-        for &index in &node_indexes {
-            values.push((&obj.nodes[index], times[index]));
-        }
-
-        let mut strs = vec![];
-        for v in values.windows(2) {
-            let before = v[0];
-            let current = v[1];
-
-            if before.1 < start_time && current.1 < start_time {
-                continue;
-            }
-            if before.1 > end_time && current.1 > end_time {
-                break;
-            }
-
-            let before_y = get_coord(root, coords, before.0.segment_id, before.0.station_id);
-            let current_y = get_coord(root, coords, current.0.segment_id, current.0.station_id);
-
-            let before_coord = DiagramLogicalCoord::new(before.1.total_second() as f64, before_y);
-            let current_coord =
-                DiagramLogicalCoord::new(current.1.total_second() as f64, current_y);
-
-            let before_coord = settings.convert(before_coord);
-            let current_coord = settings.convert(current_coord);
-
-            if strs.is_empty() {
-                strs.push(format!(
-                    "M {},{} L {},{}",
-                    before_coord.x, before_coord.y, current_coord.x, current_coord.y
-                ));
-            } else {
-                strs.push(format!(
-                    "L {},{} L {},{}",
-                    before_coord.x, before_coord.y, current_coord.x, current_coord.y
-                ));
-            }
-        }
-
-        result.push(ResultSvgTrain {
-            train_id: train.id,
-            path_string: strs.join(" "),
-        });
-    }
 
     ResultSvg { trains: result }
 }

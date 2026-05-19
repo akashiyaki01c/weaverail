@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, DiagramViewSettings, ResultSvg, DiagramRoot, Time } from "@weaverail/types";
+import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, DiagramViewSettings, ResultSvg, DiagramRoot, Time, DiagramViewSettingsId } from "@weaverail/types";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export interface WeaverailDataApi {
@@ -12,7 +12,13 @@ export interface WeaverailDataApi {
 	getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }>;
 	getTimetables(): Promise<{ [key in TimetableId]: Timetable }>;
 	getTrains(): Promise<{ [key in TrainId]: Train }>;
-	getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettings, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg>;
+	getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettingsId, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg>;
+	getWarpCoords(viewSettings: DiagramViewSettingsId): Promise<{ [key in LineSegmentId]: {
+		upper_y: number,
+		lower_y: number,
+		segment_id: LineSegmentId,
+		is_reversed: boolean,
+	} }>;
 	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
 }
 
@@ -59,8 +65,17 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 		return await invoke("weave", { timetableId });
 	}
 
-	async getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettings, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg> {
-		return await invoke("get_svg", { timetableId, viewSettings, settings, startTime, endTime });
+	async getSvg(timetableId: TimetableId, viewSettingsId: DiagramViewSettingsId, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg> {
+		return await invoke("get_svg", { timetableId, viewSettingsId, settings, startTime, endTime });
+	}
+
+	async getWarpCoords(viewSettingsId: DiagramViewSettingsId): Promise<{ [key in LineSegmentId]: {
+		upper_y: number;
+		lower_y: number;
+		segment_id: LineSegmentId;
+		is_reversed: boolean;
+	}; }> {
+		return await invoke("get_warp_coords", { viewSettingsId });
 	}
 
 	constructor() {

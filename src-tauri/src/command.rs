@@ -8,13 +8,14 @@ use weaverail_model::{
     diagram_logical_coord::DiagramLogicalConvert,
     event::EmitEventType,
     model::{
-        diagram_view_settings::DiagramViewSettings, time::Time,
-        timetable::TimetableId, train::TrainId,
+        diagram_view_settings::DiagramViewSettingsId, line_segment::LineSegmentId, time::Time, timetable::TimetableId
     },
-    result_svg::ResultSvg,
+    result_svg::ResultSvg, result_warp::ResultWarpCoords,
 };
 use weft_rail::{
-    WeftNode, make_node::{get_node_by_nodeid, make_node}, make_node_diff, ripple::ripple_time, ripple_diff::ripple_node_diff, sort_diff
+    make_node_diff,
+    ripple_diff::ripple_node_diff,
+    sort_diff,
 };
 
 pub mod data;
@@ -81,7 +82,7 @@ pub async fn redoable(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
 pub async fn get_svg(
     state: tauri::State<'_, Mutex<AppState>>,
     timetable_id: TimetableId,
-    view_settings: DiagramViewSettings,
+    view_settings_id: DiagramViewSettingsId,
     settings: DiagramLogicalConvert,
     start_time: Time,
     end_time: Time,
@@ -92,7 +93,7 @@ pub async fn get_svg(
     let node_array = sort_diff::sort_node(&nodes);
     let times: Vec<Time> = ripple_node_diff(&nodes, &node_array);
 
-    let coords = warp_coords(&root, &view_settings);
+    let coords = warp_coords(&root, view_settings_id);
     let result = warp_rail::get_svg(
         root,
         timetable_id,
@@ -102,10 +103,22 @@ pub async fn get_svg(
         &coords,
         settings,
         start_time,
-        end_time
+        end_time,
     );
     let duration = start.elapsed();
     println!("calc-svg: {}us", duration.as_micros());
 
     Ok(result)
+}
+
+#[tauri::command]
+pub async fn get_warp_coords(
+    state: tauri::State<'_, Mutex<AppState>>,
+    view_settings_id: DiagramViewSettingsId,
+) -> Result<HashMap<LineSegmentId, ResultWarpCoords>, CommandError> {
+    let coords = warp_coords(
+        &state.lock().expect("mutex lock error").command_manager.root,
+        view_settings_id,
+    );
+    Ok(coords)
 }
