@@ -262,5 +262,4 @@ fn make_node_test() {
             assert!(time.departure_time == diff_time.departure_time);
         }
     }
-    
 }

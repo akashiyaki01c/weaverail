@@ -21,7 +21,15 @@ use serde_json::Value;
 use crate::{
     id_issuer::IdIssuer,
     model::{
-        diagram_view_settings::{DiagramViewSettings, DiagramViewSettingsId}, line::{Line, LineId}, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId}
+        diagram_view_settings::{DiagramViewSettings, DiagramViewSettingsId},
+        line::{Line, LineId},
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId},
+        timetable::{Timetable, TimetableId},
+        track::{Track, TrackId},
+        train::{Train, TrainId},
+        train_type::{TrainType, TrainTypeId},
     },
 };
 

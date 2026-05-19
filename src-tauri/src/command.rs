@@ -8,15 +8,13 @@ use weaverail_model::{
     diagram_logical_coord::DiagramLogicalConvert,
     event::EmitEventType,
     model::{
-        diagram_view_settings::DiagramViewSettingsId, line_segment::LineSegmentId, time::Time, timetable::TimetableId
+        diagram_view_settings::DiagramViewSettingsId, line_segment::LineSegmentId, time::Time,
+        timetable::TimetableId,
     },
-    result_svg::ResultSvg, result_warp::ResultWarpCoords,
+    result_svg::ResultSvg,
+    result_warp::ResultWarpCoords,
 };
-use weft_rail::{
-    make_node_diff,
-    ripple_diff::ripple_node_diff,
-    sort_diff,
-};
+use weft_rail::{make_node_diff, ripple_diff::ripple_node_diff, sort_diff};
 
 pub mod data;
 pub mod line;

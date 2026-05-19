@@ -29,8 +29,8 @@ impl DiagramLogicalConvert {
 
 #[cfg(test)]
 mod tests {
-    use ts_rs::{Config, TS};
     use crate::diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord};
+    use ts_rs::{Config, TS};
 
     #[test]
     fn export_types() {

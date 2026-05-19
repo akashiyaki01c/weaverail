@@ -23,12 +23,12 @@ pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
         que.pop_front();
         answer.push(node_index);
         for edge in &tmp_obj.nodes.get(node_index).unwrap().edges {
-			let index = edge.0.0;
-			num_input[index] -= 1;
-			if num_input[index] == 0 {
+            let index = edge.0.0;
+            num_input[index] -= 1;
+            if num_input[index] == 0 {
                 que.push_back(index);
             }
-		}
+        }
     }
 
     if answer.len() != count {

@@ -21,7 +21,7 @@ mod tests {
     #[test]
     fn export_types() {
         let cfg = Config::new();
-        
+
         ResultSvg::export_all(&cfg).expect("TS export failed");
     }
 }

@@ -1,6 +1,12 @@
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use weaverail_model::{
-    model::{DiagramRoot, station::StationId, time::Time, timetable::TimetableId, train::{Train, TrainId}},
+    model::{
+        DiagramRoot,
+        station::StationId,
+        time::Time,
+        timetable::TimetableId,
+        train::{Train, TrainId},
+    },
     result_weft::{ResultWeftTime, ResultWeftTrain, StopType},
 };
 
@@ -38,7 +44,10 @@ pub fn get_time_result_diff(
     let mut node_map =
         FxHashMap::with_capacity_and_hasher(obj.nodes.len(), FxBuildHasher::default());
     for node in &obj.nodes {
-        node_map.insert(LookupNodeKey::new(node.train_id, node.station_id, node.node_type), node.clone());
+        node_map.insert(
+            LookupNodeKey::new(node.train_id, node.station_id, node.node_type),
+            node.clone(),
+        );
     }
 
     for train in trains {
@@ -47,8 +56,13 @@ pub fn get_time_result_diff(
             times: vec![],
         };
         for station_id in diagram_root.get_stations(train) {
-            let arrival_node = node_map.get(&LookupNodeKey::new(train.id, station_id, NodeType::Arrival));
-            let departure_node = node_map.get(&LookupNodeKey::new(train.id, station_id, NodeType::Departure));
+            let arrival_node =
+                node_map.get(&LookupNodeKey::new(train.id, station_id, NodeType::Arrival));
+            let departure_node = node_map.get(&LookupNodeKey::new(
+                train.id,
+                station_id,
+                NodeType::Departure,
+            ));
 
             let arrival_segment_time = arrival_node.map(|id| times[id.node_id.0]);
             let arrival_segment_id = arrival_node.map(|id| id.segment_id);
