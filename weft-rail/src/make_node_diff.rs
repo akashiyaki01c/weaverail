@@ -78,7 +78,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
 
     // add node
     for train in trains {
-        add_train_node(&root, train, &mut number_issuer, &mut result);
+        add_train_node(root, train, &mut number_issuer, &mut result);
     }
 
     result.lookup.shrink_to(result.nodes.len());

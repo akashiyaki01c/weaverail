@@ -12,13 +12,10 @@ impl WeaverailId {
     pub fn new(id: u32) -> Self {
         Self(id)
     }
-    pub fn to_string(&self) -> String {
-        self.0.to_string()
-    }
 }
 impl Display for WeaverailId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.to_string())
+        write!(f, "{}", self.0)
     }
 }
 impl std::fmt::Debug for WeaverailId {

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::{line_segment::LineSegmentId, train::TrainId};
+use crate::model::train::TrainId;
 
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct ResultSvg {

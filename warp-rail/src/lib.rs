@@ -10,7 +10,7 @@ use weaverail_model::{
         station::StationId,
         time::Time,
         timetable::TimetableId,
-        train::{Train, TrainId},
+        train::TrainId,
     },
     result_svg::{ResultSvg, ResultSvgTrain},
     result_warp::ResultWarpCoords,
@@ -70,7 +70,7 @@ fn get_coord(
     let segment = root.segments.get(&segment_id).unwrap();
     let coord = coords.get(&segment_id).unwrap();
 
-    if segment.start_station(&root).unwrap().id == station_id {
+    if segment.start_station(root).unwrap().id == station_id {
         if coord.is_reversed {
             coord.lower_y
         } else {

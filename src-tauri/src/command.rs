@@ -91,7 +91,7 @@ pub async fn get_svg(
     let node_array = sort_diff::sort_node(&nodes);
     let times: Vec<Time> = ripple_node_diff(&nodes, &node_array);
 
-    let coords = warp_coords(&root, view_settings_id);
+    let coords = warp_coords(root, view_settings_id);
     let result = warp_rail::get_svg(
         root,
         timetable_id,

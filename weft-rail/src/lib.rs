@@ -8,7 +8,6 @@ pub mod time_result;
 pub mod time_result_diff;
 pub mod update_node;
 
-use std::collections::HashMap;
 
 use smallvec::SmallVec;
 use weaverail_model::{
@@ -59,7 +58,7 @@ pub enum NodeType {
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
     let start = std::time::Instant::now();
-    let mut nodes: WeftTempObj = make_node_diff::make_node(&root, timetable_id);
+    let nodes: WeftTempObj = make_node_diff::make_node(root, timetable_id);
     let duration = start.elapsed();
     println!("make_node: {}us", duration.as_micros());
 
@@ -74,7 +73,7 @@ pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTra
     println!("ripple_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let result: Vec<ResultWeftTrain> = get_time_result_diff(&root, timetable_id, &nodes, &time);
+    let result: Vec<ResultWeftTrain> = get_time_result_diff(root, timetable_id, &nodes, &time);
     let duration = start.elapsed();
     println!("get_time: {}us", duration.as_micros());
 
