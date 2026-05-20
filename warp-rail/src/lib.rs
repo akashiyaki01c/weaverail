@@ -167,6 +167,7 @@ pub fn get_svg(
                 path_string: path,
             }
         })
+        .filter(|v| !v.path_string.is_empty())
         .collect();
 
     ResultSvg { trains: result }
