@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 /// Weaverail上の識別子を表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Default, Eq, Hash, Copy, Serialize, Deserialize)]
+#[ts(as = "String")]
 pub struct WeaverailId(pub u32);
 impl WeaverailId {
     pub fn new(id: u32) -> Self {

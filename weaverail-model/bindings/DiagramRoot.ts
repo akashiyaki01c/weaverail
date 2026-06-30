@@ -67,4 +67,8 @@ properties: ExtensionProperty,
 /**
  * ID発行
  */
-id_issuer: IdIssuer, };
+id_issuer: IdIssuer, 
+/**
+ * バージョン
+ */
+version: number, };

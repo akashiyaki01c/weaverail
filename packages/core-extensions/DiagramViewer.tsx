@@ -1,24 +1,36 @@
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LineSegmentId, ResultSvg } from "@weaverail/types";
 
 function DiagramViewer() {
   const { manager } = useExtensionManager();
   const outerRef = useRef<HTMLDivElement>(undefined);
   const svgRef = useRef<SVGElement>(undefined);
-  const [timetableId, setTimetableId] = useState(0);
-  const [diagramViewSettingsId, setDiagramViewSettingsId] = useState(0);
+  const [timetableId, setTimetableId] = useState("");
+  const [diagramViewSettingsId, setDiagramViewSettingsId] = useState("");
   const [svg, setSvg] = useState<ResultSvg>();
   const [warp, setWarp] = useState<{
     [x: LineSegmentId]: {
       upper_y: number;
       lower_y: number;
-      segment_id: number;
+      segment_id: LineSegmentId;
       is_reversed: boolean;
     };
   }>();
+  const maxY = useMemo(() => {
+    let max = 0;
+    for (const key in warp) {
+      if (!Object.hasOwn(warp, key)) continue;
+      const element = warp[key];
+      max = Math.max(max, element.lower_y);
+    }
+    console.log(max);
+
+    return max;
+  }, [warp]);
+
   const [viewSettings, setViewSettings] = useState({
     scale_x: 0.125,
     scale_y: 0.2,
@@ -37,8 +49,8 @@ function DiagramViewer() {
           timetableId,
           diagramViewSettingsId,
           viewSettings,
-          timeRange[0] - 30 * 60,
-          timeRange[1] + 30 * 60,
+          Math.max(0, timeRange[0] - 30 * 60),
+          Math.max(0, timeRange[1] + 30 * 60),
         ),
       );
     })();
@@ -58,12 +70,12 @@ function DiagramViewer() {
           timetableId,
           diagramViewSettingsId,
           viewSettings,
-          timeRange[0] - 30 * 60,
-          timeRange[1] + 30 * 60,
+          Math.max(0, timeRange[0] - 30 * 60),
+          Math.max(0, timeRange[1] + 30 * 60),
         ),
       );
       const warp = await manager.api.data.getWarpCoords(diagramViewSettingsId);
-      console.log(warp);
+      console.log("WARP: ", warp);
       setWarp(warp);
     })();
   }, []);
@@ -104,7 +116,7 @@ function DiagramViewer() {
           x1={i * viewSettings.scale_x}
           x2={i * viewSettings.scale_x}
           y1={0}
-          y2={10000}
+          y2={maxY * viewSettings.scale_y}
           stroke="black"
         />,
       );
@@ -115,7 +127,7 @@ function DiagramViewer() {
           x1={i * viewSettings.scale_x}
           x2={i * viewSettings.scale_x}
           y1={0}
-          y2={10000}
+          y2={maxY * viewSettings.scale_y}
           stroke="black"
           strokeWidth={0.5}
         />,
@@ -127,7 +139,7 @@ function DiagramViewer() {
           x1={i * viewSettings.scale_x}
           x2={i * viewSettings.scale_x}
           y1={0}
-          y2={10000}
+          y2={maxY * viewSettings.scale_y}
           stroke="black"
           strokeWidth={0.25}
         />,
@@ -139,7 +151,7 @@ function DiagramViewer() {
           x1={i * viewSettings.scale_x}
           x2={i * viewSettings.scale_x}
           y1={0}
-          y2={10000}
+          y2={maxY * viewSettings.scale_y}
           stroke="black"
           strokeWidth={0.25}
           strokeDasharray={"4 4"}
@@ -179,42 +191,58 @@ function DiagramViewer() {
         style={{ width: "100%", height: "100%", overflow: "scroll" }}
         ref={outerRef as any}
       >
-        <svg width={24 * 60 * 60} height={10000} ref={svgRef as any}>
-          <g className="station-axis">{stationAxis}</g>
-          <g className="time-axis">{timeAxis}</g>
-          <g className="trains">
-            {svg?.trains.map((t) => (
-              <>
-                <path
-                  stroke="black"
-                  strokeWidth={2}
-                  fill="none"
-                  key={`${t.train_id}/}`}
-                  d={t.path_string}
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const rawY = e.clientY - rect.top;
+        <div style={{ display: "flex" }}>
+          <div
+            style={{
+              width: "100px",
+              height: `${maxY * viewSettings.scale_y}px`,
+              position: "fixed",
+            }}
+          >
+          </div>
+          <div style={{ marginLeft: "100px" }}>
+            <svg
+              width={24 * 60 * 60}
+              height={maxY * viewSettings.scale_y}
+              ref={svgRef as any}
+            >
+              <g className="station-axis">{stationAxis}</g>
+              <g className="time-axis">{timeAxis}</g>
+              <g className="trains">
+                {svg?.trains.map((t) => (
+                  <>
+                    <path
+                      stroke="black"
+                      strokeWidth={2}
+                      fill="none"
+                      key={`${t.train_id}/}`}
+                      d={t.path_string}
+                      onClick={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const rawY = e.clientY - rect.top;
 
-                    let segment = "";
-                    for (const key in warp) {
-                      if (!Object.hasOwn(warp, key)) continue;
+                        let segment = "";
+                        for (const key in warp) {
+                          if (!Object.hasOwn(warp, key)) continue;
 
-                      const element = warp[key as any];
-                      if (
-                        element.upper_y * viewSettings.scale_y <= rawY &&
-                        rawY <= element.lower_y * viewSettings.scale_y
-                      ) {
-                        segment = key;
-                        break;
-                      }
-                    }
-                    console.log(segment);
-                  }}
-                ></path>
-              </>
-            ))}
-          </g>
-        </svg>
+                          const element = warp[key as any];
+                          if (
+                            element.upper_y * viewSettings.scale_y <= rawY &&
+                            rawY <= element.lower_y * viewSettings.scale_y
+                          ) {
+                            segment = key;
+                            break;
+                          }
+                        }
+                        console.log(segment);
+                      }}
+                    ></path>
+                  </>
+                ))}
+              </g>
+            </svg>
+          </div>
+        </div>
       </div>
     </>
   );

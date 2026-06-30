@@ -3,4 +3,4 @@
 /**
  * Weaverail上の識別子を表す構造体
  */
-export type WeaverailId = number;
+export type WeaverailId = string;
