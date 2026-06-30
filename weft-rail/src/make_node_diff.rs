@@ -1,6 +1,6 @@
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
-use weaverail_model::model::{
+use weaverail_model::{model::{
     DiagramRoot,
     line_segment::LineSegmentId,
     station::StationId,
@@ -8,25 +8,8 @@ use weaverail_model::model::{
     time::Time,
     timetable::{Timetable, TimetableId},
     train::{Train, TrainId},
-};
+}, result_weft::{LookupNodeKey, NodeId, NodeType, WeftNode, WeftTempObj}};
 use weaverail_model::result_weft::StopType;
-
-use crate::{NodeId, NodeType, WeftNode};
-
-#[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
-pub struct LookupNodeKey(u64);
-impl LookupNodeKey {
-    pub fn new(train_id: TrainId, segment_id: LineSegmentId, node_type: NodeType) -> Self {
-        let raw_train_id = train_id.0.0;
-        let raw_segment_id = segment_id.0.0;
-        let raw_node_type = match node_type {
-            NodeType::Arrival => 1,
-            NodeType::Departure => 2,
-            NodeType::Root => 3,
-        };
-        Self((raw_node_type as u64) << 62 | (raw_segment_id as u64) << 31 | raw_train_id as u64)
-    }
-}
 
 struct NumberIssuer {
     current: usize,
@@ -37,15 +20,10 @@ impl NumberIssuer {
     }
 
     pub fn next(&mut self) -> NodeId {
-        let result = NodeId(self.current);
+        let result = NodeId::new(self.current);
         self.current += 1;
         result
     }
-}
-
-pub struct WeftTempObj {
-    pub nodes: Vec<WeftNode>,
-    pub lookup: FxHashMap<LookupNodeKey, usize>,
 }
 
 pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {

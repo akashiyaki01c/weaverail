@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
 use weaverail_model::{
-    model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train},
-    result_weft::ResultWeftTime,
+    model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train}, result_weft::{NodeType, ResultWeftTime, StopType},
 };
 
-use crate::{NodeType, ResultWeftTrain, StopType, WeftNode};
+use crate::{ ResultWeftTrain, WeftNode};
 
 pub(crate) fn get_time_result(
     diagram_root: &DiagramRoot,

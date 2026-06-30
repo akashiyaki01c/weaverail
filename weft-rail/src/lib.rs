@@ -9,52 +9,15 @@ pub mod time_result_diff;
 pub mod update_node;
 
 
-use smallvec::SmallVec;
+use std::collections::HashMap;
+
 use weaverail_model::{
     model::{
-        DiagramRoot, line_segment::LineSegmentId, station::StationId, time::Time,
-        timetable::TimetableId, train::TrainId,
-    },
-    result_weft::{ResultWeftTrain, StopType},
+        DiagramRoot, time::Time, timetable::TimetableId, train::TrainId,
+    }, result_weft::{ResultWeftTrain, WeftNode, WeftTempObj},
 };
 
-use crate::{make_node_diff::WeftTempObj, time_result_diff::get_time_result_diff};
-
-/// グラフのノードの識別子を表す
-#[derive(Clone, PartialEq, Default, Eq, Hash, Copy, Debug)]
-pub struct NodeId(usize);
-impl NodeId {
-    pub fn new(value: usize) -> Self {
-        Self(value)
-    }
-}
-
-/// 列車時刻を計算するためのグラフのノードを表す
-#[derive(Clone, Debug, Default)]
-pub struct WeftNode {
-    /// ノードの識別子
-    pub node_id: NodeId,
-    /// 駅ID
-    pub station_id: StationId,
-    /// 列車ID
-    pub train_id: TrainId,
-    /// 駅間ID
-    pub segment_id: LineSegmentId,
-    /// 停車パターン
-    pub stop_type: StopType,
-    /// グラフへのエッジ
-    pub edges: SmallVec<[(NodeId, Time); 2]>,
-    /// ノードの種類
-    pub node_type: NodeType,
-}
-
-#[derive(PartialEq, Clone, Debug, Eq, Hash, Copy, Default)]
-pub enum NodeType {
-    #[default]
-    Arrival,
-    Departure,
-    Root,
-}
+use crate::{ time_result_diff::get_time_result_diff};
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
     let start = std::time::Instant::now();
@@ -167,7 +130,6 @@ fn weave_test() {
 
 #[test]
 fn weave_test_diff() {
-    use crate::make_node_diff::WeftTempObj;
 
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
     let timetable_id = test_data

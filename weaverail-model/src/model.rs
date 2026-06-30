@@ -79,6 +79,8 @@ pub struct DiagramRoot {
     pub properties: ExtensionProperty,
     /// ID発行
     pub id_issuer: IdIssuer,
+    /// バージョン
+    pub version: u32,
 }
 
 #[cfg(test)]

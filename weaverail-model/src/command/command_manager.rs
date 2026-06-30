@@ -29,6 +29,7 @@ impl CommandManager {
             self.undo_stack.push(cmd);
             self.redo_stack.clear();
         }
+        self.root.version += 1;
     }
 
     /// 元に戻す
@@ -38,6 +39,7 @@ impl CommandManager {
             self.redo_stack.push(cmd);
             return Some(undo);
         }
+        self.root.version -= 1;
         None
     }
 
@@ -48,6 +50,7 @@ impl CommandManager {
             self.undo_stack.push(cmd);
             return Some(redo);
         }
+        self.root.version += 1;
         None
     }
 

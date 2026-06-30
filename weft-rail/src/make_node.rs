@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use smallvec::SmallVec;
-use weaverail_model::model::{
+use weaverail_model::{model::{
     DiagramRoot,
     line_segment::LineSegmentId,
     station::StationId,
@@ -9,9 +9,8 @@ use weaverail_model::model::{
     time::Time,
     timetable::{Timetable, TimetableId},
     train::{Train, TrainId},
-};
+}, result_weft::{NodeId, NodeType, StopType, WeftNode}};
 
-use crate::{NodeId, NodeType, StopType, WeftNode};
 type NodeKey = (TrainId, LineSegmentId, NodeType);
 
 static DUMMY_NODE: LazyLock<WeftNode> = LazyLock::new(WeftNode::default);
@@ -25,7 +24,7 @@ impl NumberIssuer {
     }
 
     pub fn next(&mut self) -> NodeId {
-        let result = NodeId(self.current);
+        let result = NodeId::new(self.current);
         self.current += 1;
         result
     }

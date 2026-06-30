@@ -1,6 +1,4 @@
-use weaverail_model::model::time::Time;
-
-use crate::make_node_diff::WeftTempObj;
+use weaverail_model::{model::time::Time, result_weft::WeftTempObj};
 
 pub fn ripple_node_diff(tmp_obj: &WeftTempObj, sorted_node_index: &[usize]) -> Vec<Time> {
     let mut times = vec![Time::new(0, 0, 0); tmp_obj.nodes.len()];

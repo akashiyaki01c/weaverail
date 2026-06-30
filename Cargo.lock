@@ -4911,8 +4911,10 @@ version = "0.2.0"
 dependencies = [
  "base64 0.22.1",
  "ron",
+ "rustc-hash",
  "serde",
  "serde_json",
+ "smallvec",
  "strum",
  "thiserror 2.0.18",
  "ts-rs",

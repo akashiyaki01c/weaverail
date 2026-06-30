@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::{NodeId, WeftNode};
+use weaverail_model::result_weft::{NodeId, WeftNode};
 
 /// ノードを整列する関数
 /// 計算量は O(|V|+|E|)

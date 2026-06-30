@@ -6,11 +6,8 @@ use weaverail_model::{
         time::Time,
         timetable::TimetableId,
         train::{Train, TrainId},
-    },
-    result_weft::{ResultWeftTime, ResultWeftTrain, StopType},
+    }, result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftTempObj},
 };
-
-use crate::{NodeType, make_node_diff::WeftTempObj};
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
 pub struct LookupNodeKey(u64);

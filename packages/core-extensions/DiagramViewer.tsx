@@ -29,6 +29,7 @@ function DiagramViewer() {
     0,
     24 * 60 * 60,
   ]);
+  const waiting = useRef(false);
   useEffect(() => {
     (async () => {
       setSvg(
@@ -151,6 +152,10 @@ function DiagramViewer() {
     <>
       <div
         onScroll={(e) => {
+          if (waiting.current) return;
+
+          waiting.current = true;
+
           const toTimeString = (num: number) => {
             const hour = Math.floor(num / 60 / 60);
             const minute = Math.floor(num / 60) % 60;
@@ -166,6 +171,10 @@ function DiagramViewer() {
             startTime + (outerRect?.width || 0) / viewSettings.scale_x;
           console.log([toTimeString(startTime), toTimeString(endTime)]);
           setTimeRange([Math.floor(startTime), Math.ceil(endTime)]);
+
+          setTimeout(() => {
+            waiting.current = false;
+          }, 100);
         }}
         style={{ width: "100%", height: "100%", overflow: "scroll" }}
         ref={outerRef as any}

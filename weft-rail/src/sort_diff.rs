@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-use crate::make_node_diff::WeftTempObj;
+use weaverail_model::result_weft::WeftTempObj;
 
 pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
     let count = tmp_obj.nodes.len();

@@ -13,6 +13,7 @@ use weaverail_model::{
     },
     result_svg::ResultSvg,
     result_warp::ResultWarpCoords,
+    result_weft::WeftTempStore,
 };
 use weft_rail::{make_node_diff, ripple_diff::ripple_node_diff, sort_diff};
 
@@ -79,6 +80,7 @@ pub async fn redoable(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
 #[tauri::command]
 pub async fn get_svg(
     state: tauri::State<'_, Mutex<AppState>>,
+    result_svg: tauri::State<'_, Mutex<Option<WeftTempStore>>>,
     timetable_id: TimetableId,
     view_settings_id: DiagramViewSettingsId,
     settings: DiagramLogicalConvert,
@@ -87,6 +89,29 @@ pub async fn get_svg(
 ) -> Result<ResultSvg, CommandError> {
     let start = std::time::Instant::now();
     let root = &state.lock().expect("mutex lock error").command_manager.root;
+    let result_svg = &mut result_svg.lock().expect("mutex lock error");
+    if result_svg.is_some() {
+        let cached = result_svg.as_ref().unwrap();
+        if cached.version == root.version {
+            let coords = warp_coords(root, view_settings_id);
+            let result = warp_rail::get_svg(
+                root,
+                timetable_id,
+                &cached.nodes,
+                &cached.node_array,
+                &cached.times,
+                &coords,
+                settings,
+                start_time,
+                end_time,
+            );
+            let duration = start.elapsed();
+            println!("calc-svg (cached): {}us", duration.as_micros());
+
+            return Ok(result);
+        }
+    }
+
     let nodes = make_node_diff::make_node(root, timetable_id);
     let node_array = sort_diff::sort_node(&nodes);
     let times: Vec<Time> = ripple_node_diff(&nodes, &node_array);
@@ -103,6 +128,9 @@ pub async fn get_svg(
         start_time,
         end_time,
     );
+
+    **result_svg = Some(WeftTempStore { nodes, node_array, times, version: root.version });
+
     let duration = start.elapsed();
     println!("calc-svg: {}us", duration.as_micros());
 
