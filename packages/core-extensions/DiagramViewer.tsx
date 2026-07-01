@@ -42,19 +42,7 @@ function DiagramViewer() {
     24 * 60 * 60,
   ]);
   const waiting = useRef(false);
-  useEffect(() => {
-    (async () => {
-      setSvg(
-        await manager.api.data.getSvg(
-          timetableId,
-          diagramViewSettingsId,
-          viewSettings,
-          Math.max(0, timeRange[0] - 30 * 60),
-          Math.max(0, timeRange[1] + 30 * 60),
-        ),
-      );
-    })();
-  }, [timeRange]);
+  const [inited, setInited] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -77,8 +65,26 @@ function DiagramViewer() {
       const warp = await manager.api.data.getWarpCoords(diagramViewSettingsId);
       console.log("WARP: ", warp);
       setWarp(warp);
+      setInited(true);
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!inited) {
+        return;
+      }
+      setSvg(
+        await manager.api.data.getSvg(
+          timetableId,
+          diagramViewSettingsId,
+          viewSettings,
+          Math.max(0, timeRange[0] - 30 * 60),
+          Math.max(0, timeRange[1] + 30 * 60),
+        ),
+      );
+    })();
+  }, [timeRange]);
 
   const stationAxis = [];
   for (const key in warp) {
@@ -186,7 +192,7 @@ function DiagramViewer() {
 
           setTimeout(() => {
             waiting.current = false;
-          }, 100);
+          }, 50);
         }}
         style={{ width: "100%", height: "100%", overflow: "scroll" }}
         ref={outerRef as any}
