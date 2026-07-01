@@ -31,7 +31,7 @@ function DiagramViewer() {
     return max;
   }, [warp]);
 
-  const [viewSettings, setViewSettings] = useState({
+  const [viewSettings, _setViewSettings] = useState({
     scale_x: 0.125,
     scale_y: 0.2,
     offset_x: 0,
@@ -169,7 +169,7 @@ function DiagramViewer() {
   return (
     <>
       <div
-        onScroll={(e) => {
+        onScroll={() => {
           if (waiting.current) return;
 
           waiting.current = true;
