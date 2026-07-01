@@ -3,7 +3,7 @@ pub mod command;
 use std::sync::Mutex;
 
 use tauri::Manager;
-use weaverail_model::{app::AppState, result_svg::ResultSvg, result_weft::WeftTempStore};
+use weaverail_model::{app::AppState, result_weft::WeftTempStore};
 
 use crate::command::TauriEmitter;
 

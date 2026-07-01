@@ -8,16 +8,12 @@ pub mod time_result;
 pub mod time_result_diff;
 pub mod update_node;
 
-
-use std::collections::HashMap;
-
 use weaverail_model::{
-    model::{
-        DiagramRoot, time::Time, timetable::TimetableId, train::TrainId,
-    }, result_weft::{ResultWeftTrain, WeftNode, WeftTempObj},
+    model::{DiagramRoot, time::Time, timetable::TimetableId},
+    result_weft::{ResultWeftTrain, WeftNode, WeftTempObj},
 };
 
-use crate::{ time_result_diff::get_time_result_diff};
+use crate::time_result_diff::get_time_result_diff;
 
 pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
     let start = std::time::Instant::now();
@@ -51,7 +47,9 @@ fn weave_test() {
     use crate::time_result::get_time_result;
     use crate::update_node::UpdateType;
     use crate::update_node::update_node;
+    use std::collections::HashMap;
     use weaverail_model::model::train::Train;
+    use weaverail_model::model::train::TrainId;
 
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
     let timetable_id = test_data
@@ -121,7 +119,7 @@ fn weave_test() {
     update_node(&timetable, &mut nodes, change_type);
     let converted_nodes: Vec<&WeftNode> = get_node_by_nodeid(&nodes.0, &nodes.1);
     let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
-    let times: Vec<Time> = ripple_time(&node_array);
+    let _times: Vec<Time> = ripple_time(&node_array);
     let duration = start.elapsed();
     println!("update_node: {}us", duration.as_micros());
 
@@ -130,7 +128,6 @@ fn weave_test() {
 
 #[test]
 fn weave_test_diff() {
-
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
     let timetable_id = test_data
         .root
@@ -139,10 +136,10 @@ fn weave_test_diff() {
         .find(|_| true)
         .unwrap()
         .id;
-    let timetable = test_data.root.timetables.get(&timetable_id).unwrap();
+    let _timetable = test_data.root.timetables.get(&timetable_id).unwrap();
 
     let start = std::time::Instant::now();
-    let mut nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
+    let nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
     let duration = start.elapsed();
     println!("make_node: {}us", duration.as_micros());
 
@@ -159,7 +156,7 @@ fn weave_test_diff() {
     println!("{:?}", time);
 
     let start = std::time::Instant::now();
-    let result: Vec<ResultWeftTrain> =
+    let _result: Vec<ResultWeftTrain> =
         get_time_result_diff(&test_data.root, timetable_id, &nodes, &time);
     let duration = start.elapsed();
     println!("get_time: {}us", duration.as_micros());
@@ -169,6 +166,9 @@ fn weave_test_diff() {
 
 #[test]
 fn make_node_test() {
+    use std::collections::HashMap;
+    use weaverail_model::model::train::TrainId;
+
     // 前処理 開始
     let test_data = weaverail_model::test_data::diagram_root::get_test_data();
     let timetable_id = test_data
@@ -178,7 +178,7 @@ fn make_node_test() {
         .find(|_| true)
         .unwrap()
         .id;
-    let timetable = test_data.root.timetables.get(&timetable_id).unwrap();
+    let _timetable = test_data.root.timetables.get(&timetable_id).unwrap();
     // 前処理 終了
 
     let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) =

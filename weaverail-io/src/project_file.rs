@@ -78,6 +78,6 @@ fn write_read() {
     let data = read_file(&path);
     let duration = start.elapsed();
     println!("read_time: {}us", duration.as_micros());
-    let data = data.unwrap();
-    // println!("{:?}", data);
+    let _data = data.unwrap();
+    // println!("{:?}", _data);
 }

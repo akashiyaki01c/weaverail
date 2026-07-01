@@ -28,7 +28,7 @@ pub fn get_time_result_diff(
     diagram_root: &DiagramRoot,
     timetable_id: TimetableId,
     obj: &WeftTempObj,
-    times: &Vec<Time>,
+    times: &[Time],
 ) -> Vec<ResultWeftTrain> {
     let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = diagram_root

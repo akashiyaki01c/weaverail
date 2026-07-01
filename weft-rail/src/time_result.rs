@@ -6,11 +6,11 @@ use weaverail_model::{
 
 use crate::{ ResultWeftTrain, WeftNode};
 
-pub(crate) fn get_time_result(
+pub fn get_time_result(
     diagram_root: &DiagramRoot,
     timetable_id: TimetableId,
     nodes: Vec<&WeftNode>,
-    times: &Vec<Time>,
+    times: &[Time],
 ) -> Vec<ResultWeftTrain> {
     let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = diagram_root
