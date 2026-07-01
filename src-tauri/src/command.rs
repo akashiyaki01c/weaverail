@@ -129,7 +129,12 @@ pub async fn get_svg(
         end_time,
     );
 
-    **result_svg = Some(WeftTempStore { nodes, node_array, times, version: root.version });
+    **result_svg = Some(WeftTempStore {
+        nodes,
+        node_array,
+        times,
+        version: root.version,
+    });
 
     let duration = start.elapsed();
     println!("calc-svg: {}us", duration.as_micros());

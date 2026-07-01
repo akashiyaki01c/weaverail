@@ -6,7 +6,8 @@ use weaverail_model::{
         time::Time,
         timetable::TimetableId,
         train::{Train, TrainId},
-    }, result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftTempObj},
+    },
+    result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftTempObj},
 };
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
@@ -38,8 +39,7 @@ pub fn get_time_result_diff(
         .collect();
     let mut result = Vec::with_capacity(trains.len());
 
-    let mut node_map =
-        FxHashMap::with_capacity_and_hasher(obj.nodes.len(), FxBuildHasher);
+    let mut node_map = FxHashMap::with_capacity_and_hasher(obj.nodes.len(), FxBuildHasher);
     for node in &obj.nodes {
         node_map.insert(
             LookupNodeKey::new(node.train_id, node.station_id, node.node_type),

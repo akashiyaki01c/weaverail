@@ -1,15 +1,18 @@
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
-use weaverail_model::{model::{
-    DiagramRoot,
-    line_segment::LineSegmentId,
-    station::StationId,
-    template_train::StopType as TemplateTrainStopType,
-    time::Time,
-    timetable::{Timetable, TimetableId},
-    train::{Train, TrainId},
-}, result_weft::{LookupNodeKey, NodeId, NodeType, WeftNode, WeftTempObj}};
 use weaverail_model::result_weft::StopType;
+use weaverail_model::{
+    model::{
+        DiagramRoot,
+        line_segment::LineSegmentId,
+        station::StationId,
+        template_train::StopType as TemplateTrainStopType,
+        time::Time,
+        timetable::{Timetable, TimetableId},
+        train::{Train, TrainId},
+    },
+    result_weft::{LookupNodeKey, NodeId, NodeType, WeftNode, WeftTempObj},
+};
 
 struct NumberIssuer {
     current: usize,

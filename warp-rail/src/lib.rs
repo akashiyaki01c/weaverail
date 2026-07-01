@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::fmt::Write;
 
 use weaverail_model::{
-    diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord}, model::{
+    diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord},
+    model::{
         DiagramRoot,
         diagram_view_settings::{DiagramViewSegment, DiagramViewSettingsId},
         line_segment::LineSegmentId,
@@ -10,7 +11,10 @@ use weaverail_model::{
         time::Time,
         timetable::TimetableId,
         train::TrainId,
-    }, result_svg::{ResultSvg, ResultSvgTrain}, result_warp::ResultWarpCoords, result_weft::WeftTempObj,
+    },
+    result_svg::{ResultSvg, ResultSvgTrain},
+    result_warp::ResultWarpCoords,
+    result_weft::WeftTempObj,
 };
 
 const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);

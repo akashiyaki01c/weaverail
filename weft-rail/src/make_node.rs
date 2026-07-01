@@ -1,15 +1,18 @@
 use std::{collections::HashMap, sync::LazyLock};
 
 use smallvec::SmallVec;
-use weaverail_model::{model::{
-    DiagramRoot,
-    line_segment::LineSegmentId,
-    station::StationId,
-    template_train::StopType as TemplateTrainStopType,
-    time::Time,
-    timetable::{Timetable, TimetableId},
-    train::{Train, TrainId},
-}, result_weft::{NodeId, NodeType, StopType, WeftNode}};
+use weaverail_model::{
+    model::{
+        DiagramRoot,
+        line_segment::LineSegmentId,
+        station::StationId,
+        template_train::StopType as TemplateTrainStopType,
+        time::Time,
+        timetable::{Timetable, TimetableId},
+        train::{Train, TrainId},
+    },
+    result_weft::{NodeId, NodeType, StopType, WeftNode},
+};
 
 type NodeKey = (TrainId, LineSegmentId, NodeType);
 

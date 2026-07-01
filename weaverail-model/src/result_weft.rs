@@ -70,8 +70,7 @@ pub struct WeftTempObj {
     pub lookup: FxHashMap<LookupNodeKey, usize>,
 }
 
-#[derive(Clone, PartialEq, Debug, Default)]
-#[derive(Eq, Hash, Copy)]
+#[derive(Clone, PartialEq, Debug, Default, Eq, Hash, Copy)]
 pub struct LookupNodeKey(u64);
 impl LookupNodeKey {
     pub fn new(train_id: TrainId, segment_id: LineSegmentId, node_type: NodeType) -> Self {

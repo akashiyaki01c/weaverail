@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
-use weaverail_model::{model::{
-    line_segment::LineSegmentId, time::Time, timetable::Timetable, train::TrainId,
-}, result_weft::NodeType};
+use weaverail_model::{
+    model::{line_segment::LineSegmentId, time::Time, timetable::Timetable, train::TrainId},
+    result_weft::NodeType,
+};
 
-use crate::{ WeftNode};
+use crate::WeftNode;
 
 pub fn update_node(
     timetable: &Timetable,
