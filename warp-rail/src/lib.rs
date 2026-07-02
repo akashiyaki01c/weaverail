@@ -14,7 +14,7 @@ use weaverail_model::{
     },
     result_svg::{ResultSvg, ResultSvgTrain},
     result_warp::ResultWarpCoords,
-    result_weft::WeftTempObj,
+    result_weft::{NodeType, StopType, WeftTempObj},
 };
 
 const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);
@@ -70,19 +70,15 @@ fn get_coord(
     let segment = root.segments.get(&segment_id).unwrap();
     let coord = coords.get(&segment_id).unwrap();
 
+    let mut result = false;
     if segment.start_station(root).unwrap().id == station_id {
-        if coord.is_reversed {
-            coord.lower_y
-        } else {
-            coord.upper_y
-        }
-    } else {
-        if coord.is_reversed {
-            coord.upper_y
-        } else {
-            coord.lower_y
-        }
+        result = !result;
     }
+    if coord.is_reversed {
+        result = !result;
+    }
+
+    if result { coord.upper_y } else { coord.lower_y }
 }
 
 pub fn get_svg(
@@ -117,6 +113,7 @@ pub fn get_svg(
 
             let mut path = String::with_capacity(node_indexes.len() * 32);
 
+            // 前駅発車時刻〜次駅到着時刻、現在駅到着時刻〜現在駅発車時刻の対
             for window in node_indexes.windows(2) {
                 let (bi, ci) = (window[0], window[1]);
                 let (before_node, before_time): (&_, _) = (&obj.nodes[bi], times[bi]);
@@ -157,6 +154,11 @@ pub fn get_svg(
                         "M {},{} L {},{}",
                         before_coord.x, before_coord.y, current_coord.x, current_coord.y
                     );
+                } else if before_node.node_type == NodeType::Arrival
+                    && current_node.node_type == NodeType::Departure
+                    && before_y != current_y
+                {
+                    let _ = write!(path, " M {},{}", current_coord.x, current_coord.y);
                 } else {
                     let _ = write!(path, " L {},{}", current_coord.x, current_coord.y);
                 }
