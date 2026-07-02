@@ -170,18 +170,39 @@ fn connect_hatsuhatsu_edge(
     node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
-        for train_ids in orders.order.windows(2) {
+        for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
 
             let current_node_id = *node_lookup
-                .get(&(current_tid, orders.segment_id, NodeType::Departure))
+                .get(&(current_tid, orders.0.segment_id, NodeType::Departure))
                 .unwrap();
 
             let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
 
             let before_node_id = *node_lookup
-                .get(&(before_tid, orders.segment_id, NodeType::Departure))
+                .get(&(before_tid, orders.0.segment_id, NodeType::Departure))
+                .unwrap();
+
+            if let Some(node) = before_train_nodes
+                .iter_mut()
+                .find(|n| n.node_id == before_node_id)
+            {
+                node.edges.push((current_node_id, Time::new(0, 2, 0)));
+            }
+        }
+         for train_ids in orders.1.order.windows(2) {
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
+
+            let current_node_id = *node_lookup
+                .get(&(current_tid, orders.1.segment_id, NodeType::Departure))
+                .unwrap();
+
+            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+
+            let before_node_id = *node_lookup
+                .get(&(before_tid, orders.1.segment_id, NodeType::Departure))
                 .unwrap();
 
             if let Some(node) = before_train_nodes
@@ -201,18 +222,39 @@ fn connect_chakuchaku_edge(
     node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
-        for train_ids in orders.order.windows(2) {
+        for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
 
             let current_node_id = *node_lookup
-                .get(&(current_tid, orders.segment_id, NodeType::Arrival))
+                .get(&(current_tid, orders.0.segment_id, NodeType::Arrival))
                 .unwrap();
 
             let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
 
             let before_node_id = *node_lookup
-                .get(&(before_tid, orders.segment_id, NodeType::Arrival))
+                .get(&(before_tid, orders.0.segment_id, NodeType::Arrival))
+                .unwrap();
+
+            if let Some(node) = before_train_nodes
+                .iter_mut()
+                .find(|n| n.node_id == before_node_id)
+            {
+                node.edges.push((current_node_id, Time::new(0, 2, 0)));
+            }
+        }
+        for train_ids in orders.1.order.windows(2) {
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
+
+            let current_node_id = *node_lookup
+                .get(&(current_tid, orders.1.segment_id, NodeType::Arrival))
+                .unwrap();
+
+            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+
+            let before_node_id = *node_lookup
+                .get(&(before_tid, orders.1.segment_id, NodeType::Arrival))
                 .unwrap();
 
             if let Some(node) = before_train_nodes

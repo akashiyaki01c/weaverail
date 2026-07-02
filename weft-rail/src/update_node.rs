@@ -17,11 +17,17 @@ pub fn update_node(
             // no-op
         }
         UpdateType::ChangeTrainOrder(change_orders) => {
-            for (change_segment_id, before_train_id, current_train_id) in change_orders {
+            for (is_reversed, change_segment_id, before_train_id, current_train_id) in change_orders
+            {
                 let change_segment = timetable
                     .segment_train_orders
                     .get(&change_segment_id)
                     .unwrap();
+                let change_segment = if is_reversed {
+                    &change_segment.1
+                } else {
+                    &change_segment.0
+                };
                 let before_train_index = change_segment
                     .order
                     .iter()
@@ -162,5 +168,5 @@ pub enum UpdateType {
     /// 始発駅の時刻変更
     ChangeStartStationDepartureTime(TrainId, Time),
     /// 列車の順序変更
-    ChangeTrainOrder(Vec<(LineSegmentId, TrainId, TrainId)>),
+    ChangeTrainOrder(Vec<(bool, LineSegmentId, TrainId, TrainId)>),
 }

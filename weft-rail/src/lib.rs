@@ -111,7 +111,7 @@ fn weave_test() {
             let start = v[0];
             let end = v[1];
             let segment = *&test_data.root.find_segment_by_name(start, end).segment_id;
-            (segment, trains[1].id, trains[3].id)
+            (false, segment, trains[1].id, trains[3].id)
         })
         .collect(),
     );

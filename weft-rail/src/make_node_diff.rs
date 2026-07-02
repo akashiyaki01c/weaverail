@@ -151,14 +151,14 @@ fn add_train_node(
 
 fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
     for orders in timetable.segment_train_orders.values() {
-        for train_ids in orders.order.windows(2) {
+        for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.segment_id,
+                    orders.0.segment_id,
                     NodeType::Departure,
                 ))
                 .unwrap();
@@ -166,7 +166,31 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.segment_id,
+                    orders.0.segment_id,
+                    NodeType::Departure,
+                ))
+                .unwrap();
+            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+            tmp_obj.nodes[before_node_index]
+                .edges
+                .push((current_node_id, Time::new(0, 2, 0)));
+        }
+        for train_ids in orders.1.order.windows(2) {
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
+            let before_node_index = *tmp_obj
+                .lookup
+                .get(&LookupNodeKey::new(
+                    before_tid,
+                    orders.1.segment_id,
+                    NodeType::Departure,
+                ))
+                .unwrap();
+            let current_node_index = *tmp_obj
+                .lookup
+                .get(&LookupNodeKey::new(
+                    current_tid,
+                    orders.1.segment_id,
                     NodeType::Departure,
                 ))
                 .unwrap();
@@ -180,14 +204,14 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
 
 fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
     for orders in timetable.segment_train_orders.values() {
-        for train_ids in orders.order.windows(2) {
+        for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.segment_id,
+                    orders.0.segment_id,
                     NodeType::Arrival,
                 ))
                 .unwrap();
@@ -195,7 +219,31 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.segment_id,
+                    orders.0.segment_id,
+                    NodeType::Arrival,
+                ))
+                .unwrap();
+            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+            tmp_obj.nodes[before_node_index]
+                .edges
+                .push((current_node_id, Time::new(0, 2, 0)));
+        }
+        for train_ids in orders.1.order.windows(2) {
+            let before_tid = train_ids[0];
+            let current_tid = train_ids[1];
+            let before_node_index = *tmp_obj
+                .lookup
+                .get(&LookupNodeKey::new(
+                    before_tid,
+                    orders.1.segment_id,
+                    NodeType::Arrival,
+                ))
+                .unwrap();
+            let current_node_index = *tmp_obj
+                .lookup
+                .get(&LookupNodeKey::new(
+                    current_tid,
+                    orders.1.segment_id,
                     NodeType::Arrival,
                 ))
                 .unwrap();

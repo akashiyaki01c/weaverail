@@ -208,7 +208,7 @@ function DiagramViewer() {
           </div>
           <div style={{ marginLeft: "100px" }}>
             <svg
-              width={24 * 60 * 60}
+              width={24 * 60 * 60 * viewSettings.scale_x}
               height={maxY * viewSettings.scale_y}
               ref={svgRef as any}
             >
