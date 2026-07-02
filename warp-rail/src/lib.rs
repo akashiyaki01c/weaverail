@@ -14,7 +14,7 @@ use weaverail_model::{
     },
     result_svg::{ResultSvg, ResultSvgTrain},
     result_warp::ResultWarpCoords,
-    result_weft::{NodeType, StopType, WeftTempObj},
+    result_weft::{NodeType, WeftTempObj},
 };
 
 const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);
