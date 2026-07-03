@@ -1,19 +1,12 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use tauri::{AppHandle, Emitter};
-use warp_rail::warp_coords;
+use warp_rail::{warp_coords, warp_stations};
 use weaverail_model::{
-    app::AppState,
-    command::{CommandError, EventEmitter},
-    diagram_logical_coord::DiagramLogicalConvert,
-    event::EmitEventType,
-    model::{
+    app::AppState, command::{CommandError, EventEmitter}, diagram_logical_coord::DiagramLogicalConvert, event::EmitEventType, model::{
         diagram_view_settings::DiagramViewSettingsId, line_segment::LineSegmentId, time::Time,
         timetable::TimetableId,
-    },
-    result_svg::ResultSvg,
-    result_warp::ResultWarpCoords,
-    result_weft::WeftTempStore,
+    }, result_svg::ResultSvg, result_warp::{ResultWarpCoords, ResultWarpStations}, result_weft::WeftTempStore,
 };
 use weft_rail::{make_node_diff, ripple_diff::ripple_node_diff, sort_diff};
 
@@ -148,6 +141,18 @@ pub async fn get_warp_coords(
     view_settings_id: DiagramViewSettingsId,
 ) -> Result<HashMap<LineSegmentId, ResultWarpCoords>, CommandError> {
     let coords = warp_coords(
+        &state.lock().expect("mutex lock error").command_manager.root,
+        view_settings_id,
+    );
+    Ok(coords)
+}
+
+#[tauri::command]
+pub async fn get_warp_stations(
+    state: tauri::State<'_, Mutex<AppState>>,
+    view_settings_id: DiagramViewSettingsId,
+) -> Result<Vec<ResultWarpStations>, CommandError> {
+    let coords = warp_stations(
         &state.lock().expect("mutex lock error").command_manager.root,
         view_settings_id,
     );

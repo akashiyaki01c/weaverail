@@ -13,7 +13,7 @@ use weaverail_model::{
         train::TrainId,
     },
     result_svg::{ResultSvg, ResultSvgTrain},
-    result_warp::ResultWarpCoords,
+    result_warp::{ResultWarpCoords, ResultWarpStations},
     result_weft::{NodeType, WeftTempObj},
 };
 
@@ -58,6 +58,47 @@ pub fn warp_coords(
             }
         }
     }
+    result
+}
+
+/// 駅座標情報を求める関数
+pub fn warp_stations(
+    root: &DiagramRoot,
+    settings_id: DiagramViewSettingsId,
+) -> Vec<ResultWarpStations> {
+    let warp = warp_coords(root, settings_id);
+    let mut result: Vec<ResultWarpStations> = vec![];
+
+    for coord in warp.values() {
+        let segment = root.segments.get(&coord.segment_id).expect("");
+
+        let start_sta = if coord.is_reversed {
+            segment.end_station(root).unwrap()
+        } else {
+            segment.start_station(root).unwrap()
+        };
+        if !result.iter().any(|v| v.y_coord == coord.upper_y) {
+            result.push(ResultWarpStations {
+                y_coord: coord.upper_y,
+                station_id: start_sta.id,
+                name: start_sta.name.to_string(),
+            });
+        }
+
+        let end_sta = if coord.is_reversed {
+            segment.start_station(root).unwrap()
+        } else {
+            segment.end_station(root).unwrap()
+        };
+        if !result.iter().any(|v| v.y_coord == coord.lower_y) {
+            result.push(ResultWarpStations {
+                y_coord: coord.lower_y,
+                station_id: end_sta.id,
+                name: end_sta.name.to_string(),
+            });
+        }
+    }
+
     result
 }
 

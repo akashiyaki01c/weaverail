@@ -2,7 +2,7 @@ import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LineSegmentId, ResultSvg } from "@weaverail/types";
+import { LineSegmentId, ResultSvg, StationId } from "@weaverail/types";
 
 function DiagramViewer() {
   const { manager } = useExtensionManager();
@@ -19,6 +19,13 @@ function DiagramViewer() {
       is_reversed: boolean;
     };
   }>();
+  const [warpSta, setWarpSta] = useState<
+    {
+      y_coord: number;
+      station_id: StationId;
+      name: string;
+    }[]
+  >();
   const maxY = useMemo(() => {
     let max = 0;
     for (const key in warp) {
@@ -65,6 +72,12 @@ function DiagramViewer() {
       const warp = await manager.api.data.getWarpCoords(diagramViewSettingsId);
       console.log("WARP: ", warp);
       setWarp(warp);
+
+      const warpSta = await manager.api.data.getWarpStations(
+        diagramViewSettingsId,
+      );
+      console.log("WARP_STA: ", warpSta);
+      setWarpSta(warpSta);
       setInited(true);
     })();
   }, []);
@@ -203,8 +216,24 @@ function DiagramViewer() {
               width: "100px",
               height: `${maxY * viewSettings.scale_y}px`,
               position: "fixed",
+              background: "rgb(255 255 255 / 0.8)"
             }}
           >
+            {warpSta?.map((v) => (
+              <div
+                key={v.station_id}
+                style={{
+                  width: "100px",
+                  height: "1em",
+                  lineHeight: "1",
+                  textAlign: "center",
+                  position: "absolute",
+                  top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.5em)`
+                }}
+              >
+                {v.name}
+              </div>
+            ))}
           </div>
           <div style={{ marginLeft: "100px" }}>
             <svg

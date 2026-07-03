@@ -19,6 +19,11 @@ export interface WeaverailDataApi {
 		segment_id: LineSegmentId,
 		is_reversed: boolean,
 	} }>;
+	getWarpStations(viewSettingsId: DiagramViewSettingsId): Promise<{
+		y_coord: number;
+		station_id: StationId;
+		name: string;
+	}[]>;
 	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
 }
 
@@ -76,6 +81,14 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 		is_reversed: boolean;
 	}; }> {
 		return await invoke("get_warp_coords", { viewSettingsId });
+	}
+
+	async getWarpStations(viewSettingsId: DiagramViewSettingsId): Promise<{
+		y_coord: number;
+		station_id: StationId;
+		name: string;
+	}[]> {
+		return await invoke("get_warp_stations", { viewSettingsId });
 	}
 
 	constructor() {

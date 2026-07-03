@@ -37,6 +37,7 @@ pub fn run() {
             crate::command::undoable,
             crate::command::get_svg,
             crate::command::get_warp_coords,
+            crate::command::get_warp_stations,
             crate::command::station::new_station_id,
             crate::command::station::new_track_id,
             crate::command::station::add_station,
