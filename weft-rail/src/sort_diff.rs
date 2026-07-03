@@ -1,7 +1,16 @@
+//! # sort_diff
+//! 
+//! Kahn (1962) のトポロジカルソートを使用し、有向グラフを一次元に整列するモジュール (最適化済)
+//! 
+//! 閉路を検出した場合panicを起こす
+
 use std::collections::VecDeque;
 
 use weaverail_model::result_weft::WeftTempObj;
 
+/// ノードを整列する関数
+/// 計算量は O(|V|+|E|)
+/// アルゴリズムは Kahn (1962) のトポロジカルソートを使用
 pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
     let count = tmp_obj.nodes.len();
     let mut num_input: Vec<usize> = vec![0; count];

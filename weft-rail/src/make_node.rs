@@ -1,3 +1,9 @@
+//! # make_node
+//!
+//! 列車時刻ノードを生成し、有向グラフを構築するモジュール
+//! 
+//! グラフのデータ定義は、`weverail_model::result_weft`モジュールにある
+
 use std::{collections::HashMap, sync::LazyLock};
 
 use smallvec::SmallVec;
@@ -16,9 +22,12 @@ use weaverail_model::{
 
 type NodeKey = (TrainId, LineSegmentId, NodeType);
 
+/// NULL値を表す
 static DUMMY_NODE: LazyLock<WeftNode> = LazyLock::new(WeftNode::default);
 
+/// 一意のIDを生成する簡易的な構造体
 struct NumberIssuer {
+    /// 現在発行済の最大番号
     current: usize,
 }
 impl NumberIssuer {
@@ -33,7 +42,7 @@ impl NumberIssuer {
     }
 }
 
-/// ノードを生成する関数
+/// 有向グラフのノードを生成する関数
 pub fn make_node(
     root: &DiagramRoot,
     timetable_id: TimetableId,
@@ -79,14 +88,18 @@ pub fn make_node(
     (root_node, result)
 }
 
+/// NodeIdからノードを取得する関数
+/// 計算オーダは `O(nodes.count)`
 pub fn get_node_by_nodeid<'a>(
     root_node: &'a WeftNode,
     nodes: &'a HashMap<TrainId, Vec<WeftNode>>,
 ) -> Vec<&'a WeftNode> {
-    let len = nodes.values().flatten().count();
-    let mut result: Vec<&WeftNode> = vec![&DUMMY_NODE; len + 1];
+    let len = nodes.values().flatten().count(); // O(N)
+    let mut result: Vec<&WeftNode> = vec![&DUMMY_NODE; len + 1]; // O(N)
+
     for node in nodes.values().flatten() {
-        result[node.node_id.0] = node;
+        // O(N)
+        result[node.node_id.0] = node; // O(1)
     }
     result[root_node.node_id.0] = root_node;
 
@@ -94,6 +107,7 @@ pub fn get_node_by_nodeid<'a>(
 }
 
 /// 1つの列車時刻のノードを生成する関数
+/// 計算オーダは `O(segment.length)`
 fn make_train_node(
     diagram_root: &DiagramRoot,
     train: &Train,
@@ -164,12 +178,14 @@ fn make_train_node(
 }
 
 /// 発発時隔エッジを追加する関数
+/// 計算オーダは `O(segment_train_orders.length * train-time-node.length)`
 fn connect_hatsuhatsu_edge(
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
     node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
+        // 順行列車
         for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
@@ -191,7 +207,8 @@ fn connect_hatsuhatsu_edge(
                 node.edges.push((current_node_id, Time::new(0, 2, 0)));
             }
         }
-         for train_ids in orders.1.order.windows(2) {
+        // 逆行列車
+        for train_ids in orders.1.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
 
@@ -216,12 +233,14 @@ fn connect_hatsuhatsu_edge(
 }
 
 /// 着着時隔エッジを追加する関数
+/// 計算オーダは `O(segment_train_orders.length * train-time-node.length)`
 fn connect_chakuchaku_edge(
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
     node_lookup: &HashMap<NodeKey, NodeId>,
 ) {
     for orders in timetable.segment_train_orders.values() {
+        // 順行列車
         for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
@@ -243,6 +262,7 @@ fn connect_chakuchaku_edge(
                 node.edges.push((current_node_id, Time::new(0, 2, 0)));
             }
         }
+        // 逆行列車
         for train_ids in orders.1.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];

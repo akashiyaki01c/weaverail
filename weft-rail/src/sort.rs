@@ -1,3 +1,9 @@
+//! # sort
+//! 
+//! Kahn (1962) のトポロジカルソートを使用し、有向グラフを一次元に整列するモジュール
+//! 
+//! 閉路を検出した場合panicを起こす
+
 use std::collections::VecDeque;
 
 use weaverail_model::result_weft::{NodeId, WeftNode};

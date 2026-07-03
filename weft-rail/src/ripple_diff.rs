@@ -1,5 +1,10 @@
+//! `ripple` 列車時刻ノードの実際の時刻を計算するモジュール
+//! 
+//! 有向非巡回グラフ上の最長経路問題としてグラフを解くアルゴリズムを採用している
+
 use weaverail_model::{model::time::Time, result_weft::WeftTempObj};
 
+/// 列車時刻ノードの実際の時刻を関数
 pub fn ripple_node_diff(tmp_obj: &WeftTempObj, sorted_node_index: &[usize]) -> Vec<Time> {
     let mut times = vec![Time::new(0, 0, 0); tmp_obj.nodes.len()];
 

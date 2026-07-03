@@ -1,3 +1,9 @@
+//! # make_node_diff
+//!
+//! 列車時刻ノードを生成し、有向グラフを構築するモジュール(`make_node`モジュールよりも最適化を行っている)
+//! 
+//! グラフのデータ定義は、`weverail_model::result_weft`モジュールにある
+
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use weaverail_model::result_weft::StopType;
@@ -14,7 +20,9 @@ use weaverail_model::{
     result_weft::{LookupNodeKey, NodeId, NodeType, WeftNode, WeftTempObj},
 };
 
+/// 一意のIDを生成する簡易的な構造体
 struct NumberIssuer {
+    /// 現在発行済の最大番号
     current: usize,
 }
 impl NumberIssuer {
@@ -29,6 +37,7 @@ impl NumberIssuer {
     }
 }
 
+/// 有向グラフのノードを生成する関数 (最適化済)
 pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
@@ -149,8 +158,10 @@ fn add_train_node(
     }
 }
 
+/// 発発時隔エッジを追加する関数
 fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
     for orders in timetable.segment_train_orders.values() {
+        // 順行列車
         for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
@@ -175,6 +186,7 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
+        // 逆行列車
         for train_ids in orders.1.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
@@ -202,8 +214,10 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
     }
 }
 
+/// 着着時隔エッジを追加する関数
 fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
     for orders in timetable.segment_train_orders.values() {
+        // 順行列車
         for train_ids in orders.0.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
@@ -228,6 +242,7 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
+        // 逆行列車
         for train_ids in orders.1.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
