@@ -210,13 +210,52 @@ function DiagramViewer() {
         style={{ width: "100%", height: "100%", overflow: "scroll" }}
         ref={outerRef as any}
       >
-        <div style={{ display: "flex" }}>
+        <div
+          style={{
+            position: "sticky",
+            top: 0,
+            height: "50px",
+            marginLeft: "100px",
+            width: `${24 * 60 * 60 * viewSettings.scale_x}px`,
+            background: "rgb(255 255 255 / 0.75)",
+            backdropFilter: "blur(2.5px)",
+          }}
+        >
+          {[...Array(24)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100px",
+                height: "50px",
+                lineHeight: "1",
+                position: "absolute",
+                fontSize: "2em",
+                left: `calc(${i * 60 * 60 * viewSettings.scale_x}px - 50px)`,
+              }}
+            >
+              <div>{i}</div>
+            </div>
+          ))}
+        </div>
+        <div
+          style={{
+            width: `${24 * 60 * 60 * viewSettings.scale_x}px`,
+            display: "flex",
+            alignItems: "flex-start",
+            position: "relative"
+          }}
+        >
           <div
             style={{
               width: "100px",
               height: `${maxY * viewSettings.scale_y}px`,
-              position: "fixed",
-              background: "rgb(255 255 255 / 0.8)"
+              position: "sticky",
+              left: "0",
+              background: "rgb(255 255 255 / 0.75)",
+              backdropFilter: "blur(2.5px)",
             }}
           >
             {warpSta?.map((v) => (
@@ -228,7 +267,7 @@ function DiagramViewer() {
                   lineHeight: "1",
                   textAlign: "center",
                   position: "absolute",
-                  top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.5em)`
+                  top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.5em)`,
                 }}
               >
                 {v.name}
