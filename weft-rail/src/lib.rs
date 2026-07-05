@@ -38,7 +38,7 @@ pub fn weave(
     println!("make_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let node_array: Vec<usize> = sort_diff::sort_node(&nodes);
+    let node_array: Vec<usize> = sort_diff::sort_node(&nodes)?;
     let duration = start.elapsed();
     println!("sort_node: {}us", duration.as_micros());
 
@@ -89,7 +89,7 @@ fn weave_test() {
     println!("get_node_by_nodeid: {}ms", duration.as_millis());
 
     let start = std::time::Instant::now();
-    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
+    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes).unwrap();
     let duration = start.elapsed();
     println!("sort_node: {}ms", duration.as_millis());
 
@@ -136,9 +136,9 @@ fn weave_test() {
         .collect(),
     );
     let start = std::time::Instant::now();
-    update_node(&timetable, &mut nodes, change_type);
+    update_node(&timetable, &mut nodes, change_type).unwrap();
     let converted_nodes: Vec<&WeftNode> = get_node_by_nodeid(&nodes.0, &nodes.1);
-    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes);
+    let node_array: Vec<&WeftNode> = sort_node(&converted_nodes).unwrap();
     let _times: Vec<Time> = ripple_time(&node_array);
     let duration = start.elapsed();
     println!("update_node: {}us", duration.as_micros());
@@ -164,7 +164,7 @@ fn weave_test_diff() {
     println!("make_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let node_array: Vec<usize> = sort_diff::sort_node(&nodes);
+    let node_array: Vec<usize> = sort_diff::sort_node(&nodes).unwrap();
     let duration = start.elapsed();
     println!("sort_node: {}us", duration.as_micros());
 
@@ -204,10 +204,10 @@ fn make_node_test() {
     let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) =
         make_node::make_node(&test_data.root, timetable_id).unwrap();
     let converted_nodes: Vec<&WeftNode> = make_node::get_node_by_nodeid(&nodes.0, &nodes.1);
-    let node_array: Vec<&WeftNode> = sort::sort_node(&converted_nodes);
+    let node_array: Vec<&WeftNode> = sort::sort_node(&converted_nodes).unwrap();
 
     let diff_nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id).unwrap();
-    let diff_node_array: Vec<usize> = sort_diff::sort_node(&diff_nodes);
+    let diff_node_array: Vec<usize> = sort_diff::sort_node(&diff_nodes).unwrap();
 
     assert!(node_array.len() == diff_node_array.len());
 

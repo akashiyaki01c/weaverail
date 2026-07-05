@@ -41,7 +41,10 @@ impl NumberIssuer {
 /// 有向グラフのノードを生成する関数 (最適化済)
 pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Result<WeftTempObj, ModelError> {
     let mut number_issuer = NumberIssuer::new();
-    let timetable = root.timetables.get(&timetable_id).unwrap();
+    let timetable = root
+        .timetables
+        .get(&timetable_id)
+        .ok_or(ModelError::ObjectNotFound)?;
     let trains: Vec<&Train> = root
         .trains
         .values()
@@ -80,8 +83,8 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Result<WeftTe
             i,
         );
     }
-    connect_hatsuhatsu_edge(timetable, &mut result);
-    connect_chakuchaku_edge(timetable, &mut result);
+    connect_hatsuhatsu_edge(timetable, &mut result)?;
+    connect_chakuchaku_edge(timetable, &mut result)?;
 
     Ok(result)
 }
@@ -94,7 +97,11 @@ fn add_train_node(
     tmp_obj: &mut WeftTempObj,
 ) -> Result<(), ModelError> {
     let mut before_node_index: usize = 0;
-    let root_node_id: NodeId = tmp_obj.nodes.get(before_node_index).unwrap().node_id;
+    let root_node_id: NodeId = tmp_obj
+        .nodes
+        .get(before_node_index)
+        .ok_or(ModelError::ObjectNotFound)?
+        .node_id;
 
     for template_segment in &train.template_segments {
         let template_train = diagram_root
@@ -119,7 +126,13 @@ fn add_train_node(
             };
             match start.stop_time {
                 weaverail_model::model::template_train::StopType::Stop(time) => {
-                    if tmp_obj.nodes.get(before_node_index).unwrap().node_id == root_node_id {
+                    if tmp_obj
+                        .nodes
+                        .get(before_node_index)
+                        .ok_or(ModelError::ObjectNotFound)?
+                        .node_id
+                        == root_node_id
+                    {
                         tmp_obj.nodes[before_node_index]
                             .edges
                             .push((departure_node.node_id, train.start_departure_time))
@@ -162,7 +175,10 @@ fn add_train_node(
 }
 
 /// 発発時隔エッジを追加する関数
-fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
+fn connect_hatsuhatsu_edge(
+    timetable: &Timetable,
+    tmp_obj: &mut WeftTempObj,
+) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
         for train_ids in orders.0.order.windows(2) {
@@ -175,7 +191,7 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.0.segment_id,
                     NodeType::Departure,
                 ))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
             let current_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
@@ -183,8 +199,12 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.0.segment_id,
                     NodeType::Departure,
                 ))
-                .unwrap();
-            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+                .ok_or(ModelError::ObjectNotFound)?;
+            let current_node_id = tmp_obj
+                .nodes
+                .get(current_node_index)
+                .ok_or(ModelError::ObjectNotFound)?
+                .node_id;
             tmp_obj.nodes[before_node_index]
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
@@ -200,7 +220,7 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.1.segment_id,
                     NodeType::Departure,
                 ))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
             let current_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
@@ -208,17 +228,26 @@ fn connect_hatsuhatsu_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.1.segment_id,
                     NodeType::Departure,
                 ))
-                .unwrap();
-            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+                .ok_or(ModelError::ObjectNotFound)?;
+            let current_node_id = tmp_obj
+                .nodes
+                .get(current_node_index)
+                .ok_or(ModelError::ObjectNotFound)?
+                .node_id;
             tmp_obj.nodes[before_node_index]
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
     }
+
+    Ok(())
 }
 
 /// 着着時隔エッジを追加する関数
-fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
+fn connect_chakuchaku_edge(
+    timetable: &Timetable,
+    tmp_obj: &mut WeftTempObj,
+) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
         for train_ids in orders.0.order.windows(2) {
@@ -231,7 +260,7 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.0.segment_id,
                     NodeType::Arrival,
                 ))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
             let current_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
@@ -239,8 +268,12 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.0.segment_id,
                     NodeType::Arrival,
                 ))
-                .unwrap();
-            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+                .ok_or(ModelError::ObjectNotFound)?;
+            let current_node_id = tmp_obj
+                .nodes
+                .get(current_node_index)
+                .ok_or(ModelError::ObjectNotFound)?
+                .node_id;
             tmp_obj.nodes[before_node_index]
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
@@ -256,7 +289,7 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.1.segment_id,
                     NodeType::Arrival,
                 ))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
             let current_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
@@ -264,11 +297,17 @@ fn connect_chakuchaku_edge(timetable: &Timetable, tmp_obj: &mut WeftTempObj) {
                     orders.1.segment_id,
                     NodeType::Arrival,
                 ))
-                .unwrap();
-            let current_node_id = tmp_obj.nodes.get(current_node_index).unwrap().node_id;
+                .ok_or(ModelError::ObjectNotFound)?;
+            let current_node_id = tmp_obj
+                .nodes
+                .get(current_node_index)
+                .ok_or(ModelError::ObjectNotFound)?
+                .node_id;
             tmp_obj.nodes[before_node_index]
                 .edges
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
     }
+
+    Ok(())
 }

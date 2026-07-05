@@ -14,4 +14,8 @@ pub enum ModelError {
     Error,
     #[error("empty")]
     Empty,
+    #[error("diagram graph error.")]
+    DiagramGraphError,
+    #[error("diagram graph found closed path.")]
+    DiagramGraphClosedPath,
 }

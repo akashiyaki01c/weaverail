@@ -49,7 +49,10 @@ pub fn make_node(
     timetable_id: TimetableId,
 ) -> Result<(WeftNode, HashMap<TrainId, Vec<WeftNode>>), ModelError> {
     let mut number_issuer = NumberIssuer::new();
-    let timetable = root.timetables.get(&timetable_id).unwrap();
+    let timetable = root
+        .timetables
+        .get(&timetable_id)
+        .ok_or(ModelError::ObjectNotFound)?;
     let trains: Vec<&Train> = root
         .trains
         .values()
@@ -83,8 +86,8 @@ pub fn make_node(
         }
     }
 
-    connect_hatsuhatsu_edge(timetable, &mut result, &node_lookup);
-    connect_chakuchaku_edge(timetable, &mut result, &node_lookup);
+    connect_hatsuhatsu_edge(timetable, &mut result, &node_lookup)?;
+    connect_chakuchaku_edge(timetable, &mut result, &node_lookup)?;
 
     Ok((root_node, result))
 }
@@ -122,7 +125,7 @@ fn make_train_node(
         let template_train = diagram_root
             .template_trains
             .get(&template_segment.template_train_id)
-            .unwrap();
+            .ok_or(ModelError::ObjectNotFound)?;
         for (start, template_segment, end) in template_train.get_filtered_segment_iter(
             template_segment.start_station_id,
             template_segment.end_station_id,
@@ -154,7 +157,7 @@ fn make_train_node(
                     .push((departure_node.node_id, Time::new(0, 0, 0))),
             }
             result.push(departure_node);
-            before_node = result.last_mut().unwrap();
+            before_node = result.last_mut().ok_or(ModelError::ObjectNotFound)?;
 
             let arrival_node = WeftNode {
                 node_id: issuer.next(),
@@ -172,7 +175,7 @@ fn make_train_node(
                 .edges
                 .push((arrival_node.node_id, template_segment.running_time));
             result.push(arrival_node);
-            before_node = result.last_mut().unwrap();
+            before_node = result.last_mut().ok_or(ModelError::ObjectNotFound)?;
         }
     }
     Ok(result)
@@ -184,7 +187,7 @@ fn connect_hatsuhatsu_edge(
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
     node_lookup: &HashMap<NodeKey, NodeId>,
-) {
+) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
         for train_ids in orders.0.order.windows(2) {
@@ -193,13 +196,15 @@ fn connect_hatsuhatsu_edge(
 
             let current_node_id = *node_lookup
                 .get(&(current_tid, orders.0.segment_id, NodeType::Departure))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
-            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+            let before_train_nodes = nodes
+                .get_mut(&before_tid)
+                .ok_or(ModelError::ObjectNotFound)?;
 
             let before_node_id = *node_lookup
                 .get(&(before_tid, orders.0.segment_id, NodeType::Departure))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
             if let Some(node) = before_train_nodes
                 .iter_mut()
@@ -215,13 +220,15 @@ fn connect_hatsuhatsu_edge(
 
             let current_node_id = *node_lookup
                 .get(&(current_tid, orders.1.segment_id, NodeType::Departure))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
-            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+            let before_train_nodes = nodes
+                .get_mut(&before_tid)
+                .ok_or(ModelError::ObjectNotFound)?;
 
             let before_node_id = *node_lookup
                 .get(&(before_tid, orders.1.segment_id, NodeType::Departure))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
             if let Some(node) = before_train_nodes
                 .iter_mut()
@@ -231,6 +238,8 @@ fn connect_hatsuhatsu_edge(
             }
         }
     }
+
+    Ok(())
 }
 
 /// 着着時隔エッジを追加する関数
@@ -239,7 +248,7 @@ fn connect_chakuchaku_edge(
     timetable: &Timetable,
     nodes: &mut HashMap<TrainId, Vec<WeftNode>>,
     node_lookup: &HashMap<NodeKey, NodeId>,
-) {
+) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
         for train_ids in orders.0.order.windows(2) {
@@ -248,13 +257,15 @@ fn connect_chakuchaku_edge(
 
             let current_node_id = *node_lookup
                 .get(&(current_tid, orders.0.segment_id, NodeType::Arrival))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
-            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+            let before_train_nodes = nodes
+                .get_mut(&before_tid)
+                .ok_or(ModelError::ObjectNotFound)?;
 
             let before_node_id = *node_lookup
                 .get(&(before_tid, orders.0.segment_id, NodeType::Arrival))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
             if let Some(node) = before_train_nodes
                 .iter_mut()
@@ -270,13 +281,15 @@ fn connect_chakuchaku_edge(
 
             let current_node_id = *node_lookup
                 .get(&(current_tid, orders.1.segment_id, NodeType::Arrival))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
-            let before_train_nodes = nodes.get_mut(&before_tid).unwrap();
+            let before_train_nodes = nodes
+                .get_mut(&before_tid)
+                .ok_or(ModelError::ObjectNotFound)?;
 
             let before_node_id = *node_lookup
                 .get(&(before_tid, orders.1.segment_id, NodeType::Arrival))
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
 
             if let Some(node) = before_train_nodes
                 .iter_mut()
@@ -286,4 +299,6 @@ fn connect_chakuchaku_edge(
             }
         }
     }
+
+    Ok(())
 }

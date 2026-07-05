@@ -146,23 +146,42 @@ impl DiagramRoot {
     }
 
     /// 路線に所属する駅を取得する関数
-    pub fn get_line_stations(&self, line: &Line) -> Vec<&Station> {
+    pub fn get_line_stations(&self, line: &Line) -> Result<Vec<&Station>, ModelError> {
         if line.segments.is_empty() {
-            return Vec::new();
+            return Ok(Vec::new());
         }
         let first_segment = self
             .segments
-            .get(&line.segments.first().unwrap().segment_id)
-            .unwrap();
+            .get(
+                &line
+                    .segments
+                    .first()
+                    .ok_or(ModelError::ObjectNotFound)?
+                    .segment_id,
+            )
+            .ok_or(ModelError::ObjectNotFound)?;
         let start_id = first_segment.start_station;
-        let end_ids = line.segments.iter().map(|segment_id| {
-            let segment = self.segments.get(&segment_id.segment_id).unwrap();
-            segment.end_station
-        });
-        iter::once(start_id)
+        let end_ids: Result<Vec<_>, ModelError> = line
+            .segments
+            .iter()
+            .map(|segment_id| {
+                let segment = self
+                    .segments
+                    .get(&segment_id.segment_id)
+                    .ok_or(ModelError::ObjectNotFound)?;
+                Ok(segment.end_station)
+            })
+            .collect();
+        let end_ids = end_ids?;
+        let result: Result<Vec<_>, _> = iter::once(start_id)
             .chain(end_ids)
-            .map(|station_id| self.stations.get(&station_id).unwrap())
-            .collect()
+            .map(|station_id| {
+                self.stations
+                    .get(&station_id)
+                    .ok_or(ModelError::ObjectNotFound)
+            })
+            .collect();
+        result
     }
 
     /// SegmentIdから駅間を取得する関数

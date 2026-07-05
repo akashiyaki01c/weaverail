@@ -119,7 +119,7 @@ pub async fn get_svg(
     }
 
     let nodes = make_node_diff::make_node(root, timetable_id)?;
-    let node_array = sort_diff::sort_node(&nodes);
+    let node_array = sort_diff::sort_node(&nodes)?;
     let times: Vec<Time> = ripple_node_diff(&nodes, &node_array);
 
     let coords = warp_coords(root, view_settings_id)?;

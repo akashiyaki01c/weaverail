@@ -154,16 +154,20 @@ impl TemplateTrain {
 
         let get_station_by_index = |index: isize| {
             if index < 0 {
-                segments.0
+                Ok(segments.0)
             } else {
-                segments.1.get(index as usize).unwrap().1
+                Ok(segments
+                    .1
+                    .get(index as usize)
+                    .ok_or(ModelError::ObjectNotFound)?
+                    .1)
             }
         };
 
         for i in 0..segments.1.len() {
-            let start = get_station_by_index(i as isize - 1);
-            let segment = segments.1.get(i).unwrap().0;
-            let end = segments.1.get(i).unwrap().1;
+            let start = get_station_by_index(i as isize - 1)?;
+            let segment = segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.0;
+            let end = segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.1;
             if segment.is_reversed {
                 result.push((end, segment, start));
             } else {

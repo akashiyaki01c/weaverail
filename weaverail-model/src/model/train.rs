@@ -87,7 +87,7 @@ impl DiagramRoot {
             let template_train = self
                 .template_trains
                 .get(&segment.template_train_id)
-                .unwrap();
+                .ok_or(ModelError::ObjectNotFound)?;
             let stations = template_train
                 .get_filtered_stations(segment.start_station_id, segment.end_station_id)?;
             if result.is_empty() {

@@ -6,12 +6,12 @@
 
 use std::collections::VecDeque;
 
-use weaverail_model::result_weft::WeftTempObj;
+use weaverail_model::{error::ModelError, result_weft::WeftTempObj};
 
 /// ノードを整列する関数
 /// 計算量は O(|V|+|E|)
 /// アルゴリズムは Kahn (1962) のトポロジカルソートを使用
-pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
+pub fn sort_node(tmp_obj: &WeftTempObj) -> Result<Vec<usize>, ModelError> {
     let count = tmp_obj.nodes.len();
     let mut num_input: Vec<usize> = vec![0; count];
     for node in &tmp_obj.nodes {
@@ -28,10 +28,15 @@ pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
 
     let mut answer = Vec::with_capacity(count);
     while !que.is_empty() {
-        let node_index = *que.front().unwrap();
+        let node_index = *que.front().ok_or(ModelError::DiagramGraphError)?;
         que.pop_front();
         answer.push(node_index);
-        for edge in &tmp_obj.nodes.get(node_index).unwrap().edges {
+        for edge in &tmp_obj
+            .nodes
+            .get(node_index)
+            .ok_or(ModelError::DiagramGraphError)?
+            .edges
+        {
             let index = edge.0.0;
             num_input[index] -= 1;
             if num_input[index] == 0 {
@@ -41,8 +46,8 @@ pub fn sort_node(tmp_obj: &WeftTempObj) -> Vec<usize> {
     }
 
     if answer.len() != count {
-        panic!("閉路！！！");
+        Err(ModelError::DiagramGraphClosedPath)
+    } else {
+        Ok(answer)
     }
-
-    answer
 }

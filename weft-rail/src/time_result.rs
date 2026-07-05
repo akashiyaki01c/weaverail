@@ -14,7 +14,10 @@ pub fn get_time_result(
     nodes: Vec<&WeftNode>,
     times: &[Time],
 ) -> Result<Vec<ResultWeftTrain>, ModelError> {
-    let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
+    let _timetable = diagram_root
+        .timetables
+        .get(&timetable_id)
+        .ok_or(ModelError::ObjectNotFound)?;
     let trains: Vec<&Train> = diagram_root
         .trains
         .values()
