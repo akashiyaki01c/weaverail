@@ -92,10 +92,10 @@ impl TemplateTrain {
     /// 指定の駅が何番目にあるか
     pub fn get_station_index(&self, station_id: StationId) -> Result<usize, ModelError> {
         let stations = self.get_stations();
-        Ok(stations
+        stations
             .iter()
             .position(|station| station.station_id == station_id)
-            .ok_or(ModelError::ObjectNotFound)?)
+            .ok_or(ModelError::ObjectNotFound)
     }
 
     /// 指定の駅間を抽出して返す関数

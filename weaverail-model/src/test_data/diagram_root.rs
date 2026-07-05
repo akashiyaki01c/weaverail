@@ -132,7 +132,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
         let train_type = manager
             .root
             .find_train_type_by_name(train_type_name.get(train_type_index).unwrap())
-            .expect(&format!("{:?}", train_type_name.get(train_type_index)));
+            .unwrap_or_else(|| panic!("{:?}", train_type_name.get(train_type_index)));
         let mut template_train = TemplateTrain {
             id: template_id,
             name: format!("{}-{}", prefix, train_type.name),
