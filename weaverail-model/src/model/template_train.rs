@@ -67,11 +67,12 @@ impl TemplateTrain {
         &self,
         start_station_id: StationId,
         end_station_id: StationId,
-    ) -> Vec<&TemplateTrainStation> {
-        let (start_station, segments) = self.get_filtered_segment(start_station_id, end_station_id);
-        std::iter::once(start_station)
+    ) -> Result<Vec<&TemplateTrainStation>, ModelError> {
+        let (start_station, segments) =
+            self.get_filtered_segment(start_station_id, end_station_id)?;
+        Ok(std::iter::once(start_station)
             .chain(segments.iter().map(|segment| segment.1))
-            .collect()
+            .collect())
     }
 
     /// 指定の駅が含まれているか
@@ -89,12 +90,12 @@ impl TemplateTrain {
     }
 
     /// 指定の駅が何番目にあるか
-    pub fn get_station_index(&self, station_id: StationId) -> usize {
+    pub fn get_station_index(&self, station_id: StationId) -> Result<usize, ModelError> {
         let stations = self.get_stations();
-        stations
+        Ok(stations
             .iter()
             .position(|station| station.station_id == station_id)
-            .expect("Station ID not found in template train")
+            .ok_or(ModelError::ObjectNotFound)?)
     }
 
     /// 指定の駅間を抽出して返す関数
@@ -102,30 +103,37 @@ impl TemplateTrain {
         &self,
         start_station_id: StationId,
         end_station_id: StationId,
-    ) -> (
-        &TemplateTrainStation,
-        Vec<(&TemplateTrainSegment, &TemplateTrainStation)>,
-    ) {
+    ) -> Result<
+        (
+            &TemplateTrainStation,
+            Vec<(&TemplateTrainSegment, &TemplateTrainStation)>,
+        ),
+        ModelError,
+    > {
         // 対象駅がない場合
         if !self.contains_station(start_station_id) || !self.contains_station(end_station_id) {
             unreachable!();
         }
 
-        let first_index = self.get_station_index(start_station_id);
-        let end_index = self.get_station_index(end_station_id);
+        let first_index = self.get_station_index(start_station_id)?;
+        let end_index = self.get_station_index(end_station_id)?;
         let first_station = if first_index == 0 {
             &self.start_station
         } else {
-            &self.segments.get(first_index - 1).expect("index error").1
+            &self
+                .segments
+                .get(first_index - 1)
+                .ok_or(ModelError::ObjectNotFound)?
+                .1
         };
 
         let mut segments: Vec<(&TemplateTrainSegment, &TemplateTrainStation)> = Vec::new();
         for i in (first_index)..end_index {
-            let segment = self.segments.get(i).expect("index error");
+            let segment = self.segments.get(i).ok_or(ModelError::ObjectNotFound)?;
             segments.push((&segment.0, &segment.1));
         }
 
-        (first_station, segments)
+        Ok((first_station, segments))
     }
 
     /// 指定の駅間を抽出してイテレータを返す関数
@@ -133,12 +141,15 @@ impl TemplateTrain {
         &self,
         start_station_id: StationId,
         end_station_id: StationId,
-    ) -> Vec<(
-        &TemplateTrainStation,
-        &TemplateTrainSegment,
-        &TemplateTrainStation,
-    )> {
-        let segments = self.get_filtered_segment(start_station_id, end_station_id);
+    ) -> Result<
+        Vec<(
+            &TemplateTrainStation,
+            &TemplateTrainSegment,
+            &TemplateTrainStation,
+        )>,
+        ModelError,
+    > {
+        let segments = self.get_filtered_segment(start_station_id, end_station_id)?;
         let mut result = Vec::new();
 
         let get_station_by_index = |index: isize| {
@@ -159,7 +170,7 @@ impl TemplateTrain {
                 result.push((start, segment, end));
             }
         }
-        result
+        Ok(result)
     }
 
     /// 先頭の駅を返す関数

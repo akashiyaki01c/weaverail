@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use weaverail_model::{
+    error::ModelError,
     model::{DiagramRoot, time::Time, timetable::TimetableId, train::Train},
     result_weft::{NodeType, ResultWeftTime, StopType},
 };
@@ -12,7 +13,7 @@ pub fn get_time_result(
     timetable_id: TimetableId,
     nodes: Vec<&WeftNode>,
     times: &[Time],
-) -> Vec<ResultWeftTrain> {
+) -> Result<Vec<ResultWeftTrain>, ModelError> {
     let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = diagram_root
         .trains
@@ -31,7 +32,7 @@ pub fn get_time_result(
             train_id: train.id,
             times: vec![],
         };
-        for station_id in diagram_root.get_stations(train) {
+        for station_id in diagram_root.get_stations(train)? {
             let arrival_node = node_map.get(&(train.id, station_id, NodeType::Arrival));
             let departure_node = node_map.get(&(train.id, station_id, NodeType::Departure));
 
@@ -74,5 +75,5 @@ pub fn get_time_result(
         result.push(result_train);
     }
 
-    result
+    Ok(result)
 }

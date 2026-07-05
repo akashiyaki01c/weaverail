@@ -1,5 +1,6 @@
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use weaverail_model::{
+    error::ModelError,
     model::{
         DiagramRoot,
         station::StationId,
@@ -30,7 +31,7 @@ pub fn get_time_result_diff(
     timetable_id: TimetableId,
     obj: &WeftTempObj,
     times: &[Time],
-) -> Vec<ResultWeftTrain> {
+) -> Result<Vec<ResultWeftTrain>, ModelError> {
     let _timetable = diagram_root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = diagram_root
         .trains
@@ -52,7 +53,7 @@ pub fn get_time_result_diff(
             train_id: train.id,
             times: vec![],
         };
-        for station_id in diagram_root.get_stations(train) {
+        for station_id in diagram_root.get_stations(train)? {
             let arrival_node =
                 node_map.get(&LookupNodeKey::new(train.id, station_id, NodeType::Arrival));
             let departure_node = node_map.get(&LookupNodeKey::new(
@@ -100,5 +101,5 @@ pub fn get_time_result_diff(
         result.push(result_train);
     }
 
-    result
+    Ok(result)
 }

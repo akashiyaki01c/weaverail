@@ -1,10 +1,10 @@
 //! # **weft-rail**
-//! 
+//!
 //! 各種制約から列車時刻を算出するクレート
-//! 
+//!
 //! 列車の経由地・時刻から有向グラフを生成し、最短距離を求めることによって制約を満たす列車時刻を算出する。
 //! 基本的に以下の順序で列車時刻を算出する。
-//! 
+//!
 //! 1. `make_node` 有向グラフの列車時刻ノードを生成する
 //! 2. `sort` トポロジカルソートによって有向グラフを一次元に整列する
 //! 3. `ripple` 列車時刻ノードの実際の時刻を計算する
@@ -21,15 +21,19 @@ pub mod time_result_diff;
 pub mod update_node;
 
 use weaverail_model::{
+    error::ModelError,
     model::{DiagramRoot, time::Time, timetable::TimetableId},
     result_weft::{ResultWeftTrain, WeftNode, WeftTempObj},
 };
 
 use crate::time_result_diff::get_time_result_diff;
 
-pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTrain> {
+pub fn weave(
+    root: &DiagramRoot,
+    timetable_id: TimetableId,
+) -> Result<Vec<ResultWeftTrain>, ModelError> {
     let start = std::time::Instant::now();
-    let nodes: WeftTempObj = make_node_diff::make_node(root, timetable_id);
+    let nodes: WeftTempObj = make_node_diff::make_node(root, timetable_id)?;
     let duration = start.elapsed();
     println!("make_node: {}us", duration.as_micros());
 
@@ -44,11 +48,11 @@ pub fn weave(root: &DiagramRoot, timetable_id: TimetableId) -> Vec<ResultWeftTra
     println!("ripple_node: {}us", duration.as_micros());
 
     let start = std::time::Instant::now();
-    let result: Vec<ResultWeftTrain> = get_time_result_diff(root, timetable_id, &nodes, &time);
+    let result: Vec<ResultWeftTrain> = get_time_result_diff(root, timetable_id, &nodes, &time)?;
     let duration = start.elapsed();
     println!("get_time: {}us", duration.as_micros());
 
-    result
+    Ok(result)
 }
 
 #[test]
@@ -75,7 +79,7 @@ fn weave_test() {
 
     let start = std::time::Instant::now();
     let mut nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) =
-        make_node(&test_data.root, timetable_id);
+        make_node(&test_data.root, timetable_id).unwrap();
     let duration = start.elapsed();
     println!("make_node: {}ms", duration.as_millis());
 
@@ -96,7 +100,7 @@ fn weave_test() {
 
     let start = std::time::Instant::now();
     let result: Vec<ResultWeftTrain> =
-        get_time_result(&test_data.root, timetable_id, node_array, &times);
+        get_time_result(&test_data.root, timetable_id, node_array, &times).unwrap();
     let duration = start.elapsed();
     println!("get_time: {}ms", duration.as_millis());
 
@@ -122,7 +126,11 @@ fn weave_test() {
         .map(|v| {
             let start = v[0];
             let end = v[1];
-            let segment = *&test_data.root.find_segment_by_name(start, end).segment_id;
+            let segment = *&test_data
+                .root
+                .find_segment_by_name(start, end)
+                .unwrap()
+                .segment_id;
             (false, segment, trains[1].id, trains[3].id)
         })
         .collect(),
@@ -151,7 +159,7 @@ fn weave_test_diff() {
     let _timetable = test_data.root.timetables.get(&timetable_id).unwrap();
 
     let start = std::time::Instant::now();
-    let nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
+    let nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id).unwrap();
     let duration = start.elapsed();
     println!("make_node: {}us", duration.as_micros());
 
@@ -169,7 +177,7 @@ fn weave_test_diff() {
 
     let start = std::time::Instant::now();
     let _result: Vec<ResultWeftTrain> =
-        get_time_result_diff(&test_data.root, timetable_id, &nodes, &time);
+        get_time_result_diff(&test_data.root, timetable_id, &nodes, &time).unwrap();
     let duration = start.elapsed();
     println!("get_time: {}us", duration.as_micros());
 
@@ -194,11 +202,11 @@ fn make_node_test() {
     // 前処理 終了
 
     let nodes: (WeftNode, HashMap<TrainId, Vec<WeftNode>>) =
-        make_node::make_node(&test_data.root, timetable_id);
+        make_node::make_node(&test_data.root, timetable_id).unwrap();
     let converted_nodes: Vec<&WeftNode> = make_node::get_node_by_nodeid(&nodes.0, &nodes.1);
     let node_array: Vec<&WeftNode> = sort::sort_node(&converted_nodes);
 
-    let diff_nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id);
+    let diff_nodes: WeftTempObj = make_node_diff::make_node(&test_data.root, timetable_id).unwrap();
     let diff_node_array: Vec<usize> = sort_diff::sort_node(&diff_nodes);
 
     assert!(node_array.len() == diff_node_array.len());
@@ -218,9 +226,9 @@ fn make_node_test() {
     }
 
     let result: Vec<ResultWeftTrain> =
-        time_result::get_time_result(&test_data.root, timetable_id, node_array, &ripple);
+        time_result::get_time_result(&test_data.root, timetable_id, node_array, &ripple).unwrap();
     let diff_result: Vec<ResultWeftTrain> =
-        get_time_result_diff(&test_data.root, timetable_id, &diff_nodes, &diff_ripple);
+        get_time_result_diff(&test_data.root, timetable_id, &diff_nodes, &diff_ripple).unwrap();
 
     assert!(result.len() == diff_result.len());
     for i in 0..result.len() {

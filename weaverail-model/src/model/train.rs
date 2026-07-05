@@ -81,7 +81,7 @@ impl DiagramRoot {
             .ok_or(ModelError::ObjectNotFound)
     }
 
-    pub fn get_stations(&self, train: &Train) -> Vec<StationId> {
+    pub fn get_stations(&self, train: &Train) -> Result<Vec<StationId>, ModelError> {
         let mut result = Vec::new();
         for segment in &train.template_segments {
             let template_train = self
@@ -89,7 +89,7 @@ impl DiagramRoot {
                 .get(&segment.template_train_id)
                 .unwrap();
             let stations = template_train
-                .get_filtered_stations(segment.start_station_id, segment.end_station_id);
+                .get_filtered_stations(segment.start_station_id, segment.end_station_id)?;
             if result.is_empty() {
                 result.extend(stations.iter().map(|sta| sta.station_id));
             } else {
@@ -97,7 +97,7 @@ impl DiagramRoot {
             }
         }
 
-        result
+        Ok(result)
     }
 }
 

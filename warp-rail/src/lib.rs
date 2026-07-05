@@ -3,6 +3,7 @@ use std::fmt::Write;
 
 use weaverail_model::{
     diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord},
+    error::ModelError,
     model::{
         DiagramRoot,
         diagram_view_settings::{DiagramViewSegment, DiagramViewSettingsId},
@@ -23,8 +24,11 @@ const DEFAULT_BLANK_TIME: Time = Time::new(0, 2, 0);
 pub fn warp_coords(
     root: &DiagramRoot,
     settings_id: DiagramViewSettingsId,
-) -> HashMap<LineSegmentId, ResultWarpCoords> {
-    let settings = root.diagram_view_settings.get(&settings_id).expect("");
+) -> Result<HashMap<LineSegmentId, ResultWarpCoords>, ModelError> {
+    let settings = root
+        .diagram_view_settings
+        .get(&settings_id)
+        .ok_or(ModelError::ObjectNotFound)?;
     let mut result = HashMap::new();
     let mut current_y: f64 = 0.0;
     for segment in &settings.segments {
@@ -58,24 +62,27 @@ pub fn warp_coords(
             }
         }
     }
-    result
+    Ok(result)
 }
 
 /// 駅座標情報を求める関数
 pub fn warp_stations(
     root: &DiagramRoot,
     settings_id: DiagramViewSettingsId,
-) -> Vec<ResultWarpStations> {
-    let warp = warp_coords(root, settings_id);
+) -> Result<Vec<ResultWarpStations>, ModelError> {
+    let warp = warp_coords(root, settings_id)?;
     let mut result: Vec<ResultWarpStations> = vec![];
 
     for coord in warp.values() {
-        let segment = root.segments.get(&coord.segment_id).expect("");
+        let segment = root
+            .segments
+            .get(&coord.segment_id)
+            .ok_or(ModelError::ObjectNotFound)?;
 
         let start_sta = if coord.is_reversed {
-            segment.end_station(root).unwrap()
+            segment.end_station(root)?
         } else {
-            segment.start_station(root).unwrap()
+            segment.start_station(root)?
         };
         if !result.iter().any(|v| v.y_coord == coord.upper_y) {
             result.push(ResultWarpStations {
@@ -86,9 +93,9 @@ pub fn warp_stations(
         }
 
         let end_sta = if coord.is_reversed {
-            segment.start_station(root).unwrap()
+            segment.start_station(root)?
         } else {
-            segment.end_station(root).unwrap()
+            segment.end_station(root)?
         };
         if !result.iter().any(|v| v.y_coord == coord.lower_y) {
             result.push(ResultWarpStations {
@@ -99,7 +106,7 @@ pub fn warp_stations(
         }
     }
 
-    result
+    Ok(result)
 }
 
 fn get_coord(
@@ -107,19 +114,22 @@ fn get_coord(
     coords: &HashMap<LineSegmentId, ResultWarpCoords>,
     segment_id: LineSegmentId,
     station_id: StationId,
-) -> f64 {
-    let segment = root.segments.get(&segment_id).unwrap();
-    let coord = coords.get(&segment_id).unwrap();
+) -> Result<f64, ModelError> {
+    let segment = root
+        .segments
+        .get(&segment_id)
+        .ok_or(ModelError::ObjectNotFound)?;
+    let coord = coords.get(&segment_id).ok_or(ModelError::ObjectNotFound)?;
 
     let mut result = false;
-    if segment.start_station(root).unwrap().id == station_id {
+    if segment.start_station(root)?.id == station_id {
         result = !result;
     }
     if coord.is_reversed {
         result = !result;
     }
 
-    if result { coord.upper_y } else { coord.lower_y }
+    Ok(if result { coord.upper_y } else { coord.lower_y })
 }
 
 pub fn get_svg(
@@ -132,7 +142,7 @@ pub fn get_svg(
     settings: DiagramLogicalConvert,
     start_time: Time,
     end_time: Time,
-) -> ResultSvg {
+) -> Result<ResultSvg, ModelError> {
     let mut nodes_by_train: HashMap<TrainId, Vec<usize>> = HashMap::new();
     for &actual_index in node_array {
         let train_id = obj.nodes[actual_index].train_id;
@@ -142,7 +152,7 @@ pub fn get_svg(
             .push(actual_index);
     }
 
-    let result = root
+    let result: Result<Vec<_>, _> = root
         .trains
         .values()
         .filter(|train| train.timetable_id == timetable_id)
@@ -168,13 +178,13 @@ pub fn get_svg(
                 }
 
                 let before_y =
-                    get_coord(root, coords, before_node.segment_id, before_node.station_id);
+                    get_coord(root, coords, before_node.segment_id, before_node.station_id)?;
                 let current_y = get_coord(
                     root,
                     coords,
                     current_node.segment_id,
                     current_node.station_id,
-                );
+                )?;
 
                 let before_coord = settings.convert(DiagramLogicalCoord::new(
                     before_time.total_second() as f64,
@@ -205,13 +215,17 @@ pub fn get_svg(
                 }
             }
 
-            ResultSvgTrain {
+            Ok(ResultSvgTrain {
                 train_id: train.id,
                 path_string: path,
-            }
+            })
         })
+        .collect();
+    let result = result?;
+    let result = result
+        .into_iter()
         .filter(|v| !v.path_string.is_empty())
         .collect();
 
-    ResultSvg { trains: result }
+    Ok(ResultSvg { trains: result })
 }

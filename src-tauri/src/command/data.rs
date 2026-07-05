@@ -2,6 +2,7 @@ use std::{collections::HashMap, sync::Mutex};
 
 use weaverail_model::{
     app::AppState,
+    command::CommandError,
     model::{
         DiagramRoot,
         line::{Line, LineId},
@@ -16,10 +17,12 @@ use weaverail_model::{
 };
 
 #[tauri::command]
-pub async fn get_root(state: tauri::State<'_, Mutex<AppState>>) -> Result<DiagramRoot, String> {
+pub async fn get_root(
+    state: tauri::State<'_, Mutex<AppState>>,
+) -> Result<DiagramRoot, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .clone())
@@ -28,10 +31,10 @@ pub async fn get_root(state: tauri::State<'_, Mutex<AppState>>) -> Result<Diagra
 #[tauri::command]
 pub async fn get_stations(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<StationId, Station>, String> {
+) -> Result<HashMap<StationId, Station>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .stations
@@ -41,10 +44,10 @@ pub async fn get_stations(
 #[tauri::command]
 pub async fn get_tracks(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrackId, Track>, String> {
+) -> Result<HashMap<TrackId, Track>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .tracks
@@ -54,10 +57,10 @@ pub async fn get_tracks(
 #[tauri::command]
 pub async fn get_segments(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<LineSegmentId, LineSegment>, String> {
+) -> Result<HashMap<LineSegmentId, LineSegment>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .segments
@@ -67,10 +70,10 @@ pub async fn get_segments(
 #[tauri::command]
 pub async fn get_lines(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<LineId, Line>, String> {
+) -> Result<HashMap<LineId, Line>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .lines
@@ -80,10 +83,10 @@ pub async fn get_lines(
 #[tauri::command]
 pub async fn get_train_types(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrainTypeId, TrainType>, String> {
+) -> Result<HashMap<TrainTypeId, TrainType>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .train_types
@@ -93,10 +96,10 @@ pub async fn get_train_types(
 #[tauri::command]
 pub async fn get_template_trains(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TemplateTrainId, TemplateTrain>, String> {
+) -> Result<HashMap<TemplateTrainId, TemplateTrain>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .template_trains
@@ -106,10 +109,10 @@ pub async fn get_template_trains(
 #[tauri::command]
 pub async fn get_timetables(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TimetableId, Timetable>, String> {
+) -> Result<HashMap<TimetableId, Timetable>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .timetables
@@ -119,10 +122,10 @@ pub async fn get_timetables(
 #[tauri::command]
 pub async fn get_trains(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrainId, Train>, String> {
+) -> Result<HashMap<TrainId, Train>, CommandError> {
     Ok(state
         .lock()
-        .expect("mutex lock error")
+        .map_err(|_| CommandError::MutexLockError)?
         .command_manager
         .root
         .trains

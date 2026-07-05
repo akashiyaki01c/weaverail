@@ -1,5 +1,4 @@
 /// テストデータを取得するクレート群
-
 use crate::{
     command::{
         Command, EmptyEventEmitter,
@@ -188,7 +187,8 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
             let station_id = manager.root.id_issuer.next();
             let seg_ref = manager
                 .root
-                .find_segment_by_name(&start_station_name, &end_station_name);
+                .find_segment_by_name(&start_station_name, &end_station_name)
+                .unwrap();
             let segment = seg_ref.segment_id;
             template_train.segments.push((
                 TemplateTrainSegment {
@@ -371,7 +371,7 @@ fn add_test_train(manager: &mut CommandManager) {
             let start = window[0];
             let end = window[1];
 
-            let segment = manager.root.find_segment_by_name(start, end);
+            let segment = manager.root.find_segment_by_name(start, end).unwrap();
             let segment_id = segment.segment_id;
 
             timetable.segment_train_orders.insert(
@@ -416,7 +416,7 @@ fn add_test_train(manager: &mut CommandManager) {
             let start = window[0];
             let end = window[1];
 
-            let segment = manager.root.find_segment_by_name(start, end);
+            let segment = manager.root.find_segment_by_name(start, end).unwrap();
             let segment_id = segment.segment_id;
 
             timetable
@@ -451,7 +451,7 @@ fn add_test_train(manager: &mut CommandManager) {
             let start = window[0];
             let end = window[1];
 
-            let segment = manager.root.find_segment_by_name(start, end);
+            let segment = manager.root.find_segment_by_name(start, end).unwrap();
             let segment_id = segment.segment_id;
 
             timetable
@@ -484,7 +484,7 @@ fn add_test_train(manager: &mut CommandManager) {
             let start = window[0];
             let end = window[1];
 
-            let segment = manager.root.find_segment_by_name(start, end);
+            let segment = manager.root.find_segment_by_name(start, end).unwrap();
             let segment_id = segment.segment_id;
 
             timetable
@@ -546,7 +546,7 @@ fn add_test_train(manager: &mut CommandManager) {
             let start = window[0];
             let end = window[1];
 
-            let segment = manager.root.find_segment_by_name(start, end);
+            let segment = manager.root.find_segment_by_name(start, end).unwrap();
             let segment_id = segment.segment_id;
 
             timetable
@@ -625,7 +625,7 @@ fn add_test_train(manager: &mut CommandManager) {
                 let start = window[0];
                 let end = window[1];
 
-                let segment = manager.root.find_segment_by_name(start, end);
+                let segment = manager.root.find_segment_by_name(start, end).unwrap();
                 let segment_id = segment.segment_id;
 
                 let order = timetable.segment_train_orders.get_mut(&segment_id).unwrap();
@@ -702,7 +702,7 @@ fn add_test_train(manager: &mut CommandManager) {
                 let start = window[0];
                 let end = window[1];
 
-                let segment = manager.root.find_segment_by_name(start, end);
+                let segment = manager.root.find_segment_by_name(start, end).unwrap();
                 let segment_id = segment.segment_id;
 
                 let order = timetable.segment_train_orders.get_mut(&segment_id).unwrap();
@@ -771,7 +771,7 @@ fn add_diagram_view_setting(manager: &mut CommandManager) {
         let start = window[0];
         let end = window[1];
 
-        let segment = manager.root.find_segment_by_name(start, end);
+        let segment = manager.root.find_segment_by_name(start, end).unwrap();
         let segment_id = segment.segment_id;
 
         segments.push(DiagramViewSegment::StationBetween {
@@ -788,7 +788,7 @@ fn add_diagram_view_setting(manager: &mut CommandManager) {
         let start = window[0];
         let end = window[1];
 
-        let segment = manager.root.find_segment_by_name(start, end);
+        let segment = manager.root.find_segment_by_name(start, end).unwrap();
         let segment_id = segment.segment_id;
 
         segments.push(DiagramViewSegment::StationBetween {

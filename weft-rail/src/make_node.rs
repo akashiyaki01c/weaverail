@@ -1,13 +1,14 @@
 //! # make_node
 //!
 //! 列車時刻ノードを生成し、有向グラフを構築するモジュール
-//! 
+//!
 //! グラフのデータ定義は、`weverail_model::result_weft`モジュールにある
 
 use std::{collections::HashMap, sync::LazyLock};
 
 use smallvec::SmallVec;
 use weaverail_model::{
+    error::ModelError,
     model::{
         DiagramRoot,
         line_segment::LineSegmentId,
@@ -46,7 +47,7 @@ impl NumberIssuer {
 pub fn make_node(
     root: &DiagramRoot,
     timetable_id: TimetableId,
-) -> (WeftNode, HashMap<TrainId, Vec<WeftNode>>) {
+) -> Result<(WeftNode, HashMap<TrainId, Vec<WeftNode>>), ModelError> {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = root
@@ -67,7 +68,7 @@ pub fn make_node(
 
     // 列車の生時刻の取得
     for train in root.trains.values().filter(|train| trains.contains(train)) {
-        let nodes = make_train_node(root, train, &mut root_node, &mut number_issuer);
+        let nodes = make_train_node(root, train, &mut root_node, &mut number_issuer)?;
         result.insert(train.id, nodes);
     }
 
@@ -85,7 +86,7 @@ pub fn make_node(
     connect_hatsuhatsu_edge(timetable, &mut result, &node_lookup);
     connect_chakuchaku_edge(timetable, &mut result, &node_lookup);
 
-    (root_node, result)
+    Ok((root_node, result))
 }
 
 /// NodeIdからノードを取得する関数
@@ -113,7 +114,7 @@ fn make_train_node(
     train: &Train,
     root_node: &mut WeftNode,
     issuer: &mut NumberIssuer,
-) -> Vec<WeftNode> {
+) -> Result<Vec<WeftNode>, ModelError> {
     let mut result = Vec::new();
     let root_node_id = root_node.node_id;
     let mut before_node: &mut WeftNode = root_node;
@@ -125,7 +126,7 @@ fn make_train_node(
         for (start, template_segment, end) in template_train.get_filtered_segment_iter(
             template_segment.start_station_id,
             template_segment.end_station_id,
-        ) {
+        )? {
             let departure_node = WeftNode {
                 node_id: issuer.next(),
                 station_id: start.station_id,
@@ -174,7 +175,7 @@ fn make_train_node(
             before_node = result.last_mut().unwrap();
         }
     }
-    result
+    Ok(result)
 }
 
 /// 発発時隔エッジを追加する関数

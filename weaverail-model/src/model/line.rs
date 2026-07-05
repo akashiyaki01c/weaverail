@@ -276,29 +276,45 @@ impl DiagramRoot {
         &self,
         start_station_name: &str,
         end_station_name: &str,
-    ) -> &SegmentRef {
-        let start_station = self.find_station_by_name(start_station_name).expect("").id;
-        let end_station = self.find_station_by_name(end_station_name).expect("").id;
-        let reversed_segment =
-            self.lines
-                .values()
-                .flat_map(|line| &line.segments)
-                .find(|segment| {
-                    let segment = self.segments.get(&segment.segment_id).unwrap();
-                    segment.start_station == start_station && segment.end_station == end_station
-                });
-        let forward_segment = self
-            .lines
-            .values()
-            .flat_map(|line| &line.segments)
-            .find(|segment| {
-                let segment = self.segments.get(&segment.segment_id).unwrap();
-                segment.start_station == end_station && segment.end_station == start_station
-            });
+    ) -> Result<&SegmentRef, ModelError> {
+        let start_station = self
+            .find_station_by_name(start_station_name)
+            .ok_or(ModelError::ObjectNotFound)?
+            .id;
+        let end_station = self
+            .find_station_by_name(end_station_name)
+            .ok_or(ModelError::ObjectNotFound)?
+            .id;
+        let mut reversed_segment = None;
+
+        for segment_ref in self.lines.values().flat_map(|line| &line.segments) {
+            let segment = self
+                .segments
+                .get(&segment_ref.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+
+            if segment.start_station == start_station && segment.end_station == end_station {
+                reversed_segment = Some(segment_ref);
+                break;
+            }
+        }
+
+        let mut forward_segment = None;
+        for segment_ref in self.lines.values().flat_map(|line| &line.segments) {
+            let segment = self
+                .segments
+                .get(&segment_ref.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+
+            if segment.start_station == end_station && segment.end_station == start_station {
+                forward_segment = Some(segment_ref);
+                break;
+            }
+        }
         if let Some(forward_segment) = forward_segment {
-            forward_segment
+            Ok(forward_segment)
         } else {
-            reversed_segment.unwrap()
+            Ok(reversed_segment.ok_or(ModelError::ObjectNotFound)?)
         }
     }
 }

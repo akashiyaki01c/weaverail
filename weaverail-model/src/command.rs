@@ -61,6 +61,8 @@ pub enum CommandError {
     IndexOutOfBounds,
     /// 整合性がない
     Inconsistent,
+    /// データをロックできなかった
+    MutexLockError,
 }
 
 #[test]

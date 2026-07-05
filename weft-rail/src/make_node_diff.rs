@@ -1,11 +1,12 @@
 //! # make_node_diff
 //!
 //! 列車時刻ノードを生成し、有向グラフを構築するモジュール(`make_node`モジュールよりも最適化を行っている)
-//! 
+//!
 //! グラフのデータ定義は、`weverail_model::result_weft`モジュールにある
 
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
+use weaverail_model::error::ModelError;
 use weaverail_model::result_weft::StopType;
 use weaverail_model::{
     model::{
@@ -38,7 +39,7 @@ impl NumberIssuer {
 }
 
 /// 有向グラフのノードを生成する関数 (最適化済)
-pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
+pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Result<WeftTempObj, ModelError> {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root.timetables.get(&timetable_id).unwrap();
     let trains: Vec<&Train> = root
@@ -68,7 +69,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
 
     // add node
     for train in trains {
-        add_train_node(root, train, &mut number_issuer, &mut result);
+        add_train_node(root, train, &mut number_issuer, &mut result)?;
     }
 
     result.lookup.shrink_to(result.nodes.len());
@@ -82,7 +83,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> WeftTempObj {
     connect_hatsuhatsu_edge(timetable, &mut result);
     connect_chakuchaku_edge(timetable, &mut result);
 
-    result
+    Ok(result)
 }
 
 /// 1つの列車の時刻ノードを生成する関数
@@ -91,7 +92,7 @@ fn add_train_node(
     train: &Train,
     issuer: &mut NumberIssuer,
     tmp_obj: &mut WeftTempObj,
-) {
+) -> Result<(), ModelError> {
     let mut before_node_index: usize = 0;
     let root_node_id: NodeId = tmp_obj.nodes.get(before_node_index).unwrap().node_id;
 
@@ -99,11 +100,11 @@ fn add_train_node(
         let template_train = diagram_root
             .template_trains
             .get(&template_segment.template_train_id)
-            .unwrap();
+            .ok_or(ModelError::ObjectNotFound)?;
         for (start, template_segment, end) in template_train.get_filtered_segment_iter(
             template_segment.start_station_id,
             template_segment.end_station_id,
-        ) {
+        )? {
             let departure_node = WeftNode {
                 node_id: issuer.next(),
                 station_id: start.station_id,
@@ -156,6 +157,8 @@ fn add_train_node(
             before_node_index = tmp_obj.nodes.len() - 1;
         }
     }
+
+    Ok(())
 }
 
 /// 発発時隔エッジを追加する関数
