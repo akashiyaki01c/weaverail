@@ -41,7 +41,6 @@ export * from "./bindings/ResultWeftTrain";
 
 export * from "./bindings/ResultSvg";
 export * from "./bindings/ResultSvgTrain";
-export * from "./bindings/ResultSvgSegment";
 
 export * from "./bindings/DiagramLogicalConvert";
 export * from "./bindings/DiagramLogicalCoord";

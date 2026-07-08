@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, DiagramViewSettings, ResultSvg, DiagramRoot, Time, DiagramViewSettingsId } from "@weaverail/types";
+import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, ResultSvg, DiagramRoot, Time, DiagramViewSettingsId } from "@weaverail/types";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export interface WeaverailDataApi {

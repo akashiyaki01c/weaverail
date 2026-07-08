@@ -1,8 +1,6 @@
 import "flexlayout-react/style/light.css";
 import { useEffect, useState } from "react";
 import {
-  Actions,
-  DockLocation,
   IJsonTabNode,
   Layout,
   Model,
