@@ -160,6 +160,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                 .get(1)
                 .unwrap()
                 .to_string();
+            println!("{}", end_station_name);
             let end_station = manager
                 .root
                 .find_station_by_name(&end_station_name)
@@ -818,6 +819,8 @@ pub fn get_test_data() -> CommandManager {
     add_train_types(&mut manager);
     add_template_trains(&mut manager, include_str!("./shinki_down.tsv"));
     add_template_trains(&mut manager, include_str!("./shinki_up.tsv"));
+    add_template_trains(&mut manager, include_str!("./hanshin_down.tsv"));
+    add_template_trains(&mut manager, include_str!("./hanshin_up.tsv"));
     add_test_train(&mut manager);
     add_diagram_view_setting(&mut manager);
     manager
