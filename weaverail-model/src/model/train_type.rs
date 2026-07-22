@@ -4,11 +4,10 @@
 use std::collections::hash_map::Entry;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{DiagramRoot, ExtensionProperty},
-    weaverail_id,
+    error::ModelError, model::{DiagramRoot, ExtensionProperty, PropertiableObject}, weaverail_id,
 };
 
 weaverail_id!(TrainTypeId, "TYP_");
@@ -73,5 +72,18 @@ impl DiagramRoot {
         self.train_types
             .values()
             .find(|train_type| train_type.name == train_type_name)
+    }
+}
+impl PropertiableObject for TrainType {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }

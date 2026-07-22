@@ -1,3 +1,5 @@
+//! TauriのIPCで使用するコマンドを定義するモジュール
+
 use std::{collections::HashMap, sync::Mutex};
 
 use tauri::{AppHandle, Emitter};

@@ -1,3 +1,11 @@
+//! 列車(`Train`)関係の操作を定義するモジュール
+//! 
+//! 以下の操作が含まれる
+//! - AddTrainCommand
+//! - *DeleteTrainCommand*
+//! - *RenameTrainCommand*
+//! - *ChangeDepartureTimeCommand*
+
 use crate::{
     command::{Command, CommandError, EventEmitter},
     event::EmitEventType,

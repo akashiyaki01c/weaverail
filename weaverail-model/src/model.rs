@@ -54,6 +54,16 @@ impl ExtensionProperty {
     }
 }
 
+/// 拡張プロパティを保持する構造体を表すトレイト
+pub trait PropertiableObject {
+    /// 拡張プロパティの値を取得する
+    fn get_property(&self, id: &str) -> Option<&Value>;
+    /// 拡張プロパティの値を設定する
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value>;
+    /// 拡張プロパティの値を削除する
+    fn remove_property(&mut self, id: &str) -> Option<Value>;
+}
+
 /// ダイヤグラムプロジェクトファイルを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct DiagramRoot {
@@ -81,6 +91,19 @@ pub struct DiagramRoot {
     pub id_issuer: IdIssuer,
     /// バージョン
     pub version: u32,
+}
+impl PropertiableObject for DiagramRoot {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
+    }
 }
 
 #[cfg(test)]

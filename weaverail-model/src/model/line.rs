@@ -6,15 +6,12 @@ use std::collections::hash_map::Entry;
 use std::iter;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty,
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-    },
-    weaverail_id,
+    error::ModelError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId},
+    }, weaverail_id,
 };
 
 weaverail_id!(LineId, "LIN_");
@@ -119,6 +116,20 @@ impl Line {
         } else {
             Ok(None)
         }
+    }
+}
+
+impl PropertiableObject for Line {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }
 

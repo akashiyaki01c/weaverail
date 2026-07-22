@@ -4,14 +4,12 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::{
-    command::CommandError,
-    model::{
-        DiagramRoot, ExtensionProperty, line_segment::LineSegmentId,
-        segment_train_order::SegmentTrainOrder,
-    },
-    weaverail_id,
+    command::CommandError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId, segment_train_order::SegmentTrainOrder,
+    }, weaverail_id,
 };
 
 weaverail_id!(TimetableId, "TBL_");
@@ -59,5 +57,18 @@ impl DiagramRoot {
         self.timetables
             .remove(&timetable_id)
             .ok_or(CommandError::TargetObjectNotFound)
+    }
+}
+impl PropertiableObject for Timetable {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }

@@ -1,3 +1,10 @@
+//! 路線(`Line`)関係の操作を定義するモジュール
+//! 
+//! 以下の操作が含まれる
+//! - AddLineCommand
+//! - RemoveLineCommand
+//! - RenameLineCommand
+
 use crate::{
     command::{Command, CommandError, EventEmitter},
     event::EmitEventType,

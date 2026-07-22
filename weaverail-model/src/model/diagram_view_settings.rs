@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
-use crate::{model::line::SegmentRef, weaverail_id};
+use crate::{model::{ExtensionProperty, PropertiableObject, line::SegmentRef}, weaverail_id};
 
 weaverail_id!(DiagramViewSettingsId, "DVS_");
 
@@ -13,6 +14,21 @@ pub struct DiagramViewSettings {
     pub name: String,
     /// ダイヤグラムの縦軸の区間の一覧を表す
     pub segments: Vec<DiagramViewSegment>,
+    /// 拡張プロパティ
+    pub properties: ExtensionProperty,
+}
+impl PropertiableObject for DiagramViewSettings {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
+    }
 }
 
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]

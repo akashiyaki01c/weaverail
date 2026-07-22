@@ -1,3 +1,10 @@
+//! 駅(`Station`)関係の操作を定義するモジュール
+//! 
+//! 以下の操作が含まれる
+//! - AddStationCommand
+//! - RemoveStationCommand
+//! - RenameStationCommand
+
 use crate::{
     command::{Command, CommandError, EventEmitter},
     event::EmitEventType,

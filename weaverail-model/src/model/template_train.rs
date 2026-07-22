@@ -7,18 +7,12 @@
 use std::collections::hash_map::Entry;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty,
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        time::Time,
-        track::{Track, TrackId},
-        train_type::{TrainType, TrainTypeId},
-    },
-    weaverail_id,
+    error::ModelError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, time::Time, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId},
+    }, weaverail_id,
 };
 
 weaverail_id!(TemplateTrainId, "TTR_");
@@ -189,6 +183,19 @@ impl TemplateTrain {
         } else {
             Ok(&self.segments.last().ok_or(ModelError::Empty)?.1)
         }
+    }
+}
+impl PropertiableObject for TemplateTrain {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }
 impl DiagramRoot {
@@ -380,6 +387,8 @@ pub struct TemplateTrainSegment {
     pub is_reversed: bool,
     /// 基準運転時分
     pub running_time: Time,
+    /// 拡張プロパティ
+    pub properties: ExtensionProperty,
 }
 impl TemplateTrainSegment {
     /// 駅間を取得する関数
@@ -388,6 +397,19 @@ impl TemplateTrainSegment {
         root.segments
             .get(&self.segment_id)
             .ok_or(ModelError::ObjectNotFound)
+    }
+}
+impl PropertiableObject for TemplateTrainSegment {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }
 
@@ -404,6 +426,8 @@ pub struct TemplateTrainStation {
     pub track_id: TrackId,
     /// 停車時間
     pub stop_time: StopType,
+    /// 拡張プロパティ
+    pub properties: ExtensionProperty
 }
 impl TemplateTrainStation {
     /// 駅を取得する関数
@@ -419,6 +443,19 @@ impl TemplateTrainStation {
         root.tracks
             .get(&self.track_id)
             .ok_or(ModelError::ObjectNotFound)
+    }
+}
+impl PropertiableObject for TemplateTrainStation {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }
 

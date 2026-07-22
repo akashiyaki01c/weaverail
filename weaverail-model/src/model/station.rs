@@ -3,11 +3,10 @@
 //!   - Track (列車番線)
 
 use crate::{
-    error::ModelError,
-    model::{DiagramRoot, ExtensionProperty},
-    weaverail_id,
+    error::ModelError, model::{DiagramRoot, ExtensionProperty, PropertiableObject}, weaverail_id,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::hash_map::Entry;
 use weaverail_object::WeaverailDNA;
 
@@ -78,6 +77,19 @@ impl DiagramRoot {
         self.stations
             .values()
             .find(|station| station.name == station_name)
+    }
+}
+impl PropertiableObject for Station {
+    fn get_property(&self, id: &str) -> Option<&Value> {
+        self.properties.get(id)
+    }
+
+    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+        self.properties.set(id, value)
+    }
+
+    fn remove_property(&mut self, id: &str) -> Option<Value> {
+        self.properties.remove(id)
     }
 }
 
