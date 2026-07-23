@@ -1,4 +1,5 @@
 use thiserror::Error;
+use weaverail_model::error::ModelError;
 
 pub mod project_file;
 
@@ -8,6 +9,8 @@ pub enum WeaverailIoError {
     InvalidMagicNumber,
     #[error("io error")]
     Io(#[from] std::io::Error),
+    #[error("weaverail model error")]
+    ModelError(#[from] ModelError),
     #[error("Metadata text encoding format is invalid")]
     InvalidMetadataEncodingFormat(#[from] std::str::Utf8Error),
     #[error("ron deserializing error")]

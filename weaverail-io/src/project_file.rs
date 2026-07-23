@@ -38,7 +38,8 @@ pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoE
     let metadata = ron::de::from_reader(metadata_raw.as_slice())?;
 
     let decompressed = zstd::decode_all(file)?;
-    let root = ron::de::from_reader(decompressed.as_slice())?;
+    let root: DiagramRoot = ron::de::from_reader(decompressed.as_slice())?;
+    let _ = &root.validate()?;
 
     Ok((root, metadata))
 }
@@ -49,6 +50,8 @@ pub fn write_file(
     root: &DiagramRoot,
     metadata: &Metadata,
 ) -> Result<(), WeaverailIoError> {
+    let _ = &root.validate()?;
+    
     let mut file = File::create(path)?;
 
     let metadata = ron::ser::to_string(&metadata)?;

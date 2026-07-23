@@ -95,7 +95,7 @@ pub struct DiagramRoot {
 }
 impl DiagramRoot {
     /// データが正常な値であるかを検証する
-    pub fn vaidate(&self) -> Result<(), ModelError> {
+    pub fn validate(&self) -> Result<(), ModelError> {
         for sta in self.stations.keys() {
             let _ = self.validate_station(*sta)?;
         }
