@@ -1,5 +1,5 @@
 //! 駅番線(`Track`)関係の操作を定義するモジュール
-//! 
+//!
 //! 以下の操作が含まれる
 //! - AddTrackCommand
 //! - *DeleteTrackCommand*

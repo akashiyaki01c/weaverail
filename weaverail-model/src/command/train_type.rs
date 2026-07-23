@@ -1,5 +1,5 @@
 //! 列車種別(`TrainType`)関係の操作を定義するモジュール
-//! 
+//!
 //! 以下の操作が含まれる
 //! - AddTrainTypeCommand
 //! - RemoveTrainTypeCommand

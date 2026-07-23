@@ -1,5 +1,5 @@
 //! テンプレート列車駅間(`TemplateTrainSegment`)関係の操作を定義するモジュール
-//! 
+//!
 //! 以下の操作が含まれる
 //! - PushBackTemplateTrainSegment
 //! - *PushFrontTemplateTrainSegment*

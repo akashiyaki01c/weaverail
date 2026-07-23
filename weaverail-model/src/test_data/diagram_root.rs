@@ -198,7 +198,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                     segment_id: segment,
                     running_time: Time::new_from_total_second(running_time),
                     is_reversed: seg_ref.is_reversed,
-                    properties: ExtensionProperty::new()
+                    properties: ExtensionProperty::new(),
                 },
                 TemplateTrainStation {
                     id: TemplateTrainStationId::new(station_id),
@@ -215,7 +215,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                     } else {
                         StopType::Stop(Time::new(0, 0, stop_time))
                     },
-                    properties: ExtensionProperty::new()
+                    properties: ExtensionProperty::new(),
                 },
             ));
         }
@@ -385,13 +385,13 @@ fn add_test_train(manager: &mut CommandManager) {
                         order: vec![],
                         segment_id,
                         is_reversed: false,
-                        properties: ExtensionProperty::new()
+                        properties: ExtensionProperty::new(),
                     },
                     SegmentTrainOrder {
                         order: vec![],
                         segment_id,
                         is_reversed: true,
-                        properties: ExtensionProperty::new()
+                        properties: ExtensionProperty::new(),
                     },
                 ),
             );
@@ -809,7 +809,7 @@ fn add_diagram_view_setting(manager: &mut CommandManager) {
         id: DiagramViewSettingsId::new(id),
         name: "てすと".to_string(),
         segments,
-        properties: ExtensionProperty::new()
+        properties: ExtensionProperty::new(),
     };
 
     manager

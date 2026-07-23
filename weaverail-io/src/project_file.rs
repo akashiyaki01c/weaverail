@@ -51,7 +51,7 @@ pub fn write_file(
     metadata: &Metadata,
 ) -> Result<(), WeaverailIoError> {
     let _ = &root.validate()?;
-    
+
     let mut file = File::create(path)?;
 
     let metadata = ron::ser::to_string(&metadata)?;

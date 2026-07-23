@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    error::ModelError, model::{DiagramRoot, ExtensionProperty, PropertiableObject}, weaverail_id,
+    error::ModelError,
+    model::{DiagramRoot, ExtensionProperty, PropertiableObject},
+    weaverail_id,
 };
 
 weaverail_id!(TrainTypeId, "TYP_");
@@ -76,7 +78,10 @@ impl DiagramRoot {
 
     /// 列車種別データが正常な値であるかを検証する
     pub fn validate_train_type(&self, train_type_id: TrainTypeId) -> Result<(), ModelError> {
-        let _ = self.train_types.get(&train_type_id).ok_or(ModelError::ObjectNotFound)?;
+        let _ = self
+            .train_types
+            .get(&train_type_id)
+            .ok_or(ModelError::ObjectNotFound)?;
         Ok(())
     }
 }
