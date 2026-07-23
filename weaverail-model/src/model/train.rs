@@ -8,9 +8,15 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, time::Time, timetable::{Timetable, TimetableId},
-    }, weaverail_id,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId, TemplateTrainSegment},
+        time::Time,
+        timetable::{Timetable, TimetableId},
+    },
+    weaverail_id,
 };
 
 weaverail_id!(TrainId, "TRA_");
@@ -71,19 +77,30 @@ impl DiagramRoot {
     /// 計算オーダは `O(1)`
     /// 指定IDの列車が存在しない場合はエラーを返す
     pub fn delete_train(&mut self, train_id: TrainId) -> Result<Train, ModelError> {
+        for timetable in self.timetables.values_mut() {
+            for order in timetable.segment_train_orders.values_mut() {
+                if let Some(index) = order.0.order.iter().position(|v| *v == train_id) {
+                    order.0.order.remove(index);
+                }
+                if let Some(index) = order.1.order.iter().position(|v| *v == train_id) {
+                    order.0.order.remove(index);
+                }
+            }
+        }
         self.trains
             .remove(&train_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 
-    pub fn get_stations(&self, train: &Train) -> Result<Vec<StationId>, ModelError> {
+    /// 列車の経由する駅を列挙する関数
+    pub fn get_train_stations(&self, train: &Train) -> Result<Vec<StationId>, ModelError> {
         let mut result = Vec::new();
         for segment in &train.template_segments {
             let template_train = self
                 .template_trains
                 .get(&segment.template_train_id)
                 .ok_or(ModelError::ObjectNotFound)?;
-            let stations = template_train
+            let stations: Vec<&super::template_train::TemplateTrainStation> = template_train
                 .get_filtered_stations(segment.start_station_id, segment.end_station_id)?;
             if result.is_empty() {
                 result.extend(stations.iter().map(|sta| sta.station_id));
@@ -92,6 +109,24 @@ impl DiagramRoot {
             }
         }
 
+        Ok(result)
+    }
+
+    /// 列車の経由する駅間を列挙する関数
+    pub fn get_train_segment(
+        &self,
+        train: &Train,
+    ) -> Result<Vec<TemplateTrainSegment>, ModelError> {
+        let mut result = Vec::new();
+        for segment in &train.template_segments {
+            let template_train = self
+                .template_trains
+                .get(&segment.template_train_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            let segments = template_train
+                .get_filtered_segment(segment.start_station_id, segment.end_station_id)?;
+            result.extend(segments.1.iter().map(|v| v.0.clone()));
+        }
         Ok(result)
     }
 }

@@ -35,7 +35,7 @@ pub fn get_time_result(
             train_id: train.id,
             times: vec![],
         };
-        for station_id in diagram_root.get_stations(train)? {
+        for station_id in diagram_root.get_train_stations(train)? {
             let arrival_node = node_map.get(&(train.id, station_id, NodeType::Arrival));
             let departure_node = node_map.get(&(train.id, station_id, NodeType::Departure));
 

@@ -21,7 +21,7 @@ pub struct Timetable {
     pub id: TimetableId,
     /// 時刻表名
     pub name: String,
-    /// 駅間の列車順序
+    /// 駅間の列車順序 (順行 / 逆行を表す)
     pub segment_train_orders: HashMap<LineSegmentId, (SegmentTrainOrder, SegmentTrainOrder)>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
