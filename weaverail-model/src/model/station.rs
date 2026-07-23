@@ -78,6 +78,12 @@ impl DiagramRoot {
             .values()
             .find(|station| station.name == station_name)
     }
+
+    /// 駅データが正常な値であるかを検証する
+    pub fn validate_station(&self, station_id: StationId) -> Result<(), ModelError> {
+        let _ = self.stations.get(&station_id).ok_or(ModelError::ObjectNotFound)?;
+        Ok(())
+    }
 }
 impl PropertiableObject for Station {
     fn get_property(&self, id: &str) -> Option<&Value> {

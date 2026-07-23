@@ -129,6 +129,21 @@ impl DiagramRoot {
         }
         Ok(result)
     }
+
+    /// 列車種別データが正常な値であるかを検証する
+    pub fn validate_train(&self, train_id: TrainId) -> Result<(), ModelError> {
+        let train = self
+            .trains
+            .get(&train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        for seg in train.template_segments.iter() {
+            let _ = self
+                .template_trains
+                .get(&seg.template_train_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+        }
+        Ok(())
+    }
 }
 impl PropertiableObject for Train {
     fn get_property(&self, id: &str) -> Option<&Value> {

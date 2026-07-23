@@ -7,9 +7,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    command::CommandError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId, segment_train_order::SegmentTrainOrder,
-    }, weaverail_id,
+    command::CommandError,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId,
+        segment_train_order::SegmentTrainOrder,
+    },
+    weaverail_id,
 };
 
 weaverail_id!(TimetableId, "TBL_");
@@ -57,6 +61,31 @@ impl DiagramRoot {
         self.timetables
             .remove(&timetable_id)
             .ok_or(CommandError::TargetObjectNotFound)
+    }
+
+    /// 時刻表データが正常な値であるかを検証する
+    pub fn validate_timetable(&self, timetable_id: TimetableId) -> Result<(), ModelError> {
+        let timetable = self
+            .timetables
+            .get(&timetable_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        for order in timetable.segment_train_orders.values() {
+            let _ = self
+                .segments
+                .get(&order.0.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            let _ = self
+                .segments
+                .get(&order.1.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            for forward in order.0.order.iter() {
+                let _ = self.trains.get(forward).ok_or(ModelError::ObjectNotFound)?;
+            }
+            for forward in order.1.order.iter() {
+                let _ = self.trains.get(forward).ok_or(ModelError::ObjectNotFound)?;
+            }
+        }
+        Ok(())
     }
 }
 impl PropertiableObject for Timetable {

@@ -4,9 +4,12 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId},
-    }, weaverail_id,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+    },
+    weaverail_id,
 };
 
 weaverail_id!(LineSegmentId, "SGM_");
@@ -92,6 +95,17 @@ impl DiagramRoot {
         self.segments
             .remove(&segment_id)
             .ok_or(ModelError::ObjectNotFound)
+    }
+
+    /// 駅間データが正常な値であるかを検証する
+    pub fn validate_segment(&self, segment_id: LineSegmentId) -> Result<(), ModelError> {
+        let segment = self
+            .get_segment(segment_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let _ = segment.start_station(self)?;
+        let _ = segment.end_station(self)?;
+
+        Ok(())
     }
 }
 impl PropertiableObject for LineSegment {

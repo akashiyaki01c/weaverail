@@ -10,9 +10,16 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, time::Time, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId},
-    }, weaverail_id,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        time::Time,
+        track::{Track, TrackId},
+        train_type::{TrainType, TrainTypeId},
+    },
+    weaverail_id,
 };
 
 weaverail_id!(TemplateTrainId, "TTR_");
@@ -372,6 +379,47 @@ impl DiagramRoot {
         }
         result
     }
+
+    /// テンプレート列車データが正常な値であるかを検証する
+    pub fn validate_template_train(
+        &self,
+        template_train_id: TemplateTrainId,
+    ) -> Result<(), ModelError> {
+        let template_train = self
+            .template_trains
+            .get(&template_train_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        for segment in template_train.segments.as_slice() {
+            let station = &segment.1;
+            let segment = &segment.0;
+
+            let _ = self
+                .stations
+                .get(&station.station_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            let _ = self
+                .tracks
+                .get(&station.track_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            let _ = self
+                .segments
+                .get(&segment.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+        }
+        {
+            let station = &template_train.start_station;
+            let _ = self
+                .stations
+                .get(&station.station_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+            let _ = self
+                .tracks
+                .get(&station.track_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+        }
+
+        Ok(())
+    }
 }
 
 weaverail_id!(TemplateTrainSegmentId, "TSG_");
@@ -427,7 +475,7 @@ pub struct TemplateTrainStation {
     /// 停車時間
     pub stop_time: StopType,
     /// 拡張プロパティ
-    pub properties: ExtensionProperty
+    pub properties: ExtensionProperty,
 }
 impl TemplateTrainStation {
     /// 駅を取得する関数

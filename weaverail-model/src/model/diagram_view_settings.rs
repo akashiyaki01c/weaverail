@@ -1,7 +1,11 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::{model::{ExtensionProperty, PropertiableObject, line::SegmentRef}, weaverail_id};
+use crate::{
+    error::ModelError,
+    model::{DiagramRoot, ExtensionProperty, PropertiableObject, line::SegmentRef},
+    weaverail_id,
+};
 
 weaverail_id!(DiagramViewSettingsId, "DVS_");
 
@@ -16,6 +20,28 @@ pub struct DiagramViewSettings {
     pub segments: Vec<DiagramViewSegment>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
+}
+impl DiagramRoot {
+    /// 駅間データが正常な値であるかを検証する
+    pub fn validate_diagram_view_settings(
+        &self,
+        diagram_view_settings_id: DiagramViewSettingsId,
+    ) -> Result<(), ModelError> {
+        let diagram_view_settings = self
+            .diagram_view_settings
+            .get(&diagram_view_settings_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        for seg in &diagram_view_settings.segments {
+            if let DiagramViewSegment::StationBetween { segment } = seg {
+                let _ = self
+                    .segments
+                    .get(&segment.segment_id)
+                    .ok_or(ModelError::ObjectNotFound)?;
+            }
+        }
+
+        Ok(())
+    }
 }
 impl PropertiableObject for DiagramViewSettings {
     fn get_property(&self, id: &str) -> Option<&Value> {

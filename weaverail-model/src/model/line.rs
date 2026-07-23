@@ -9,9 +9,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId},
-    }, weaverail_id,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+    },
+    weaverail_id,
 };
 
 weaverail_id!(LineId, "LIN_");
@@ -346,5 +350,17 @@ impl DiagramRoot {
         } else {
             Ok(reversed_segment.ok_or(ModelError::ObjectNotFound)?)
         }
+    }
+
+    /// 路線データが正常な値であるかを検証する
+    pub fn validate_line(&self, line_id: LineId) -> Result<(), ModelError> {
+        let line = self.lines.get(&line_id).ok_or(ModelError::ObjectNotFound)?;
+        for seg in &line.segments {
+            let _ = self
+                .get_segment(seg.segment_id)
+                .ok_or(ModelError::ObjectNotFound)?;
+        }
+
+        Ok(())
     }
 }

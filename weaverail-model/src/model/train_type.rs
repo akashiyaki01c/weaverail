@@ -73,6 +73,12 @@ impl DiagramRoot {
             .values()
             .find(|train_type| train_type.name == train_type_name)
     }
+
+    /// 列車種別データが正常な値であるかを検証する
+    pub fn validate_train_type(&self, train_type_id: TrainTypeId) -> Result<(), ModelError> {
+        let _ = self.train_types.get(&train_type_id).ok_or(ModelError::ObjectNotFound)?;
+        Ok(())
+    }
 }
 impl PropertiableObject for TrainType {
     fn get_property(&self, id: &str) -> Option<&Value> {

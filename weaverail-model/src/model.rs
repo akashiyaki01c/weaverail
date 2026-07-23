@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{
+    error::ModelError,
     id_issuer::IdIssuer,
     model::{
         diagram_view_settings::{DiagramViewSettings, DiagramViewSettingsId},
@@ -91,6 +92,40 @@ pub struct DiagramRoot {
     pub id_issuer: IdIssuer,
     /// バージョン
     pub version: u32,
+}
+impl DiagramRoot {
+    /// データが正常な値であるかを検証する
+    pub fn vaidate(&self) -> Result<(), ModelError> {
+        for sta in self.stations.keys() {
+            let _ = self.validate_station(*sta)?;
+        }
+        for track in self.tracks.keys() {
+            let _ = self.validate_track(*track)?;
+        }
+        for segment in self.segments.keys() {
+            let _ = self.validate_segment(*segment)?;
+        }
+        for line in self.lines.keys() {
+            let _ = self.validate_line(*line)?;
+        }
+        for train_type in self.train_types.keys() {
+            let _ = self.validate_train_type(*train_type)?;
+        }
+        for template_train in self.template_trains.keys() {
+            let _ = self.validate_template_train(*template_train)?;
+        }
+        for timetable in self.timetables.keys() {
+            let _ = self.validate_timetable(*timetable)?;
+        }
+        for train in self.trains.keys() {
+            let _ = self.validate_train(*train)?;
+        }
+        for diagram_view_setting in self.diagram_view_settings.keys() {
+            let _ = self.validate_diagram_view_settings(*diagram_view_setting)?;
+        }
+
+        Ok(())
+    }
 }
 impl PropertiableObject for DiagramRoot {
     fn get_property(&self, id: &str) -> Option<&Value> {

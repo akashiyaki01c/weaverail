@@ -3,9 +3,12 @@
 //!   - Track (列車番線)
 
 use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId},
-    }, weaverail_id,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+    },
+    weaverail_id,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -73,6 +76,19 @@ impl DiagramRoot {
         self.tracks
             .remove(&track_id)
             .ok_or(ModelError::ObjectNotFound)
+    }
+
+    /// 番線データが正常な値であるかを検証する
+    pub fn validate_track(&self, track_id: TrackId) -> Result<(), ModelError> {
+        let track = self
+            .tracks
+            .get(&track_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        let _ = self
+            .stations
+            .get(&track.station_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+        Ok(())
     }
 }
 impl PropertiableObject for Track {
