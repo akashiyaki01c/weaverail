@@ -240,7 +240,7 @@ fn add_train_types(manager: &mut CommandManager) {
     }
 }
 
-fn add_test_train(manager: &mut CommandManager) {
+fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
     let mut timetable = Timetable::new(TimetableId::new(manager.root.id_issuer.next()), "1号表");
 
     // 12:00発湊川発姫路行特急
@@ -564,6 +564,7 @@ fn add_test_train(manager: &mut CommandManager) {
         }
     }
 
+    if is_detail
     {
         // 12:30から2分ごとに列車を追加
         let stations = vec![
@@ -639,6 +640,8 @@ fn add_test_train(manager: &mut CommandManager) {
             }
         }
     }
+
+    if is_detail
     {
         // 12:30から2分ごとに列車を追加
         let mut stations = vec![
@@ -827,7 +830,21 @@ pub fn get_test_data() -> CommandManager {
     add_template_trains(&mut manager, include_str!("./shinki_up.tsv"));
     add_template_trains(&mut manager, include_str!("./hanshin_down.tsv"));
     add_template_trains(&mut manager, include_str!("./hanshin_up.tsv"));
-    add_test_train(&mut manager);
+    add_test_train(&mut manager, true);
+    add_diagram_view_setting(&mut manager);
+    manager
+}
+
+pub fn get_test_data_shortly() -> CommandManager {
+    let mut manager = CommandManager::new(Box::new(EmptyEventEmitter));
+    add_stations(&mut manager);
+    add_lines(&mut manager);
+    add_train_types(&mut manager);
+    add_template_trains(&mut manager, include_str!("./shinki_down.tsv"));
+    add_template_trains(&mut manager, include_str!("./shinki_up.tsv"));
+    add_template_trains(&mut manager, include_str!("./hanshin_down.tsv"));
+    add_template_trains(&mut manager, include_str!("./hanshin_up.tsv"));
+    add_test_train(&mut manager, false);
     add_diagram_view_setting(&mut manager);
     manager
 }

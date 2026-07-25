@@ -286,23 +286,24 @@ impl DiagramRoot {
     }
 
     /// 路線の末尾の駅間を削除する関数
-    pub fn pop_back_line_segment(&mut self, line_id: LineId) -> Result<(), ModelError> {
+    pub fn pop_back_line_segment(&mut self, line_id: LineId) -> Result<SegmentRef, ModelError> {
         let line = self
             .lines
             .get_mut(&line_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        line.segments.pop();
-        Ok(())
+        line.segments.pop().ok_or(ModelError::Empty)
     }
 
     /// 路線の先頭の駅間を削除する関数
-    pub fn pop_front_line_segment(&mut self, line_id: LineId) -> Result<(), ModelError> {
+    pub fn pop_front_line_segment(&mut self, line_id: LineId) -> Result<SegmentRef, ModelError> {
         let line = self
             .lines
             .get_mut(&line_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        line.segments.remove(0);
-        Ok(())
+        if line.segments.is_empty() {
+            return Err(ModelError::Empty);
+        }
+        Ok(line.segments.remove(0))
     }
 
     /// 駅間を、開始/終了駅名から検索する関数

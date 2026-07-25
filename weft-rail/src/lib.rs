@@ -19,6 +19,7 @@ pub mod sort_diff;
 pub mod time_result;
 pub mod time_result_diff;
 pub mod update_node;
+pub mod shuutle;
 
 use weaverail_model::{
     error::ModelError,
