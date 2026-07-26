@@ -1,5 +1,6 @@
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "../api";
+import { TestViwer } from "./TestViewer";
 
 export * from "./StationViewer";
 
@@ -12,7 +13,7 @@ export class CoreExtensions implements WeaverailExtension {
 			label: "",
 			slot: "main",
 			render: function (): React.ReactNode {
-				return <>めいんだよ〜(拡張機能側)</>
+				return <></>
 			}
 		})
 		api.ui.registerPanel({
@@ -20,7 +21,7 @@ export class CoreExtensions implements WeaverailExtension {
 			label: "",
 			slot: "sidebar",
 			render: function (): React.ReactNode {
-				return <>さぶだよ〜(拡張機能側)</>
+				return <><TestViwer /></>
 			}
 		})
 		api.ui.registerPanel({

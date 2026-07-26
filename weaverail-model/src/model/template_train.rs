@@ -446,6 +446,16 @@ impl TemplateTrainSegment {
             .get(&self.segment_id)
             .ok_or(ModelError::ObjectNotFound)
     }
+
+    /// 駅間を取得する関数
+    /// 計算量は `O(1)`
+    pub fn segment_with_reversed<'a>(&self, root: &'a DiagramRoot) -> Result<(&'a LineSegment, bool), ModelError> {
+        let result = root.segments
+            .get(&self.segment_id)
+            .ok_or(ModelError::ObjectNotFound)?;
+
+        Ok((result, self.is_reversed))
+    }
 }
 impl PropertiableObject for TemplateTrainSegment {
     fn get_property(&self, id: &str) -> Option<&Value> {

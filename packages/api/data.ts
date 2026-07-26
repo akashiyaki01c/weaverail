@@ -25,6 +25,7 @@ export interface WeaverailDataApi {
 		name: string;
 	}[]>;
 	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
+	debugInsertTrain(timetableId: TimetableId, departureTime: Time): Promise<void>;
 }
 
 /** WeaverailのAPI群を表すオブジェクト */
@@ -89,6 +90,10 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 		name: string;
 	}[]> {
 		return await invoke("get_warp_stations", { viewSettingsId });
+	}
+
+	async debugInsertTrain(timetableId: TimetableId, startingDepartureTime: Time): Promise<void> {
+		return await invoke("debug_insert_train", { timetableId, startingDepartureTime });
 	}
 
 	constructor() {

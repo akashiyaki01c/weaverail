@@ -14,7 +14,7 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle();
             let mut app_state = AppState::new(Box::new(TauriEmitter::new(handle.clone())));
-            app_state.command_manager = weaverail_model::test_data::diagram_root::get_test_data();
+            app_state.command_manager = weaverail_model::test_data::diagram_root::get_test_data_shortly();
             app_state.command_manager.emitter = Box::new(TauriEmitter::new(handle.clone()));
 
             app.manage(Mutex::new(app_state));
@@ -48,7 +48,8 @@ pub fn run() {
             crate::command::train_type::new_train_type_id,
             crate::command::train_type::add_train_type,
             crate::command::train_type::remove_train_type,
-            crate::command::weave::weave
+            crate::command::weave::weave,
+            crate::command::weave::debug_insert_train
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
