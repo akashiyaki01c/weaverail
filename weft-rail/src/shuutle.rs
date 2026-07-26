@@ -25,13 +25,13 @@ pub fn get_starting_order_index(
         root.segments
             .get(&segment_id)
             .ok_or(ModelError::ObjectNotFound)?
-            .end_station(&root)?
+            .end_station(root)?
             .id
     } else {
         root.segments
             .get(&segment_id)
             .ok_or(ModelError::ObjectNotFound)?
-            .start_station(&root)?
+            .start_station(root)?
             .id
     };
     // 始発駅→次駅を走行する列車の発車時刻一覧
@@ -132,7 +132,7 @@ pub fn get_next_order_index(
         // 先行列車・続行列車とも前区間に存在しない
         (None, None) => {
             println!("先行列車・続行列車とも前区間に存在しない");
-            return Ok(None);
+            Ok(None)
         }
         // 先行列車が前区間に存在せず、続行列車が前区間に存在する
         (None, Some(_before_following_train)) => {
@@ -144,13 +144,13 @@ pub fn get_next_order_index(
                             "先行列車が前区間に存在せず、続行列車が前区間に存在する, 続行列車が次区間にも存在する, 次区間において、続行列車の前に列車が存在しない場合"
                         );
                         // 次区間において、続行列車の前に列車が存在しない場合
-                        return Ok(Some(next_before_following_train_index));
+                        Ok(Some(next_before_following_train_index))
                     } else {
                         println!(
                             "先行列車が前区間に存在せず、続行列車が前区間に存在する, 続行列車が次区間にも存在する, 次区間において、続行列車の前に列車が存在する場合"
                         );
                         // 次区間において、続行列車の前に列車が存在する場合
-                        return Ok(None);
+                        Ok(None)
                     }
                 }
                 None => {
@@ -158,7 +158,7 @@ pub fn get_next_order_index(
                         "先行列車が前区間に存在せず、続行列車が前区間に存在する, 続行列車が次区間に存在しない場合"
                     );
                     // 続行列車が次区間に存在しない
-                    return Ok(None);
+                    Ok(None)
                 }
             }
         }
@@ -172,13 +172,13 @@ pub fn get_next_order_index(
                             "先行列車が前区間に存在し、続行列車が前区間に存在しない, 先行列車が次区間にも存在する, 次区間において、先行列車の後に列車が存在しない場合"
                         );
                         // 次区間において、先行列車の後に列車が存在しない場合
-                        return Ok(Some(next_before_preceding_train_index + 1));
+                        Ok(Some(next_before_preceding_train_index + 1))
                     } else {
                         println!(
                             "先行列車が前区間に存在し、続行列車が前区間に存在しない, 先行列車が次区間にも存在する, 次区間において、先行列車の後に列車が存在する場合"
                         );
                         // 次区間において、先行列車の後に列車が存在する場合
-                        return Ok(None);
+                        Ok(None)
                     }
                 }
                 None => {
@@ -186,7 +186,7 @@ pub fn get_next_order_index(
                         "先行列車が前区間に存在し、続行列車が前区間に存在しない, 先行列車が次区間に存在しない"
                     );
                     // 先行列車が次区間に存在しない
-                    return Ok(None);
+                    Ok(None)
                 }
             }
         }
@@ -250,14 +250,14 @@ pub fn get_next_order_index(
 
                         return Ok(Some(next_before_preceding_train_index + 1 + i));
                     }
-                    return Ok(Some(next_before_following_train_index));
+                    Ok(Some(next_before_following_train_index))
                 }
                 // 次区間で先行列車・続行列車が存在しない
                 (None, None) => {
                     println!(
                         "先行列車・続行列車が前区間に存在する, 次区間で先行列車・続行列車が存在しない"
                     );
-                    return Ok(None);
+                    Ok(None)
                 }
                 // 次区間で先行列車が存在せず、続行列車が存在する
                 (None, Some(next_before_following_train_index)) => {
@@ -275,20 +275,20 @@ pub fn get_next_order_index(
                                 "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在せず、続行列車が存在する, 続行列車の1本前が前区間に存在する"
                             );
                             // 続行列車の1本前が前区間に存在する
-                            return Ok(Some(next_before_following_train_index));
+                            Ok(Some(next_before_following_train_index))
                         } else {
                             println!(
                                 "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在せず、続行列車が存在する, 続行列車の1本前が前区間に存在しない"
                             );
                             // 続行列車の1本前が前区間に存在しない
-                            return Ok(None);
+                            Ok(None)
                         }
                     } else {
                         println!(
                             "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在せず、続行列車が存在する, 続行列車の1本前が存在しない"
                         );
                         // 続行列車の1本前が存在しない
-                        return Ok(Some(next_before_following_train_index));
+                        Ok(Some(next_before_following_train_index))
                     }
                 }
                 // 次区間で先行列車が存在し、続行列車が存在しない
@@ -303,20 +303,20 @@ pub fn get_next_order_index(
                             println!(
                                 "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在し、続行列車が存在しない, 先行列車の1本後が前区間に存在する"
                             );
-                            return Ok(Some(next_before_preceding_train_index + 1));
+                            Ok(Some(next_before_preceding_train_index + 1))
                         } else {
                             println!(
                                 "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在し、続行列車が存在しない, 先行列車の1本後が前区間に存在しない"
                             );
                             // 先行列車の1本後が前区間に存在しない
-                            return Ok(None);
+                            Ok(None)
                         }
                     } else {
                         println!(
                             "先行列車・続行列車が前区間に存在する, 次区間で先行列車が存在し、続行列車が存在しない, 先行列車の1本後が前区間に存在しない"
                         );
                         // 先行列車の1本後が存在しない
-                        return Ok(Some(next_before_preceding_train_index + 1));
+                        Ok(Some(next_before_preceding_train_index + 1))
                     }
                 }
             }
@@ -368,7 +368,7 @@ pub fn insert_train_order(
         .ok_or(ModelError::ObjectNotFound)?
         .template_segments = vec![];
 
-    let mut nodes = crate::make_node_diff::make_node(&root, timetable_id)?;
+    let mut nodes = crate::make_node_diff::make_node(root, timetable_id)?;
     let mut node_array = crate::sort_diff::sort_node(&nodes)?;
     let mut times = crate::ripple_diff::ripple_node_diff(&nodes, &node_array);
 
@@ -380,7 +380,7 @@ pub fn insert_train_order(
     {
         let segment = segments.first().unwrap();
         order =
-            get_starting_order_index(&root, &nodes, &times, segment.1, segment.2, departure_time)?;
+            get_starting_order_index(root, &nodes, &times, segment.1, segment.2, departure_time)?;
         println!("1. 初回");
         println!("順序: {:?}", order);
 
@@ -443,7 +443,7 @@ pub fn insert_train_order(
             println!("順序: {:?}", order);
         } else {
             println!("1. 前区間より順序が同定できなかった");
-            nodes = crate::make_node_diff::make_node(&root, timetable_id)?;
+            nodes = crate::make_node_diff::make_node(root, timetable_id)?;
             node_array = crate::sort_diff::sort_node(&nodes)?;
             times = crate::ripple_diff::ripple_node_diff(&nodes, &node_array);
 
@@ -505,7 +505,7 @@ pub fn insert_train_order(
             // 新規TemplateSegmentを挿入
             let line_segment = root
                 .segments
-                .get(&segment)
+                .get(segment)
                 .ok_or(ModelError::ObjectNotFound)?;
 
             let (start_station, end_station) = if *is_reversed {
@@ -531,12 +531,12 @@ pub fn insert_train_order(
                 .ok_or(ModelError::Error)?;
             let end_station_id = if *is_reversed {
                 root.segments
-                    .get(&segment)
+                    .get(segment)
                     .ok_or(ModelError::ObjectNotFound)?
                     .start_station
             } else {
                 root.segments
-                    .get(&segment)
+                    .get(segment)
                     .ok_or(ModelError::ObjectNotFound)?
                     .end_station
             };

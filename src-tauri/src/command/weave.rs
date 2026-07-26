@@ -43,7 +43,7 @@ pub async fn debug_insert_train(
 
     let _ = &root.trains.insert(add_train.id, add_train.clone());
 
-    let _ = insert_train_order(&mut root, timetable_id, add_train.id);
+    let _ = insert_train_order(root, timetable_id, add_train.id);
 
     root.version += 1;
 
