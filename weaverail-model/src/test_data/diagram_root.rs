@@ -564,8 +564,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
         }
     }
 
-    if is_detail
-    {
+    if is_detail {
         // 12:30から2分ごとに列車を追加
         let stations = vec![
             "湊川",
@@ -641,8 +640,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
         }
     }
 
-    if is_detail
-    {
+    if is_detail {
         // 12:30から2分ごとに列車を追加
         let mut stations = vec![
             "湊川",

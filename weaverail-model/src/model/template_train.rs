@@ -449,8 +449,12 @@ impl TemplateTrainSegment {
 
     /// 駅間を取得する関数
     /// 計算量は `O(1)`
-    pub fn segment_with_reversed<'a>(&self, root: &'a DiagramRoot) -> Result<(&'a LineSegment, bool), ModelError> {
-        let result = root.segments
+    pub fn segment_with_reversed<'a>(
+        &self,
+        root: &'a DiagramRoot,
+    ) -> Result<(&'a LineSegment, bool), ModelError> {
+        let result = root
+            .segments
             .get(&self.segment_id)
             .ok_or(ModelError::ObjectNotFound)?;
 
