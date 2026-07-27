@@ -1,14 +1,12 @@
 use std::sync::Mutex;
 
+use tauri::{AppHandle, Emitter};
 use weaverail_model::{
-    app::AppState,
-    command::CommandError,
-    model::{
+    app::AppState, command::CommandError, event::EmitEventType, model::{
         time::Time,
         timetable::TimetableId,
         train::{TemplateSegment, Train, TrainId},
-    },
-    result_weft::ResultWeftTrain,
+    }, result_weft::ResultWeftTrain,
 };
 use weft_rail::shuutle::insert_train_order;
 
@@ -26,9 +24,12 @@ pub async fn debug_insert_train(
     starting_departure_time: Time,
     timetable_id: TimetableId,
     state: tauri::State<'_, Mutex<AppState>>,
+    handle: AppHandle
 ) -> Result<(), CommandError> {
+    let start = std::time::Instant::now();
+
     let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
-    let mut root = &mut state.command_manager.root;
+    let root = &mut state.command_manager.root;
 
     let mut add_train = Train::new(TrainId(root.id_issuer.next()), timetable_id);
     add_train.template_segments = vec![TemplateSegment {
@@ -46,6 +47,11 @@ pub async fn debug_insert_train(
     let _ = insert_train_order(root, timetable_id, add_train.id);
 
     root.version += 1;
+
+    let _ = handle.emit(EmitEventType::TrainAdded.into(), ());
+
+    let duration = start.elapsed();
+    println!("insert-train {:?}us", duration.as_micros());
 
     Ok(())
 }
