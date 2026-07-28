@@ -12,7 +12,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::hash_map::Entry;
+use indexmap::map::Entry;
 use weaverail_object::WeaverailDNA;
 
 weaverail_id!(TrackId, "TRC_");
@@ -74,7 +74,7 @@ impl DiagramRoot {
             return Err(ModelError::ExternalReferenced);
         }
         self.tracks
-            .remove(&track_id)
+            .shift_remove(&track_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

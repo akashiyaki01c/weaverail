@@ -1,5 +1,6 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 
+use indexmap::IndexMap;
 use ron::ser::PrettyConfig;
 use weaverail_model::{
     metadata::Metadata,
@@ -36,27 +37,27 @@ pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoE
     diagram_root.version = root_file.version;
     let metadata = root_file.metadata;
 
-    let stations: HashMap<StationId, Station> = ron::de::from_str(&std::fs::read_to_string(
+    let stations: IndexMap<StationId, Station> = ron::de::from_str(&std::fs::read_to_string(
         path.join(project_file.path.stations_path),
     )?)?;
     diagram_root.stations = stations;
 
-    let tracks: HashMap<TrackId, Track> = ron::de::from_str(&std::fs::read_to_string(
+    let tracks: IndexMap<TrackId, Track> = ron::de::from_str(&std::fs::read_to_string(
         path.join(project_file.path.tracks_path),
     )?)?;
     diagram_root.tracks = tracks;
 
-    let segments: HashMap<LineSegmentId, LineSegment> = ron::de::from_str(
+    let segments: IndexMap<LineSegmentId, LineSegment> = ron::de::from_str(
         &std::fs::read_to_string(path.join(project_file.path.segments_path))?,
     )?;
     diagram_root.segments = segments;
 
-    let train_types: HashMap<TrainTypeId, TrainType> = ron::de::from_str(
+    let train_types: IndexMap<TrainTypeId, TrainType> = ron::de::from_str(
         &std::fs::read_to_string(path.join(project_file.path.train_types_path))?,
     )?;
     diagram_root.train_types = train_types;
 
-    let template_trains: HashMap<TemplateTrainId, TemplateTrain> = ron::de::from_str(
+    let template_trains: IndexMap<TemplateTrainId, TemplateTrain> = ron::de::from_str(
         &std::fs::read_to_string(path.join(project_file.path.template_trains_path))?,
     )?;
     diagram_root.template_trains = template_trains;

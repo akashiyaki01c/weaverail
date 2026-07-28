@@ -2,7 +2,7 @@
 //! - Train (列車)
 //!   - TemplateSegment (テンプレート列車への部分参照)
 
-use std::collections::hash_map::Entry;
+use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -88,7 +88,7 @@ impl DiagramRoot {
             }
         }
         self.trains
-            .remove(&train_id)
+            .shift_remove(&train_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

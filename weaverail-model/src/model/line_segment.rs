@@ -1,5 +1,4 @@
-use std::collections::hash_map::Entry;
-
+use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -93,7 +92,7 @@ impl DiagramRoot {
         }
 
         self.segments
-            .remove(&segment_id)
+            .shift_remove(&segment_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

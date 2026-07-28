@@ -15,6 +15,7 @@ pub mod train_type;
 
 use std::collections::HashMap;
 
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -69,23 +70,23 @@ pub trait PropertiableObject {
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct DiagramRoot {
     /// 駅の集合
-    pub stations: HashMap<StationId, Station>,
+    pub stations: IndexMap<StationId, Station>,
     /// 番線の集合
-    pub tracks: HashMap<TrackId, Track>,
+    pub tracks: IndexMap<TrackId, Track>,
     /// 駅間の集合
-    pub segments: HashMap<LineSegmentId, LineSegment>,
+    pub segments: IndexMap<LineSegmentId, LineSegment>,
     /// 路線の集合
-    pub lines: HashMap<LineId, Line>,
+    pub lines: IndexMap<LineId, Line>,
     /// 列車種別の集合
-    pub train_types: HashMap<TrainTypeId, TrainType>,
+    pub train_types: IndexMap<TrainTypeId, TrainType>,
     /// テンプレート列車の集合
-    pub template_trains: HashMap<TemplateTrainId, TemplateTrain>,
+    pub template_trains: IndexMap<TemplateTrainId, TemplateTrain>,
     /// 時刻表の集合
-    pub timetables: HashMap<TimetableId, Timetable>,
+    pub timetables: IndexMap<TimetableId, Timetable>,
     /// 列車の集合
-    pub trains: HashMap<TrainId, Train>,
+    pub trains: IndexMap<TrainId, Train>,
     /// ダイヤグラムの表示設定の集合
-    pub diagram_view_settings: HashMap<DiagramViewSettingsId, DiagramViewSettings>,
+    pub diagram_view_settings: IndexMap<DiagramViewSettingsId, DiagramViewSettings>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
     /// ID発行

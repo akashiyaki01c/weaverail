@@ -1,7 +1,7 @@
 //! Weaverail上の「列車種別」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
 //! - TrainType (列車種別)
 
-use std::collections::hash_map::Entry;
+use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -64,7 +64,7 @@ impl DiagramRoot {
         }
 
         self.train_types
-            .remove(&train_type_id)
+            .shift_remove(&train_type_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

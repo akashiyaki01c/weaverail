@@ -1,5 +1,6 @@
-use std::{collections::HashMap, sync::Mutex};
+use std::sync::Mutex;
 
+use indexmap::IndexMap;
 use weaverail_model::{
     app::AppState,
     command::CommandError,
@@ -31,7 +32,7 @@ pub async fn get_root(
 #[tauri::command]
 pub async fn get_stations(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<StationId, Station>, CommandError> {
+) -> Result<IndexMap<StationId, Station>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -44,7 +45,7 @@ pub async fn get_stations(
 #[tauri::command]
 pub async fn get_tracks(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrackId, Track>, CommandError> {
+) -> Result<IndexMap<TrackId, Track>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -57,7 +58,7 @@ pub async fn get_tracks(
 #[tauri::command]
 pub async fn get_segments(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<LineSegmentId, LineSegment>, CommandError> {
+) -> Result<IndexMap<LineSegmentId, LineSegment>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -70,7 +71,7 @@ pub async fn get_segments(
 #[tauri::command]
 pub async fn get_lines(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<LineId, Line>, CommandError> {
+) -> Result<IndexMap<LineId, Line>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -83,7 +84,7 @@ pub async fn get_lines(
 #[tauri::command]
 pub async fn get_train_types(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrainTypeId, TrainType>, CommandError> {
+) -> Result<IndexMap<TrainTypeId, TrainType>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -96,7 +97,7 @@ pub async fn get_train_types(
 #[tauri::command]
 pub async fn get_template_trains(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TemplateTrainId, TemplateTrain>, CommandError> {
+) -> Result<IndexMap<TemplateTrainId, TemplateTrain>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -109,7 +110,7 @@ pub async fn get_template_trains(
 #[tauri::command]
 pub async fn get_timetables(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TimetableId, Timetable>, CommandError> {
+) -> Result<IndexMap<TimetableId, Timetable>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?
@@ -122,7 +123,7 @@ pub async fn get_timetables(
 #[tauri::command]
 pub async fn get_trains(
     state: tauri::State<'_, Mutex<AppState>>,
-) -> Result<HashMap<TrainId, Train>, CommandError> {
+) -> Result<IndexMap<TrainId, Train>, CommandError> {
     Ok(state
         .lock()
         .map_err(|_| CommandError::MutexLockError)?

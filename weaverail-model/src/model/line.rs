@@ -2,9 +2,9 @@
 //! - Line (路線)
 //!   - LineSegment (駅間)
 
-use std::collections::hash_map::Entry;
 use std::iter;
 
+use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -156,7 +156,7 @@ impl DiagramRoot {
     /// 指定IDの路線が存在しない場合はエラーを返す
     pub fn delete_line(&mut self, line_id: LineId) -> Result<Line, ModelError> {
         self.lines
-            .remove(&line_id)
+            .shift_remove(&line_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

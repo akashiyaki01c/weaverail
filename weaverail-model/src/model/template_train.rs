@@ -4,7 +4,7 @@
 //!   - TemplateTrainStation (テンプレート列車の駅情報)
 //!     - StopType (停車種別)
 
-use std::collections::hash_map::Entry;
+use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -234,7 +234,7 @@ impl DiagramRoot {
             return Err(ModelError::ExternalReferenced);
         }
         self.template_trains
-            .remove(&template_train_id)
+            .shift_remove(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

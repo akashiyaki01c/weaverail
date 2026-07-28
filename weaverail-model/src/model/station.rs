@@ -9,7 +9,7 @@ use crate::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::hash_map::Entry;
+use indexmap::map::Entry;
 use weaverail_object::WeaverailDNA;
 
 weaverail_id!(StationId, "STA_");
@@ -69,7 +69,7 @@ impl DiagramRoot {
             return Err(ModelError::ExternalReferenced);
         }
         self.stations
-            .remove(&station_id)
+            .shift_remove(&station_id)
             .ok_or(ModelError::ObjectNotFound)
     }
 

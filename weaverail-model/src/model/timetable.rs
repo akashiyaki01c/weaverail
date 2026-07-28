@@ -1,7 +1,8 @@
 //! Weaverail上の「時刻表」を表すデータ構造を定義するモジュールであり、以下のモデルの定義を内包する
 //! - Timetable (時刻表)
 
-use std::collections::{HashMap, hash_map::Entry};
+use indexmap::map::Entry;
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -59,7 +60,7 @@ impl DiagramRoot {
         timetable_id: TimetableId,
     ) -> Result<Timetable, CommandError> {
         self.timetables
-            .remove(&timetable_id)
+            .shift_remove(&timetable_id)
             .ok_or(CommandError::TargetObjectNotFound)
     }
 
