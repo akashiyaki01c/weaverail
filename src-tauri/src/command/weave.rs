@@ -2,11 +2,15 @@ use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter};
 use weaverail_model::{
-    app::AppState, command::CommandError, event::EmitEventType, model::{
+    app::AppState,
+    command::CommandError,
+    event::EmitEventType,
+    model::{
         time::Time,
         timetable::TimetableId,
         train::{TemplateSegment, Train, TrainId},
-    }, result_weft::ResultWeftTrain,
+    },
+    result_weft::ResultWeftTrain,
 };
 use weft_rail::shuutle::insert_train_order;
 
@@ -24,7 +28,7 @@ pub async fn debug_insert_train(
     starting_departure_time: Time,
     timetable_id: TimetableId,
     state: tauri::State<'_, Mutex<AppState>>,
-    handle: AppHandle
+    handle: AppHandle,
 ) -> Result<(), CommandError> {
     let start = std::time::Instant::now();
 

@@ -1,8 +1,8 @@
 use thiserror::Error;
 use weaverail_model::error::ModelError;
 
-pub mod ron_compressed_zstd;
 pub mod directory;
+pub mod ron_compressed_zstd;
 
 #[derive(Error, Debug)]
 pub enum WeaverailIoError {

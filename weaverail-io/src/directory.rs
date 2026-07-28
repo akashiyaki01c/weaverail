@@ -2,8 +2,16 @@ use std::{collections::HashMap, path::PathBuf};
 
 use ron::ser::PrettyConfig;
 use weaverail_model::{
-    metadata::Metadata, model::{
-        DiagramRoot, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId}, timetable::{Timetable, TimetableId}, track::{Track, TrackId}, train::{Train, TrainId}, train_type::{TrainType, TrainTypeId},
+    metadata::Metadata,
+    model::{
+        DiagramRoot,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId},
+        timetable::{Timetable, TimetableId},
+        track::{Track, TrackId},
+        train::Train,
+        train_type::{TrainType, TrainTypeId},
     },
 };
 
@@ -60,12 +68,11 @@ pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoE
     diagram_root.timetables = timetables;
 
     for train_path in project_file.path.trains_path {
-        let trains: Vec<Train> = ron::de::from_str(
-            &std::fs::read_to_string(path.join(train_path))?,
-        )?;
+        let trains: Vec<Train> =
+            ron::de::from_str(&std::fs::read_to_string(path.join(train_path))?)?;
         for train in trains {
-			diagram_root.trains.insert(train.id, train);
-		}
+            diagram_root.trains.insert(train.id, train);
+        }
     }
 
     Ok((diagram_root, metadata))
@@ -86,10 +93,11 @@ pub fn write_file(
 
     let mut project = DirectoryProject::default();
     for timetable in root.timetables.keys() {
-        project
-            .path
-            .trains_path
-            .push(PathBuf::from("model").join("trains").join(format!("{}.ron", timetable.to_string())));
+        project.path.trains_path.push(
+            PathBuf::from("model")
+                .join("trains")
+                .join(format!("{}.ron", timetable.to_string())),
+        );
     }
     std::fs::write(
         path.join("project.ron"),
