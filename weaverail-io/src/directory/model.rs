@@ -37,7 +37,7 @@ pub struct PathSettings {
     pub lines_path: PathBuf,
     pub train_types_path: PathBuf,
     pub template_trains_path: PathBuf,
-    pub timetables_path: PathBuf,
+    pub timetables_path: Vec<PathBuf>,
     pub trains_path: Vec<PathBuf>,
 }
 impl Default for PathSettings {
@@ -45,12 +45,12 @@ impl Default for PathSettings {
         Self {
             root_path: PathBuf::from("model").join("root.ron"),
             stations_path: PathBuf::from("model").join("stations.ron"),
-            tracks_path: PathBuf::from("model").join("tracks"),
+            tracks_path: PathBuf::from("model").join("tracks.ron"),
             segments_path: PathBuf::from("model").join("segments.ron"),
             lines_path: PathBuf::from("model").join("lines.ron"),
-            train_types_path: PathBuf::from("model").join("train_types"),
+            train_types_path: PathBuf::from("model").join("train_types.ron"),
             template_trains_path: PathBuf::from("model").join("template_train.ron"),
-            timetables_path: PathBuf::from("model").join("timetables.ron"),
+            timetables_path: vec![],
             trains_path: vec![],
         }
     }

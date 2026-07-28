@@ -8,7 +8,7 @@ use weaverail_model::{
         line_segment::{LineSegment, LineSegmentId},
         station::{Station, StationId},
         template_train::{TemplateTrain, TemplateTrainId},
-        timetable::{Timetable, TimetableId},
+        timetable::Timetable,
         track::{Track, TrackId},
         train::Train,
         train_type::{TrainType, TrainTypeId},
@@ -25,7 +25,6 @@ mod model;
 /// Weaverailプロジェクトファイルを読み込む関数
 pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
     let mut diagram_root = DiagramRoot::default();
-    
 
     let project_file: DirectoryProject =
         ron::de::from_str(&std::fs::read_to_string(path.join("project.ron"))?)?;
@@ -62,10 +61,11 @@ pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoE
     )?;
     diagram_root.template_trains = template_trains;
 
-    let timetables: HashMap<TimetableId, Timetable> = ron::de::from_str(&std::fs::read_to_string(
-        path.join(project_file.path.timetables_path),
-    )?)?;
-    diagram_root.timetables = timetables;
+    for timetable_path in project_file.path.timetables_path {
+        let timetable: Timetable =
+            ron::de::from_str(&std::fs::read_to_string(path.join(timetable_path))?)?;
+        diagram_root.timetables.insert(timetable.id, timetable);
+    }
 
     for train_path in project_file.path.trains_path {
         let trains: Vec<Train> =
@@ -89,9 +89,21 @@ pub fn write_file(
     }
 
     let _ = &root.validate()?;
-    let pretty_config = PrettyConfig::new().new_line("\n");
+    let pretty_config = PrettyConfig::new()
+        .new_line("\n")
+		.indentor("\t")
+		.number_suffixes(true)
+		.escape_strings(true)
+        .struct_names(true);
 
     let mut project = DirectoryProject::default();
+    for timetable in root.timetables.keys() {
+        project.path.timetables_path.push(
+            PathBuf::from("model")
+                .join("timetables")
+                .join(format!("{}.ron", timetable.to_string())),
+        );
+    }
     for timetable in root.timetables.keys() {
         project.path.trains_path.push(
             PathBuf::from("model")
@@ -145,12 +157,23 @@ pub fn write_file(
         path.join(project.path.template_trains_path),
         ron::ser::to_string_pretty(&root.template_trains, pretty_config.clone())?,
     )?;
-    std::fs::write(
-        path.join(project.path.timetables_path),
-        ron::ser::to_string_pretty(&root.timetables, pretty_config.clone())?,
-    )?;
-    if !std::fs::exists(path.join("trains"))? {
-        std::fs::create_dir(path.join("trains"))?;
+    if !std::fs::exists(path.join("model").join("timetables"))? {
+        std::fs::create_dir(path.join("model").join("timetables"))?;
+    }
+    for timetable in root.timetables.keys() {
+        std::fs::write(
+            path.join("model")
+                .join("timetables")
+                .join(PathBuf::from(format!("{}.ron", timetable.to_string()))),
+            ron::ser::to_string_pretty(
+                &root.timetables.get(timetable).unwrap(),
+                pretty_config.clone(),
+            )?,
+        )?;
+    }
+
+    if !std::fs::exists(path.join("model").join("trains"))? {
+        std::fs::create_dir(path.join("model").join("trains"))?;
     }
     for timetable in root.timetables.keys() {
         std::fs::write(
@@ -184,5 +207,4 @@ fn write_read() {
     let data = read_file(&path);
     let duration = start.elapsed();
     println!("read_time: {}us", duration.as_micros());
-    println!("{:?}", data);
 }
