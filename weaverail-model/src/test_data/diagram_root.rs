@@ -160,7 +160,6 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                 .get(1)
                 .unwrap()
                 .to_string();
-            println!("{}", end_station_name);
             let end_station = manager
                 .root
                 .find_station_by_name(&end_station_name)

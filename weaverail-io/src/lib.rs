@@ -1,7 +1,8 @@
 use thiserror::Error;
 use weaverail_model::error::ModelError;
 
-pub mod project_file;
+pub mod ron_compressed_zstd;
+pub mod directory;
 
 #[derive(Error, Debug)]
 pub enum WeaverailIoError {
@@ -19,8 +20,16 @@ pub enum WeaverailIoError {
     RonSerializeError(#[from] ron::error::Error),
 }
 
+/// Weaverailの保存形式を表す列挙体
+pub enum ProjectFormat {
+    /// RONファイルをzstdで圧縮した形式
+    RonCompressedZstd,
+    /// ディレクトリ形式
+    Directory,
+}
+
 /// Weaverailプロジェクトファイルを読み込む関数
-pub fn read_project_file() {}
+pub fn read_project() {}
 
 /// Weaverailプロジェクトファイルを書き込む関数
-pub fn write_project_file() {}
+pub fn write_project() {}
