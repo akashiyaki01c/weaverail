@@ -13,8 +13,6 @@ pub mod track;
 pub mod train;
 pub mod train_type;
 
-use std::collections::HashMap;
-
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -37,10 +35,10 @@ use crate::{
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
-pub struct ExtensionProperty(HashMap<String, Value>);
+pub struct ExtensionProperty(IndexMap<String, Value>);
 impl ExtensionProperty {
     pub fn new() -> Self {
-        Self(HashMap::new())
+        Self(IndexMap::new())
     }
     /// 値を取得する
     pub fn get(&self, id: &str) -> Option<&Value> {
@@ -52,7 +50,7 @@ impl ExtensionProperty {
     }
     /// 値を削除する
     pub fn remove(&mut self, id: &str) -> Option<Value> {
-        self.0.remove(id)
+        self.0.shift_remove(id)
     }
 }
 
