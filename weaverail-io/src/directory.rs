@@ -25,7 +25,7 @@ mod model;
 /// Weaverailプロジェクトファイルを読み込む関数
 pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
     let mut diagram_root = DiagramRoot::default();
-    let metadata;
+    
 
     let project_file: DirectoryProject =
         ron::de::from_str(&std::fs::read_to_string(path.join("project.ron"))?)?;
@@ -35,7 +35,7 @@ pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoE
     diagram_root.properties = root_file.properties;
     diagram_root.id_issuer = root_file.id_issuer;
     diagram_root.version = root_file.version;
-    metadata = root_file.metadata;
+    let metadata = root_file.metadata;
 
     let stations: HashMap<StationId, Station> = ron::de::from_str(&std::fs::read_to_string(
         path.join(project_file.path.stations_path),
@@ -102,9 +102,9 @@ pub fn write_file(
     std::fs::write(
         path.join("project.ron"),
         ron::ser::to_string_pretty(&project, pretty_config.clone())
-            .map_err(|e| WeaverailIoError::RonSerializeError(e))?,
+            .map_err(WeaverailIoError::RonSerializeError)?,
     )
-    .map_err(|e| WeaverailIoError::Io(e))?;
+    .map_err(WeaverailIoError::Io)?;
 
     if !std::fs::exists(path.join("model"))? {
         std::fs::create_dir(path.join("model"))?;
@@ -113,7 +113,7 @@ pub fn write_file(
     let root_file = RootFile {
         properties: root.properties.clone(),
         id_issuer: root.id_issuer.clone(),
-        version: root.version.clone(),
+        version: root.version,
         metadata: metadata.clone(),
     };
     std::fs::write(
