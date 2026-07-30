@@ -181,14 +181,14 @@ fn connect_hatsuhatsu_edge(
 ) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
-        for train_ids in orders.0.order.windows(2) {
+        for train_ids in orders.prograde.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.0.segment_id,
+                    orders.prograde.segment_id,
                     NodeType::Departure,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -196,7 +196,7 @@ fn connect_hatsuhatsu_edge(
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.0.segment_id,
+                    orders.prograde.segment_id,
                     NodeType::Departure,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -210,14 +210,14 @@ fn connect_hatsuhatsu_edge(
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
         // 逆行列車
-        for train_ids in orders.1.order.windows(2) {
+        for train_ids in orders.retrograde.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.1.segment_id,
+                    orders.retrograde.segment_id,
                     NodeType::Departure,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -225,7 +225,7 @@ fn connect_hatsuhatsu_edge(
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.1.segment_id,
+                    orders.retrograde.segment_id,
                     NodeType::Departure,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -250,14 +250,14 @@ fn connect_chakuchaku_edge(
 ) -> Result<(), ModelError> {
     for orders in timetable.segment_train_orders.values() {
         // 順行列車
-        for train_ids in orders.0.order.windows(2) {
+        for train_ids in orders.prograde.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.0.segment_id,
+                    orders.prograde.segment_id,
                     NodeType::Arrival,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -265,7 +265,7 @@ fn connect_chakuchaku_edge(
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.0.segment_id,
+                    orders.prograde.segment_id,
                     NodeType::Arrival,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -279,14 +279,14 @@ fn connect_chakuchaku_edge(
                 .push((current_node_id, Time::new(0, 2, 0)));
         }
         // 逆行列車
-        for train_ids in orders.1.order.windows(2) {
+        for train_ids in orders.retrograde.order.windows(2) {
             let before_tid = train_ids[0];
             let current_tid = train_ids[1];
             let before_node_index = *tmp_obj
                 .lookup
                 .get(&LookupNodeKey::new(
                     before_tid,
-                    orders.1.segment_id,
+                    orders.retrograde.segment_id,
                     NodeType::Arrival,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;
@@ -294,7 +294,7 @@ fn connect_chakuchaku_edge(
                 .lookup
                 .get(&LookupNodeKey::new(
                     current_tid,
-                    orders.1.segment_id,
+                    orders.retrograde.segment_id,
                     NodeType::Arrival,
                 ))
                 .ok_or(ModelError::ObjectNotFound)?;

@@ -8,24 +8,12 @@ use crate::{
         station::AddStationCommand,
         track::AddTrackCommand,
         train_type::AddTrainTypeCommand,
-    },
-    model::{
-        ExtensionProperty,
-        diagram_view_settings::{DiagramViewSegment, DiagramViewSettings, DiagramViewSettingsId},
-        line::{Line, LineId, SegmentRef},
-        line_segment::{LineSegment, LineSegmentId},
-        segment_train_order::SegmentTrainOrder,
-        station::{Station, StationId},
-        template_train::{
-            StopType, TemplateTrain, TemplateTrainId, TemplateTrainSegment, TemplateTrainSegmentId,
-            TemplateTrainStation, TemplateTrainStationId,
-        },
-        time::Time,
-        timetable::{Timetable, TimetableId},
-        track::{Track, TrackId},
-        train::{TemplateSegment, Train, TrainId},
-        train_type::{TrainType, TrainTypeId},
-    },
+    }, model::{
+        ExtensionProperty, diagram_view_settings::{DiagramViewSegment, DiagramViewSettings, DiagramViewSettingsId}, line::{Line, LineId, SegmentRef}, line_segment::{LineSegment, LineSegmentId}, segment_train_order::SegmentTrainOrder, station::{Station, StationId}, template_train::{
+            StopType, TemplateTrain, TemplateTrainId, TemplateTrainSection, TemplateTrainSegment,
+            TemplateTrainSegmentId, TemplateTrainStation, TemplateTrainStationId,
+        }, time::Time, timetable::{SegmentTrainOrders, Timetable, TimetableId}, track::{Track, TrackId}, train::{TemplateSegment, Train, TrainId}, train_type::{TrainType, TrainTypeId},
+    }, path::Heddle,
 };
 
 fn remove_brackets(mut s: &str) -> &str {
@@ -71,6 +59,75 @@ fn add_stations(manager: &mut CommandManager) {
                 StationId::new(id),
                 sta_name,
             ))));
+        }
+    }
+}
+
+fn add_new_stations(manager: &mut CommandManager) {
+    let station = include_str!("./station-new.csv");
+    for row in station.split("\n") {
+        let cell: Vec<&str> = row.split("\t").collect();
+        let station_code = cell[0]; // 駅ID
+        let station_name = cell[1]; // 駅名(漢字)
+        let station_type = cell[2]; // 駅格
+        let station_name_short = cell[3]; // 略称
+        let station_name_hira = cell[4]; // 駅名(ひらがな)
+        let station_name_kata = cell[5]; // 駅名(カタカナ)
+        let station_name_roma = cell[6]; // 駅名(ローマ字)
+        let station_name_zh1 = cell[7]; // 駅名(簡体字)
+        let station_name_zh2 = cell[8]; // 駅名(繁体字)
+        let station_name_ko = cell[9]; // 駅名(韓国語)
+        let address = cell[10]; // 住所
+        let station_number = cell[11]; // 駅番号
+        let jisha = cell[12]; // 自社
+        let track_list = cell[14]; // 線路数
+
+        let mut station = Station::new(StationId::new(manager.root.id_issuer.next()), station_name);
+        station
+            .properties
+            .set("code", Heddle::String(station_code.to_string()));
+        station
+            .properties
+            .set("type", Heddle::String(station_type.to_string()));
+        station
+            .properties
+            .set("name_short", Heddle::String(station_name_short.to_string()));
+        station
+            .properties
+            .set("name_hira", Heddle::String(station_name_hira.to_string()));
+        station
+            .properties
+            .set("name_kata", Heddle::String(station_name_kata.to_string()));
+        station
+            .properties
+            .set("name_roma", Heddle::String(station_name_roma.to_string()));
+        station
+            .properties
+            .set("name_zh1", Heddle::String(station_name_zh1.to_string()));
+        station
+            .properties
+            .set("name_zh2", Heddle::String(station_name_zh2.to_string()));
+        station
+            .properties
+            .set("name_ko", Heddle::String(station_name_ko.to_string()));
+        station
+            .properties
+            .set("address", Heddle::String(address.to_string()));
+        station
+            .properties
+            .set("number", Heddle::String(station_number.to_string()));
+        station
+            .properties
+            .set("jisha", Heddle::Boolean(jisha == "TRUE"));
+
+        manager.execute(Box::new(AddStationCommand::new(station.clone())));
+        for track_name in track_list.split(",") {
+            let track = Track::new(
+                TrackId::new(manager.root.id_issuer.next()),
+                station.id,
+                track_name,
+            );
+            manager.execute(Box::new(AddTrackCommand::new(track)));
         }
     }
 }
@@ -191,15 +248,15 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                 .find_segment_by_name(&start_station_name, &end_station_name)
                 .unwrap();
             let segment = seg_ref.segment_id;
-            template_train.segments.push((
-                TemplateTrainSegment {
+            template_train.segments.push(TemplateTrainSection {
+                segment: TemplateTrainSegment {
                     id: TemplateTrainSegmentId::new(segment_id),
                     segment_id: segment,
                     running_time: Time::new_from_total_second(running_time),
                     is_reversed: seg_ref.is_reversed,
                     properties: ExtensionProperty::new(),
                 },
-                TemplateTrainStation {
+                station: TemplateTrainStation {
                     id: TemplateTrainStationId::new(station_id),
                     station_id: end_station.id,
                     track_id: manager
@@ -216,7 +273,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                     },
                     properties: ExtensionProperty::new(),
                 },
-            ));
+            });
         }
 
         // 暫定処置始まり
@@ -379,20 +436,20 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
 
             timetable.segment_train_orders.insert(
                 segment_id,
-                (
-                    SegmentTrainOrder {
+                SegmentTrainOrders {
+                    prograde: SegmentTrainOrder {
                         order: vec![],
                         segment_id,
                         is_reversed: false,
                         properties: ExtensionProperty::new(),
                     },
-                    SegmentTrainOrder {
+                    retrograde: SegmentTrainOrder {
                         order: vec![],
                         segment_id,
                         is_reversed: true,
                         properties: ExtensionProperty::new(),
-                    },
-                ),
+                    }
+                }
             );
         }
     }
@@ -428,7 +485,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 .segment_train_orders
                 .get_mut(&segment_id)
                 .unwrap()
-                .0
+                .prograde
                 .order = vec![train_ltd1.id, train_local.id, train_ltd2.id, train_ltd3.id];
         }
     }
@@ -463,7 +520,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 .segment_train_orders
                 .get_mut(&segment_id)
                 .unwrap()
-                .0
+                .prograde
                 .order = vec![train_ltd1.id, train_ltd2.id, train_local.id, train_ltd3.id];
         }
     }
@@ -496,7 +553,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 .segment_train_orders
                 .get_mut(&segment_id)
                 .unwrap()
-                .0
+                .prograde
                 .order = vec![train_ltd1.id, train_ltd2.id, train_ltd3.id, train_local.id];
         }
     }
@@ -558,7 +615,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 .segment_train_orders
                 .get_mut(&segment_id)
                 .unwrap()
-                .1
+                .retrograde
                 .order = vec![train_local_up.id];
         }
     }
@@ -634,7 +691,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 let segment_id = segment.segment_id;
 
                 let order = timetable.segment_train_orders.get_mut(&segment_id).unwrap();
-                order.0.order.push(train_local.id);
+                order.prograde.order.push(train_local.id);
             }
         }
     }
@@ -712,7 +769,7 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                 let segment_id = segment.segment_id;
 
                 let order = timetable.segment_train_orders.get_mut(&segment_id).unwrap();
-                order.1.order.push(train_local.id);
+                order.retrograde.order.push(train_local.id);
             }
         }
     }
@@ -820,7 +877,8 @@ fn add_diagram_view_setting(manager: &mut CommandManager) {
 
 pub fn get_test_data() -> CommandManager {
     let mut manager = CommandManager::new(Box::new(EmptyEventEmitter));
-    add_stations(&mut manager);
+    // add_stations(&mut manager);
+    add_new_stations(&mut manager);
     add_lines(&mut manager);
     add_train_types(&mut manager);
     add_template_trains(&mut manager, include_str!("./shinki_down.tsv"));

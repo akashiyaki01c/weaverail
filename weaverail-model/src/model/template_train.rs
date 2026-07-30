@@ -7,25 +7,18 @@
 use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject,
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        time::Time,
-        track::{Track, TrackId},
-        train_type::{TrainType, TrainTypeId},
-    },
-    weaverail_id,
+    error::ModelError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, time::Time, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId},
+    }, weaverail_id,
 };
+use crate::path::Heddle;
 
 weaverail_id!(TemplateTrainId, "TTR_");
 
 /// Weaverail上の1つのテンプレート列車を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrain {
     /// 識別ID
     pub id: TemplateTrainId,
@@ -36,7 +29,7 @@ pub struct TemplateTrain {
     /// 開始駅情報
     pub start_station: TemplateTrainStation,
     /// 駅間/駅情報の一覧
-    pub segments: Vec<(TemplateTrainSegment, TemplateTrainStation)>,
+    pub segments: Vec<TemplateTrainSection>,
     /// 拡張プロパティ
     pub properties: ExtensionProperty,
 }
@@ -53,13 +46,13 @@ impl TemplateTrain {
     pub fn contains_segment(&self, segment_id: LineSegmentId) -> bool {
         self.segments
             .iter()
-            .any(|segment| segment.0.segment_id == segment_id)
+            .any(|section| section.segment.segment_id == segment_id)
     }
 
     /// 全ての駅を取得する関数
     pub fn get_stations(&self) -> Vec<&TemplateTrainStation> {
         std::iter::once(&self.start_station)
-            .chain(self.segments.iter().map(|segment| &segment.1))
+            .chain(self.segments.iter().map(|section| &section.station))
             .collect()
     }
 
@@ -72,7 +65,7 @@ impl TemplateTrain {
         let (start_station, segments) =
             self.get_filtered_segment(start_station_id, end_station_id)?;
         Ok(std::iter::once(start_station)
-            .chain(segments.iter().map(|segment| segment.1))
+            .chain(segments.iter().map(|section| &section.station))
             .collect())
     }
 
@@ -107,7 +100,7 @@ impl TemplateTrain {
     ) -> Result<
         (
             &TemplateTrainStation,
-            Vec<(&TemplateTrainSegment, &TemplateTrainStation)>,
+            Vec<&TemplateTrainSection>,
         ),
         ModelError,
     > {
@@ -125,13 +118,13 @@ impl TemplateTrain {
                 .segments
                 .get(first_index - 1)
                 .ok_or(ModelError::ObjectNotFound)?
-                .1
+                .station
         };
 
-        let mut segments: Vec<(&TemplateTrainSegment, &TemplateTrainStation)> = Vec::new();
+        let mut segments: Vec<_> = Vec::new();
         for i in (first_index)..end_index {
-            let segment = self.segments.get(i).ok_or(ModelError::ObjectNotFound)?;
-            segments.push((&segment.0, &segment.1));
+            let section = self.segments.get(i).ok_or(ModelError::ObjectNotFound)?;
+            segments.push(section);
         }
 
         Ok((first_station, segments))
@@ -157,18 +150,18 @@ impl TemplateTrain {
             if index < 0 {
                 Ok(segments.0)
             } else {
-                Ok(segments
+                Ok(&segments
                     .1
                     .get(index as usize)
                     .ok_or(ModelError::ObjectNotFound)?
-                    .1)
+                    .station)
             }
         };
 
         for i in 0..segments.1.len() {
             let start = get_station_by_index(i as isize - 1)?;
-            let segment = segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.0;
-            let end = segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.1;
+            let segment = &segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.segment;
+            let end = &segments.1.get(i).ok_or(ModelError::ObjectNotFound)?.station;
             if segment.is_reversed {
                 result.push((end, segment, start));
             } else {
@@ -188,20 +181,20 @@ impl TemplateTrain {
         if self.segments.is_empty() {
             Ok(&self.start_station)
         } else {
-            Ok(&self.segments.last().ok_or(ModelError::Empty)?.1)
+            Ok(&self.segments.last().ok_or(ModelError::Empty)?.station)
         }
     }
 }
 impl PropertiableObject for TemplateTrain {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }
@@ -273,7 +266,7 @@ impl DiagramRoot {
 
         template_train
             .segments
-            .push((template_segment, template_station));
+            .push(TemplateTrainSection { segment: template_segment, station: template_station });
 
         Ok(())
     }
@@ -305,7 +298,7 @@ impl DiagramRoot {
 
         template_train
             .segments
-            .push((template_segment, template_station));
+            .push(TemplateTrainSection { segment: template_segment, station: template_station });
 
         Ok(())
     }
@@ -371,9 +364,9 @@ impl DiagramRoot {
     pub fn get_template_segments(&self, id: LineSegmentId) -> Vec<&TemplateTrainSegment> {
         let mut result = vec![];
         for train in self.template_trains.values() {
-            for segment in &train.segments {
-                if segment.0.segment_id == id {
-                    result.push(&segment.0)
+            for section in &train.segments {
+                if section.segment.segment_id == id {
+                    result.push(&section.segment)
                 }
             }
         }
@@ -389,9 +382,9 @@ impl DiagramRoot {
             .template_trains
             .get(&template_train_id)
             .ok_or(ModelError::ObjectNotFound)?;
-        for segment in template_train.segments.as_slice() {
-            let station = &segment.1;
-            let segment = &segment.0;
+        for section in template_train.segments.as_slice() {
+            let station = &section.station;
+            let segment = &section.segment;
 
             let _ = self
                 .stations
@@ -422,10 +415,17 @@ impl DiagramRoot {
     }
 }
 
+// (segment, station)の代替
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+pub struct TemplateTrainSection {
+    pub segment: TemplateTrainSegment,
+    pub station: TemplateTrainStation,
+}
+
 weaverail_id!(TemplateTrainSegmentId, "TSG_");
 
 /// Weaverail上のテンプレート列車の駅間情報を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainSegment {
     /// 識別ID
     pub id: TemplateTrainSegmentId,
@@ -462,15 +462,15 @@ impl TemplateTrainSegment {
     }
 }
 impl PropertiableObject for TemplateTrainSegment {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }
@@ -478,7 +478,7 @@ impl PropertiableObject for TemplateTrainSegment {
 weaverail_id!(TemplateTrainStationId, "TST_");
 
 /// Weaverail上のテンプレート列車の駅情報を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateTrainStation {
     /// 識別ID
     pub id: TemplateTrainStationId,
@@ -508,21 +508,21 @@ impl TemplateTrainStation {
     }
 }
 impl PropertiableObject for TemplateTrainStation {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }
 
 /// テンプレート列車の停車種別を表す列挙体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize, strum::EnumString, strum::Display)]
 pub enum StopType {
     /// 停車（停車時分）
     Stop(Time),

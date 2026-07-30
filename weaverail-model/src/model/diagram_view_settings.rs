@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
     error::ModelError,
     model::{DiagramRoot, ExtensionProperty, PropertiableObject, line::SegmentRef},
+    path::Heddle,
     weaverail_id,
 };
 
 weaverail_id!(DiagramViewSettingsId, "DVS_");
 
 /// ダイヤグラムを表示する際の設定を表す
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct DiagramViewSettings {
     /// 設定の識別子
     pub id: DiagramViewSettingsId,
@@ -44,20 +44,20 @@ impl DiagramRoot {
     }
 }
 impl PropertiableObject for DiagramViewSettings {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }
 
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize, strum::EnumString, strum::Display)]
 /// ダイヤグラムの縦軸の区間を表す
 pub enum DiagramViewSegment {
     /// 空白

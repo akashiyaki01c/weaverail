@@ -1,20 +1,17 @@
 use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject,
-        station::{Station, StationId},
-    },
-    weaverail_id,
+    error::ModelError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId},
+    }, weaverail_id,
 };
+use crate::path::Heddle;
 
 weaverail_id!(LineSegmentId, "SGM_");
 
 /// Weaverail上の1つの路線に属する駅間を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct LineSegment {
     /// 識別ID
     pub id: LineSegmentId,
@@ -108,15 +105,15 @@ impl DiagramRoot {
     }
 }
 impl PropertiableObject for LineSegment {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }

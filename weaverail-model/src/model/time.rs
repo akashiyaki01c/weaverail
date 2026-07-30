@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// 時刻
 #[derive(
-    ts_rs::TS, Copy, Clone, PartialEq, Default, Serialize, Deserialize, Eq, PartialOrd, Ord,
+    ts_rs::TS, Copy, Clone, PartialEq, Default, Serialize, Deserialize, Eq, PartialOrd, Ord, Hash,
 )]
 pub struct Time(u32);
 

@@ -84,9 +84,9 @@ pub fn get_next_order_index(
         .ok_or(ModelError::ObjectNotFound)?;
     // 前区間における順序
     let before_orders = if before_segment_reversed {
-        &before_orders.1
+        &before_orders.retrograde
     } else {
-        &before_orders.0
+        &before_orders.prograde
     };
     // 前区間の先行列車
     let before_preceding_train = if before_segment_order == 0 {
@@ -103,9 +103,9 @@ pub fn get_next_order_index(
         .ok_or(ModelError::ObjectNotFound)?;
     // 次区間における順序
     let next_orders = if next_segment_reversed {
-        &next_orders.1
+        &next_orders.retrograde
     } else {
-        &next_orders.0
+        &next_orders.prograde
     };
 
     // 次区間での先行列車の順序
@@ -338,7 +338,7 @@ fn get_train_segment(
             .ok_or(ModelError::ObjectNotFound)?
             .get_filtered_segment(segment.1.start_station_id, segment.1.end_station_id)?;
         for ls in &segments.1 {
-            result.push((segment.0, ls.0.segment_id, ls.0.is_reversed));
+            result.push((segment.0, ls.segment.segment_id, ls.segment.is_reversed));
         }
     }
 
@@ -405,9 +405,9 @@ pub fn insert_train_order(
             .get_mut(&line_segment.id)
             .ok_or(ModelError::ObjectNotFound)?;
         let orders = if segment.2 {
-            &mut orders.1
+            &mut orders.retrograde
         } else {
-            &mut orders.0
+            &mut orders.prograde
         };
         orders.order.insert(order, target_train_id);
 
@@ -490,9 +490,9 @@ pub fn insert_train_order(
             .get_mut(segment)
             .ok_or(ModelError::ObjectNotFound)?;
         let orders = if *is_reversed {
-            &mut orders.1
+            &mut orders.retrograde
         } else {
-            &mut orders.0
+            &mut orders.prograde
         };
         orders.order.insert(order, target_train_id);
 

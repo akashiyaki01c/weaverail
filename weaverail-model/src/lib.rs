@@ -13,3 +13,4 @@ pub mod result_svg;
 pub mod result_warp;
 pub mod result_weft;
 pub mod test_data;
+pub mod path;

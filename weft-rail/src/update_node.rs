@@ -26,9 +26,9 @@ pub fn update_node(
                     .get(&change_segment_id)
                     .ok_or(ModelError::ObjectNotFound)?;
                 let change_segment = if is_reversed {
-                    &change_segment.1
+                    &change_segment.retrograde
                 } else {
-                    &change_segment.0
+                    &change_segment.prograde
                 };
                 let before_train_index = change_segment
                     .order

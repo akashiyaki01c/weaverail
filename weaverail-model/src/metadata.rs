@@ -1,9 +1,9 @@
 //! プロジェクト上のメタデータを表すモジュール
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::model::{ExtensionProperty, PropertiableObject};
+use crate::path::Heddle;
 
 /// プロジェクトのメタデータを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
@@ -15,15 +15,15 @@ pub struct Metadata {
     pub properties: ExtensionProperty,
 }
 impl PropertiableObject for Metadata {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }

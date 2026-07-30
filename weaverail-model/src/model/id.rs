@@ -6,7 +6,18 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 
 /// Weaverail上の識別子を表す構造体
-#[derive(ts_rs::TS, Clone, PartialEq, Default, Eq, Hash, Copy, Serialize, Deserialize)]
+#[derive(
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Default,
+    Eq,
+    Hash,
+    Copy,
+    Serialize,
+    Deserialize,
+    weaverail_object::RnaObjectable,
+)]
 #[ts(as = "String")]
 pub struct WeaverailId(pub u32);
 impl WeaverailId {
@@ -28,7 +39,9 @@ impl std::fmt::Debug for WeaverailId {
 #[macro_export]
 macro_rules! weaverail_id {
     ($name: ident, $id: expr) => {
-        #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default)]
+        #[derive(
+            weaverail_object::RnaObjectable, ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default,
+        )]
         pub struct $name(pub $crate::model::id::WeaverailId);
 
         impl $name {

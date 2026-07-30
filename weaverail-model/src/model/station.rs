@@ -2,20 +2,22 @@
 //! - Station (駅)
 //!   - Track (列車番線)
 
+
 use crate::{
     error::ModelError,
-    model::{DiagramRoot, ExtensionProperty, PropertiableObject},
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+    },
     weaverail_id,
 };
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use indexmap::map::Entry;
-use weaverail_object::WeaverailDNA;
+use crate::path::Heddle;
 
+use indexmap::map::Entry;
+use serde::{Deserialize, Serialize};
 weaverail_id!(StationId, "STA_");
 
 /// Weaverail上の1つの駅を表す構造体
-#[derive(WeaverailDNA, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Station {
     /// 識別ID
     pub id: StationId,
@@ -91,20 +93,15 @@ impl DiagramRoot {
     }
 }
 impl PropertiableObject for Station {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
-}
-
-#[test]
-fn dna_test() {
-    println!("{:?}", Station::print_dna_info());
 }

@@ -5,24 +5,18 @@
 use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::{
-    error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject,
-        station::{Station, StationId},
-        template_train::{TemplateTrain, TemplateTrainId, TemplateTrainSegment},
-        time::Time,
-        timetable::{Timetable, TimetableId},
-    },
-    weaverail_id,
+    error::ModelError, model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId, TemplateTrainSegment}, time::Time, timetable::{Timetable, TimetableId},
+    }, weaverail_id,
 };
+use crate::path::Heddle;
 
 weaverail_id!(TrainId, "TRA_");
 
 /// Weaverail上の1つの「列車」を表す
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct Train {
     /// 識別ID
     pub id: TrainId,
@@ -79,11 +73,11 @@ impl DiagramRoot {
     pub fn delete_train(&mut self, train_id: TrainId) -> Result<Train, ModelError> {
         for timetable in self.timetables.values_mut() {
             for order in timetable.segment_train_orders.values_mut() {
-                if let Some(index) = order.0.order.iter().position(|v| *v == train_id) {
-                    order.0.order.remove(index);
+                if let Some(index) = order.prograde.order.iter().position(|v| *v == train_id) {
+                    order.prograde.order.remove(index);
                 }
-                if let Some(index) = order.1.order.iter().position(|v| *v == train_id) {
-                    order.0.order.remove(index);
+                if let Some(index) = order.retrograde.order.iter().position(|v| *v == train_id) {
+                    order.retrograde.order.remove(index);
                 }
             }
         }
@@ -125,7 +119,7 @@ impl DiagramRoot {
                 .ok_or(ModelError::ObjectNotFound)?;
             let segments = template_train
                 .get_filtered_segment(segment.start_station_id, segment.end_station_id)?;
-            result.extend(segments.1.iter().map(|v| v.0.clone()));
+            result.extend(segments.1.iter().map(|section| section.segment.clone()));
         }
         Ok(result)
     }
@@ -146,21 +140,21 @@ impl DiagramRoot {
     }
 }
 impl PropertiableObject for Train {
-    fn get_property(&self, id: &str) -> Option<&Value> {
+    fn get_property(&self, id: &str) -> Option<&Heddle> {
         self.properties.get(id)
     }
 
-    fn set_property(&mut self, id: &str, value: Value) -> Option<Value> {
+    fn set_property(&mut self, id: &str, value: Heddle) -> Option<Heddle> {
         self.properties.set(id, value)
     }
 
-    fn remove_property(&mut self, id: &str) -> Option<Value> {
+    fn remove_property(&mut self, id: &str) -> Option<Heddle> {
         self.properties.remove(id)
     }
 }
 
 /// Weaverail上のテンプレート列車への部分参照
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct TemplateSegment {
     /// テンプレート列車ID
     pub template_train_id: TemplateTrainId,

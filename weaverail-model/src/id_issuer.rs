@@ -2,9 +2,9 @@ use std::cell::Cell;
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::id::WeaverailId;
+use crate::{model::id::WeaverailId};
 
-#[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
 pub struct IdIssuer {
     current: Cell<u32>,
 }
@@ -22,3 +22,4 @@ impl IdIssuer {
         result
     }
 }
+    
