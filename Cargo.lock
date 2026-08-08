@@ -917,7 +917,7 @@ checksum = "521e380c0c8afb8d9a1e83a1822ee03556fc3e3e7dbc1fd30be14e37f9cb3f89"
 dependencies = [
  "bit-set",
  "cssparser",
- "foldhash 0.2.0",
+ "foldhash",
  "html5ever",
  "precomputed-hash",
  "selectors",
@@ -1107,12 +1107,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "26b73573e6edcd2af0cdf47bd6cb58f0b3839491263c314eaad1ccf24430e1de"
 
 [[package]]
-name = "fixedbitset"
-version = "0.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
-
-[[package]]
 name = "flate2"
 version = "1.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1127,12 +1121,6 @@ name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
-
-[[package]]
-name = "foldhash"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
 
 [[package]]
 name = "foldhash"
@@ -1567,15 +1555,6 @@ name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-
-[[package]]
-name = "hashbrown"
-version = "0.15.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
-dependencies = [
- "foldhash 0.1.5",
-]
 
 [[package]]
 name = "hashbrown"
@@ -2564,18 +2543,6 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
-
-[[package]]
-name = "petgraph"
-version = "0.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8701b58ea97060d5e5b155d383a69952a60943f0e6dfe30b04c287beb0b27455"
-dependencies = [
- "fixedbitset",
- "hashbrown 0.15.5",
- "indexmap 2.14.0",
- "serde",
-]
 
 [[package]]
 name = "phf"
@@ -4413,9 +4380,7 @@ dependencies = [
 name = "warp-rail"
 version = "0.2.2"
 dependencies = [
- "serde",
  "weaverail-model",
- "weft-rail",
 ]
 
 [[package]]
@@ -4506,12 +4471,9 @@ name = "weaverail"
 version = "0.2.2"
 dependencies = [
  "indexmap 2.14.0",
- "serde",
- "serde_json",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
- "uuid",
  "warp-rail",
  "weaverail-model",
  "weft-rail",
@@ -4524,7 +4486,6 @@ dependencies = [
  "indexmap 2.14.0",
  "ron",
  "serde",
- "serde_json",
  "thiserror 2.0.19",
  "weaverail-model",
  "zstd",
@@ -4534,17 +4495,14 @@ dependencies = [
 name = "weaverail-model"
 version = "0.2.2"
 dependencies = [
- "base64 0.22.1",
  "indexmap 2.14.0",
  "ron",
  "rustc-hash",
  "serde",
- "serde_json",
  "smallvec",
  "strum",
  "thiserror 2.0.19",
  "ts-rs",
- "uuid",
  "weaverail-object",
  "zstd",
 ]
@@ -4553,7 +4511,6 @@ dependencies = [
 name = "weaverail-object"
 version = "0.2.2"
 dependencies = [
- "proc-macro2",
  "quote",
  "syn 2.0.119",
 ]
@@ -4665,10 +4622,8 @@ name = "weft-rail"
 version = "0.2.2"
 dependencies = [
  "criterion",
- "petgraph",
  "rustc-hash",
  "smallvec",
- "uuid",
  "weaverail-model",
 ]
 

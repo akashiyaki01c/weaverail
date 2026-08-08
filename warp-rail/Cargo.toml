@@ -8,5 +8,3 @@ documentation.workspace = true
 
 [dependencies]
 weaverail-model = { path = "../weaverail-model" }
-weft-rail = { path = "../weft-rail" }
-serde = { version = "1.0.228", features = ["derive"] }
