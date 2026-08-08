@@ -2,19 +2,31 @@
 //! - Station (駅)
 //!   - Track (列車番線)
 
-use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId},
-    }, weaverail_id,
-};
-use serde::{Deserialize, Serialize};
-use indexmap::map::Entry;
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+    },
+    weaverail_id,
+};
+use indexmap::map::Entry;
+use serde::{Deserialize, Serialize};
 
 weaverail_id!(TrackId, "TRC_");
 
 /// Weaverail上の駅に存在している1つの列車番線を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct Track {
     /// 識別ID
     pub id: TrackId,

@@ -6,18 +6,7 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 
 /// Weaverail上の識別子を表す構造体
-#[derive(
-    ts_rs::TS,
-    Clone,
-    PartialEq,
-    Default,
-    Eq,
-    Hash,
-    Copy,
-    Serialize,
-    Deserialize,
-    weaverail_object::RnaObjectable,
-)]
+#[derive(ts_rs::TS, Clone, PartialEq, Default, Eq, Hash, Copy, Serialize, Deserialize)]
 #[ts(as = "String")]
 pub struct WeaverailId(pub u32);
 impl WeaverailId {
@@ -36,12 +25,32 @@ impl std::fmt::Debug for WeaverailId {
     }
 }
 
+impl crate::model::RnaObject for WeaverailId {
+    fn to_heddle(&self) -> Option<crate::path::Heddle> {
+        Some(crate::path::Heddle::Id(*self))
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl TryFrom<crate::path::Heddle> for WeaverailId {
+    type Error = crate::model::RnaError;
+
+    fn try_from(value: crate::path::Heddle) -> Result<Self, Self::Error> {
+        if let crate::path::Heddle::Id(id) = value {
+            Ok(id)
+        } else {
+            Err(crate::model::RnaError::TypeMismatch)
+        }
+    }
+}
+
 #[macro_export]
 macro_rules! weaverail_id {
     ($name: ident, $id: expr) => {
-        #[derive(
-            weaverail_object::RnaObjectable, ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default,
-        )]
+        #[derive(ts_rs::TS, Clone, Copy, PartialEq, Eq, Hash, Default)]
         pub struct $name(pub $crate::model::id::WeaverailId);
 
         impl $name {
@@ -90,6 +99,28 @@ macro_rules! weaverail_id {
         impl std::fmt::Debug for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 f.write_str(&self.to_string())
+            }
+        }
+
+        impl crate::model::RnaObject for $name {
+            fn to_heddle(&self) -> Option<crate::path::Heddle> {
+                self.0.to_heddle()
+            }
+
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+        }
+
+        impl TryFrom<crate::path::Heddle> for $name {
+            type Error = crate::model::RnaError;
+
+            fn try_from(value: crate::path::Heddle) -> Result<Self, Self::Error> {
+                if let crate::path::Heddle::Id(id) = value {
+                    Ok($name(id))
+                } else {
+                    Err(crate::model::RnaError::TypeMismatch)
+                }
             }
         }
     };

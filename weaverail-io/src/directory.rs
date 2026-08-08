@@ -92,9 +92,9 @@ pub fn write_file(
     let _ = &root.validate()?;
     let pretty_config = PrettyConfig::new()
         .new_line("\n")
-		.indentor("\t")
-		.number_suffixes(true)
-		.escape_strings(true)
+        .indentor("\t")
+        .number_suffixes(true)
+        .escape_strings(true)
         .struct_names(true);
 
     let mut project = DirectoryProject::default();

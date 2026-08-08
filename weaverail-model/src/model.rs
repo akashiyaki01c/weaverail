@@ -425,7 +425,7 @@ impl TryFrom<Heddle> for Time {
 
 #[cfg(test)]
 mod tests {
-    use crate::result_weft::ResultWeftTrain;
+    use crate::{model::id::WeaverailId, result_weft::ResultWeftTrain};
 
     use super::*;
     use ts_rs::{Config, TS};
@@ -435,5 +435,12 @@ mod tests {
         let cfg = Config::new();
         DiagramRoot::export_all(&cfg).expect("TS export failed");
         ResultWeftTrain::export_all(&cfg).expect("TS export failed");
+    }
+
+    #[test]
+    fn test_rna() {
+        let data = crate::test_data::diagram_root::get_test_data_shortly();
+        let station = Station::new(StationId(WeaverailId(0)), "test");
+        println!("{:#?}", data.root.to_heddle());
     }
 }

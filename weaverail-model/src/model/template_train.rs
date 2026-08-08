@@ -8,17 +8,33 @@ use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId}, time::Time, track::{Track, TrackId}, train_type::{TrainType, TrainTypeId},
-    }, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+        time::Time,
+        track::{Track, TrackId},
+        train_type::{TrainType, TrainTypeId},
+    },
+    weaverail_id,
+};
 
 weaverail_id!(TemplateTrainId, "TTR_");
 
 /// Weaverail上の1つのテンプレート列車を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TemplateTrain {
     /// 識別ID
     pub id: TemplateTrainId,
@@ -97,13 +113,7 @@ impl TemplateTrain {
         &self,
         start_station_id: StationId,
         end_station_id: StationId,
-    ) -> Result<
-        (
-            &TemplateTrainStation,
-            Vec<&TemplateTrainSection>,
-        ),
-        ModelError,
-    > {
+    ) -> Result<(&TemplateTrainStation, Vec<&TemplateTrainSection>), ModelError> {
         // 対象駅がない場合
         if !self.contains_station(start_station_id) || !self.contains_station(end_station_id) {
             unreachable!();
@@ -264,9 +274,10 @@ impl DiagramRoot {
             return Err(ModelError::Error);
         }
 
-        template_train
-            .segments
-            .push(TemplateTrainSection { segment: template_segment, station: template_station });
+        template_train.segments.push(TemplateTrainSection {
+            segment: template_segment,
+            station: template_station,
+        });
 
         Ok(())
     }
@@ -296,9 +307,10 @@ impl DiagramRoot {
             return Err(ModelError::Error);
         }
 
-        template_train
-            .segments
-            .push(TemplateTrainSection { segment: template_segment, station: template_station });
+        template_train.segments.push(TemplateTrainSection {
+            segment: template_segment,
+            station: template_station,
+        });
 
         Ok(())
     }
@@ -416,7 +428,16 @@ impl DiagramRoot {
 }
 
 // (segment, station)の代替
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TemplateTrainSection {
     pub segment: TemplateTrainSegment,
     pub station: TemplateTrainStation,
@@ -425,7 +446,16 @@ pub struct TemplateTrainSection {
 weaverail_id!(TemplateTrainSegmentId, "TSG_");
 
 /// Weaverail上のテンプレート列車の駅間情報を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TemplateTrainSegment {
     /// 識別ID
     pub id: TemplateTrainSegmentId,
@@ -478,7 +508,16 @@ impl PropertiableObject for TemplateTrainSegment {
 weaverail_id!(TemplateTrainStationId, "TST_");
 
 /// Weaverail上のテンプレート列車の駅情報を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TemplateTrainStation {
     /// 識別ID
     pub id: TemplateTrainStationId,
@@ -522,7 +561,17 @@ impl PropertiableObject for TemplateTrainStation {
 }
 
 /// テンプレート列車の停車種別を表す列挙体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize, strum::EnumString, strum::Display)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Serialize,
+    Deserialize,
+    strum::EnumString,
+    strum::Display,
+)]
 pub enum StopType {
     /// 停車（停車時分）
     Stop(Time),

@@ -55,6 +55,7 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
             let mut get_arms = Vec::new();
             let mut get_mut_arms = Vec::new();
             let mut set_arms = Vec::new();
+            let mut to_heddle = Vec::new();
 
             match &data.fields {
                 // ① 名前付きフィールド構造体: struct Station { id: String, name: String }
@@ -77,6 +78,10 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                 Ok(())
                             }
                         });
+
+                        to_heddle.push(quote! {
+                            obj.insert(crate::path::Heddle::String(stringify!(#field_name).to_string()), self.#field_name.to_heddle()?);
+                        });
                     }
                 }
 
@@ -84,7 +89,7 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                 Fields::Unnamed(fields) => {
                     for (i, _) in fields.unnamed.iter().enumerate() {
                         let index = syn::Index::from(i); // self.0, self.1 用のインデックス表現
-                        let idx_str = i.to_string();     // "0", "1" 用の文字列
+                        let idx_str = i.to_string(); // "0", "1" 用の文字列
 
                         get_arms.push(quote! {
                             #idx_str => Some(&self.#index as &dyn crate::model::RnaObject),
@@ -99,6 +104,10 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                 self.#index = value.try_into().map_err(|_| crate::model::RnaError::TypeMismatch)?;
                                 Ok(())
                             }
+                        });
+
+                        to_heddle.push(quote! {
+                            obj.insert(crate::path::Heddle::String(#idx_str.to_string()), self.#index.to_heddle()?);
                         });
                     }
                 }
@@ -133,6 +142,13 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                     fn as_any(&self) -> &dyn std::any::Any {
                         self
                     }
+
+                    fn to_heddle(&self) -> Option<crate::path::Heddle> {
+                        let mut obj = ::indexmap::IndexMap::new();
+                        #(#to_heddle)*
+
+                        Some(crate::path::Heddle::Compound(obj))
+                    }
                 }
 
                 impl TryFrom<crate::path::Heddle> for #name {
@@ -163,7 +179,11 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         let mut inner_get_mut = Vec::new();
                         let mut inner_set = Vec::new();
 
-                        let field_names: Vec<_> = fields.named.iter().map(|f| f.ident.as_ref().unwrap()).collect();
+                        let field_names: Vec<_> = fields
+                            .named
+                            .iter()
+                            .map(|f| f.ident.as_ref().unwrap())
+                            .collect();
 
                         for field_name in &field_names {
                             let field_str = field_name.to_string();

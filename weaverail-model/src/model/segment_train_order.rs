@@ -6,7 +6,16 @@ use crate::model::{
 use crate::path::Heddle;
 
 /// 駅間での列車の順序を表す
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct SegmentTrainOrder {
     pub segment_id: LineSegmentId,
     pub is_reversed: bool,

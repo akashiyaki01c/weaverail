@@ -219,7 +219,11 @@ fn connect_hatsuhatsu_edge(
             let current_tid = train_ids[1];
 
             let current_node_id = *node_lookup
-                .get(&(current_tid, orders.retrograde.segment_id, NodeType::Departure))
+                .get(&(
+                    current_tid,
+                    orders.retrograde.segment_id,
+                    NodeType::Departure,
+                ))
                 .ok_or(ModelError::ObjectNotFound)?;
 
             let before_train_nodes = nodes
@@ -227,7 +231,11 @@ fn connect_hatsuhatsu_edge(
                 .ok_or(ModelError::ObjectNotFound)?;
 
             let before_node_id = *node_lookup
-                .get(&(before_tid, orders.retrograde.segment_id, NodeType::Departure))
+                .get(&(
+                    before_tid,
+                    orders.retrograde.segment_id,
+                    NodeType::Departure,
+                ))
                 .ok_or(ModelError::ObjectNotFound)?;
 
             if let Some(node) = before_train_nodes

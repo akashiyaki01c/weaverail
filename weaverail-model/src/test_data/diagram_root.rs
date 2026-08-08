@@ -8,12 +8,25 @@ use crate::{
         station::AddStationCommand,
         track::AddTrackCommand,
         train_type::AddTrainTypeCommand,
-    }, model::{
-        ExtensionProperty, diagram_view_settings::{DiagramViewSegment, DiagramViewSettings, DiagramViewSettingsId}, line::{Line, LineId, SegmentRef}, line_segment::{LineSegment, LineSegmentId}, segment_train_order::SegmentTrainOrder, station::{Station, StationId}, template_train::{
+    },
+    model::{
+        ExtensionProperty,
+        diagram_view_settings::{DiagramViewSegment, DiagramViewSettings, DiagramViewSettingsId},
+        line::{Line, LineId, SegmentRef},
+        line_segment::{LineSegment, LineSegmentId},
+        segment_train_order::SegmentTrainOrder,
+        station::{Station, StationId},
+        template_train::{
             StopType, TemplateTrain, TemplateTrainId, TemplateTrainSection, TemplateTrainSegment,
             TemplateTrainSegmentId, TemplateTrainStation, TemplateTrainStationId,
-        }, time::Time, timetable::{SegmentTrainOrders, Timetable, TimetableId}, track::{Track, TrackId}, train::{TemplateSegment, Train, TrainId}, train_type::{TrainType, TrainTypeId},
-    }, path::Heddle,
+        },
+        time::Time,
+        timetable::{SegmentTrainOrders, Timetable, TimetableId},
+        track::{Track, TrackId},
+        train::{TemplateSegment, Train, TrainId},
+        train_type::{TrainType, TrainTypeId},
+    },
+    path::Heddle,
 };
 
 fn remove_brackets(mut s: &str) -> &str {
@@ -448,8 +461,8 @@ fn add_test_train(manager: &mut CommandManager, is_detail: bool) {
                         segment_id,
                         is_reversed: true,
                         properties: ExtensionProperty::new(),
-                    }
-                }
+                    },
+                },
             );
         }
     }

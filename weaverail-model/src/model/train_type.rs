@@ -5,15 +5,26 @@ use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError, model::{DiagramRoot, ExtensionProperty, PropertiableObject}, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{DiagramRoot, ExtensionProperty, PropertiableObject},
+    weaverail_id,
+};
 
 weaverail_id!(TrainTypeId, "TYP_");
 
 /// Weaverail上の1つの「列車種別」を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TrainType {
     /// 識別ID
     pub id: TrainTypeId,

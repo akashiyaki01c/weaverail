@@ -10,7 +10,16 @@ use crate::{
 weaverail_id!(DiagramViewSettingsId, "DVS_");
 
 /// ダイヤグラムを表示する際の設定を表す
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct DiagramViewSettings {
     /// 設定の識別子
     pub id: DiagramViewSettingsId,
@@ -57,7 +66,17 @@ impl PropertiableObject for DiagramViewSettings {
     }
 }
 
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Serialize, Deserialize, strum::EnumString, strum::Display)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Serialize,
+    Deserialize,
+    strum::EnumString,
+    strum::Display,
+)]
 /// ダイヤグラムの縦軸の区間を表す
 pub enum DiagramViewSegment {
     /// 空白

@@ -2,22 +2,28 @@
 //! - Station (駅)
 //!   - Track (列車番線)
 
-
+use crate::path::Heddle;
 use crate::{
     error::ModelError,
-    model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject,
-    },
+    model::{DiagramRoot, ExtensionProperty, PropertiableObject},
     weaverail_id,
 };
-use crate::path::Heddle;
 
 use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
 weaverail_id!(StationId, "STA_");
 
 /// Weaverail上の1つの駅を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct Station {
     /// 識別ID
     pub id: StationId,

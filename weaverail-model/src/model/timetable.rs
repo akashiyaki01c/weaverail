@@ -5,17 +5,30 @@ use indexmap::{IndexMap, map::Entry};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    command::CommandError, error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId, segment_train_order::SegmentTrainOrder,
-    }, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    command::CommandError,
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId,
+        segment_train_order::SegmentTrainOrder,
+    },
+    weaverail_id,
+};
 
 weaverail_id!(TimetableId, "TBL_");
 
 /// Weaverail上の1つの時刻表を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct Timetable {
     /// 識別ID
     pub id: TimetableId,
@@ -98,7 +111,16 @@ impl PropertiableObject for Timetable {
     }
 }
 
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct SegmentTrainOrders {
     /// 順行列車
     pub prograde: SegmentTrainOrder,

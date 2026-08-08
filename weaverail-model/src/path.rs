@@ -59,7 +59,7 @@ impl std::hash::Hash for Heddle {
         std::mem::discriminant(self).hash(state);
 
         match self {
-            Heddle::Null => {},
+            Heddle::Null => {}
             Heddle::Id(v) => v.hash(state),
             Heddle::Boolean(v) => v.hash(state),
             Heddle::U8(v) => v.hash(state),
@@ -72,11 +72,11 @@ impl std::hash::Hash for Heddle {
             Heddle::I64(v) => v.hash(state),
             Heddle::U128(v) => v.hash(state),
             Heddle::I128(v) => v.hash(state),
-            
+
             // float はビット列でハッシュ化 (-0.0 と +0.0、NaN の揺れを正規化)
             Heddle::F32(v) => canonicalize_f32(*v).hash(state),
             Heddle::F64(v) => canonicalize_f64(*v).hash(state),
-            
+
             Heddle::String(v) => v.hash(state),
             Heddle::Array(v) => v.hash(state),
             Heddle::Compound(v) => {

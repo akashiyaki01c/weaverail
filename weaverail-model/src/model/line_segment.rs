@@ -1,17 +1,29 @@
 use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId},
-    }, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+    },
+    weaverail_id,
+};
 
 weaverail_id!(LineSegmentId, "SGM_");
 
 /// Weaverail上の1つの路線に属する駅間を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct LineSegment {
     /// 識別ID
     pub id: LineSegmentId,

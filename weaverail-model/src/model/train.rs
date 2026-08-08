@@ -6,17 +6,32 @@ use indexmap::map::Entry;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, station::{Station, StationId}, template_train::{TemplateTrain, TemplateTrainId, TemplateTrainSegment}, time::Time, timetable::{Timetable, TimetableId},
-    }, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        station::{Station, StationId},
+        template_train::{TemplateTrain, TemplateTrainId, TemplateTrainSegment},
+        time::Time,
+        timetable::{Timetable, TimetableId},
+    },
+    weaverail_id,
+};
 
 weaverail_id!(TrainId, "TRA_");
 
 /// Weaverail上の1つの「列車」を表す
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct Train {
     /// 識別ID
     pub id: TrainId,
@@ -154,7 +169,16 @@ impl PropertiableObject for Train {
 }
 
 /// Weaverail上のテンプレート列車への部分参照
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct TemplateSegment {
     /// テンプレート列車ID
     pub template_train_id: TemplateTrainId,

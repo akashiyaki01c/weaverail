@@ -7,24 +7,46 @@ use std::iter;
 use indexmap::map::Entry;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError, model::{
-        DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::{LineSegment, LineSegmentId}, station::{Station, StationId},
-    }, weaverail_id,
-};
 use crate::path::Heddle;
+use crate::{
+    error::ModelError,
+    model::{
+        DiagramRoot, ExtensionProperty, PropertiableObject,
+        line_segment::{LineSegment, LineSegmentId},
+        station::{Station, StationId},
+    },
+    weaverail_id,
+};
 
 weaverail_id!(LineId, "LIN_");
 
 /// 駅間への参照を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct SegmentRef {
     pub segment_id: LineSegmentId,
     pub is_reversed: bool,
 }
 
 /// Weaverail上の1つの路線を表す構造体
-#[derive(weaverail_object::RnaObjectable, ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]
+#[derive(
+    weaverail_object::RnaObjectable,
+    ts_rs::TS,
+    Clone,
+    PartialEq,
+    Debug,
+    Default,
+    Serialize,
+    Deserialize,
+)]
 pub struct Line {
     /// 識別ID
     pub id: LineId,
