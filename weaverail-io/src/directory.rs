@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use indexmap::IndexMap;
 use ron::ser::PrettyConfig;
@@ -24,7 +24,7 @@ use crate::{
 mod model;
 
 /// Weaverailプロジェクトファイルを読み込む関数
-pub fn read_file(path: &PathBuf) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
+pub fn read_file(path: &Path) -> Result<(DiagramRoot, Metadata), WeaverailIoError> {
     let mut diagram_root = DiagramRoot::default();
 
     let project_file: DirectoryProject =

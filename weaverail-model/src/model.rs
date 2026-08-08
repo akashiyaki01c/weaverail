@@ -178,17 +178,17 @@ pub enum RnaError {
 pub trait RnaObject: Any {
     /// 1. フィールドの参照を取得する (Read)
     ///    指定された key (例: "name") に対応するフィールドの &dyn RnaObject を返す
-    fn rna_get(&self, key: &str) -> Option<&dyn RnaObject> {
+    fn rna_get(&self, _key: &str) -> Option<&dyn RnaObject> {
         None // デフォルト実装（基本型や子を持たない型用）
     }
 
     /// 2. フィールドの可変参照を取得する (Write/Mut)
-    fn rna_get_mut(&mut self, key: &str) -> Option<&mut dyn RnaObject> {
+    fn rna_get_mut(&mut self, _key: &str) -> Option<&mut dyn RnaObject> {
         None
     }
 
     /// 3. Heddle（抽象値）を使って直接値を書き換える (Set)
-    fn rna_set(&mut self, key: &str, value: Heddle) -> Result<(), RnaError> {
+    fn rna_set(&mut self, key: &str, _value: Heddle) -> Result<(), RnaError> {
         Err(RnaError::FieldNotFound(key.to_string()))
     }
 
@@ -406,7 +406,7 @@ impl<T: RnaObject + Hash + TryFrom<Heddle> + Eq, S: RnaObject + TryFrom<Heddle>>
 }
 impl RnaObject for Time {
     fn to_heddle(&self) -> Option<Heddle> {
-        Some(Heddle::Time(self.clone()))
+        Some(Heddle::Time(*self))
     }
     fn as_any(&self) -> &dyn Any {
         self

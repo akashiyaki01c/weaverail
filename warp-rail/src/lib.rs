@@ -42,10 +42,10 @@ pub fn warp_coords(
                 let time = segments
                     .iter()
                     .max_by(|x, y| x.running_time.cmp(&y.running_time));
-                let time = if time.is_none() {
-                    DEFAULT_BLANK_TIME
+                let time = if let Some(time) = time {
+                    time.running_time
                 } else {
-                    time.unwrap().running_time
+                    DEFAULT_BLANK_TIME
                 };
                 current_y += time.total_second() as f64;
                 let lower_y = current_y;

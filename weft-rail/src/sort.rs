@@ -26,8 +26,8 @@ pub fn sort_node<'a>(nodes: &'a Vec<&'a WeftNode>) -> Result<Vec<&'a WeftNode>, 
     }
 
     let mut que = VecDeque::new();
-    for i in 0..count {
-        if num_input[i] == 0 {
+    for (i, v) in num_input.iter().enumerate().take(count) {
+        if *v == 0 {
             que.push_back(i);
         }
     }

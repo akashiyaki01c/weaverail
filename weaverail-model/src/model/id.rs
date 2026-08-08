@@ -102,8 +102,8 @@ macro_rules! weaverail_id {
             }
         }
 
-        impl crate::model::RnaObject for $name {
-            fn to_heddle(&self) -> Option<crate::path::Heddle> {
+        impl $crate::model::RnaObject for $name {
+            fn to_heddle(&self) -> Option<$crate::path::Heddle> {
                 self.0.to_heddle()
             }
 
@@ -112,14 +112,14 @@ macro_rules! weaverail_id {
             }
         }
 
-        impl TryFrom<crate::path::Heddle> for $name {
-            type Error = crate::model::RnaError;
+        impl TryFrom<$crate::path::Heddle> for $name {
+            type Error = $crate::model::RnaError;
 
-            fn try_from(value: crate::path::Heddle) -> Result<Self, Self::Error> {
-                if let crate::path::Heddle::Id(id) = value {
+            fn try_from(value: $crate::path::Heddle) -> Result<Self, Self::Error> {
+                if let $crate::path::Heddle::Id(id) = value {
                     Ok($name(id))
                 } else {
-                    Err(crate::model::RnaError::TypeMismatch)
+                    Err($crate::model::RnaError::TypeMismatch)
                 }
             }
         }
