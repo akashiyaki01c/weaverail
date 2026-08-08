@@ -1,10 +1,6 @@
 use std::collections::HashMap;
 
-use weaverail_model::{
-    error::ModelError,
-    model::{line_segment::LineSegmentId, time::Time, timetable::Timetable, train::TrainId},
-    result_weft::NodeType,
-};
+use weaverail_model::{error::ModelError, model::*, result_weft::NodeType};
 
 use crate::WeftNode;
 

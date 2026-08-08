@@ -4,17 +4,7 @@ use indexmap::IndexMap;
 use weaverail_model::{
     app::AppState,
     command::CommandError,
-    model::{
-        DiagramRoot,
-        line::{Line, LineId},
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        template_train::{TemplateTrain, TemplateTrainId},
-        timetable::{Timetable, TimetableId},
-        track::{Track, TrackId},
-        train::{Train, TrainId},
-        train_type::{TrainType, TrainTypeId},
-    },
+    model::*,
 };
 
 #[tauri::command]

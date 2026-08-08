@@ -23,7 +23,7 @@ pub mod update_node;
 
 use weaverail_model::{
     error::ModelError,
-    model::{DiagramRoot, time::Time, timetable::TimetableId},
+    model::*,
     result_weft::{ResultWeftTrain, WeftNode, WeftTempObj},
 };
 

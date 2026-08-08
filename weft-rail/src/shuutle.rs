@@ -2,13 +2,7 @@
 
 use weaverail_model::{
     error::ModelError,
-    model::{
-        DiagramRoot,
-        line_segment::LineSegmentId,
-        time::Time,
-        timetable::TimetableId,
-        train::{TemplateSegment, TrainId},
-    },
+    model::*,
     result_weft::{NodeType, WeftTempObj},
 };
 

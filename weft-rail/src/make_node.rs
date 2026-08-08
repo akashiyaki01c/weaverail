@@ -9,16 +9,8 @@ use std::{collections::HashMap, sync::LazyLock};
 use smallvec::SmallVec;
 use weaverail_model::{
     error::ModelError,
-    model::{
-        DiagramRoot,
-        line_segment::LineSegmentId,
-        station::StationId,
-        template_train::StopType as TemplateTrainStopType,
-        time::Time,
-        timetable::{Timetable, TimetableId},
-        train::{Train, TrainId},
-    },
-    result_weft::{NodeId, NodeType, StopType, WeftNode},
+    model::*,
+    result_weft::{NodeId, NodeType, StopType as WeftStopType, WeftNode},
 };
 
 type NodeKey = (TrainId, LineSegmentId, NodeType);
@@ -66,7 +58,7 @@ pub fn make_node(
         segment_id: LineSegmentId::default(),
         edges: SmallVec::new(),
         node_type: NodeType::Root,
-        stop_type: StopType::Pass,
+        stop_type: WeftStopType::Pass,
     };
 
     // 列車の生時刻の取得
@@ -138,8 +130,8 @@ fn make_train_node(
                 edges: SmallVec::new(),
                 node_type: NodeType::Departure,
                 stop_type: match start.stop_time {
-                    TemplateTrainStopType::Stop(_) => StopType::Stop,
-                    TemplateTrainStopType::Pass => StopType::Pass,
+                    StopType::Stop(_) => WeftStopType::Stop,
+                    StopType::Pass => WeftStopType::Pass,
                 },
             };
             match start.stop_time {
@@ -167,8 +159,8 @@ fn make_train_node(
                 edges: SmallVec::new(),
                 node_type: NodeType::Arrival,
                 stop_type: match end.stop_time {
-                    TemplateTrainStopType::Stop(_) => StopType::Stop,
-                    TemplateTrainStopType::Pass => StopType::Pass,
+                    StopType::Stop(_) => WeftStopType::Stop,
+                    StopType::Pass => WeftStopType::Pass,
                 },
             };
             before_node

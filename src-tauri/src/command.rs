@@ -9,10 +9,7 @@ use weaverail_model::{
     command::{CommandError, EventEmitter},
     diagram_logical_coord::DiagramLogicalConvert,
     event::EmitEventType,
-    model::{
-        diagram_view_settings::DiagramViewSettingsId, line_segment::LineSegmentId, time::Time,
-        timetable::TimetableId,
-    },
+    model::*,
     result_svg::ResultSvg,
     result_warp::{ResultWarpCoords, ResultWarpStations},
     result_weft::WeftTempStore,

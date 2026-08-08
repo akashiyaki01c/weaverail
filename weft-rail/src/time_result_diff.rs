@@ -1,14 +1,8 @@
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use weaverail_model::{
     error::ModelError,
-    model::{
-        DiagramRoot,
-        station::StationId,
-        time::Time,
-        timetable::TimetableId,
-        train::{Train, TrainId},
-    },
-    result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType, WeftTempObj},
+    model::*,
+    result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType as WeftStopType, WeftTempObj},
 };
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
@@ -69,7 +63,7 @@ pub fn get_time_result_diff(
             let arrival_segment_id = arrival_node.map(|id| id.segment_id);
             let departure_segment_time = departure_node.map(|id| times[id.node_id.0]);
             let departure_segment_id = departure_node.map(|id| id.segment_id);
-            let stop_type: StopType = {
+            let stop_type: WeftStopType = {
                 if let Some(id) = arrival_node {
                     id.stop_type.clone()
                 } else if let Some(id) = departure_node {
@@ -81,7 +75,7 @@ pub fn get_time_result_diff(
             let arrival_segment_time = if let (Some(arrival), Some(departure)) =
                 (arrival_segment_time, departure_segment_time)
             {
-                if stop_type == StopType::Pass && departure != arrival {
+                if stop_type == WeftStopType::Pass && departure != arrival {
                     Some(departure)
                 } else {
                     Some(arrival)

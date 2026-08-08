@@ -4,15 +4,7 @@ use std::fmt::Write;
 use weaverail_model::{
     diagram_logical_coord::{DiagramLogicalConvert, DiagramLogicalCoord},
     error::ModelError,
-    model::{
-        DiagramRoot,
-        diagram_view_settings::{DiagramViewSegment, DiagramViewSettingsId},
-        line_segment::LineSegmentId,
-        station::StationId,
-        time::Time,
-        timetable::TimetableId,
-        train::TrainId,
-    },
+    model::*,
     result_svg::{ResultSvg, ResultSvgTrain},
     result_warp::{ResultWarpCoords, ResultWarpStations},
     result_weft::{NodeType, WeftTempObj},

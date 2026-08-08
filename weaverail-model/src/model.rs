@@ -19,20 +19,39 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::ModelError,
     id_issuer::IdIssuer,
-    model::{
-        diagram_view_settings::{DiagramViewSettings, DiagramViewSettingsId},
-        line::{Line, LineId},
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        template_train::{TemplateTrain, TemplateTrainId},
-        time::Time,
-        timetable::{Timetable, TimetableId},
-        track::{Track, TrackId},
-        train::{Train, TrainId},
-        train_type::{TrainType, TrainTypeId},
-    },
     path::Heddle,
 };
+
+pub use station::Station;
+pub use track::Track;
+pub use track::TrackId;
+pub use station::StationId;
+pub use line::Line;
+pub use line::LineId;
+pub use line::SegmentRef;
+pub use line_segment::LineSegment;
+pub use line_segment::LineSegmentId;
+pub use train_type::TrainType;
+pub use train_type::TrainTypeId;
+pub use template_train::TemplateTrain;
+pub use template_train::TemplateTrainId;
+pub use template_train::TemplateTrainSection;
+pub use template_train::TemplateTrainSegment;
+pub use template_train::TemplateTrainSegmentId;
+pub use template_train::TemplateTrainStation;
+pub use template_train::TemplateTrainStationId;
+pub use template_train::StopType;
+pub use timetable::Timetable;
+pub use timetable::TimetableId;
+pub use timetable::SegmentTrainOrders;
+pub use segment_train_order::SegmentTrainOrder;
+pub use train::Train;
+pub use train::TrainId;
+pub use train::TemplateSegment;
+pub use time::Time;
+pub use diagram_view_settings::DiagramViewSegment;
+pub use diagram_view_settings::DiagramViewSettings;
+pub use diagram_view_settings::DiagramViewSettingsId;
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(

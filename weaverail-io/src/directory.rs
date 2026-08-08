@@ -2,19 +2,7 @@ use std::path::{Path, PathBuf};
 
 use indexmap::IndexMap;
 use ron::ser::PrettyConfig;
-use weaverail_model::{
-    metadata::Metadata,
-    model::{
-        DiagramRoot,
-        line_segment::{LineSegment, LineSegmentId},
-        station::{Station, StationId},
-        template_train::{TemplateTrain, TemplateTrainId},
-        timetable::Timetable,
-        track::{Track, TrackId},
-        train::Train,
-        train_type::{TrainType, TrainTypeId},
-    },
-};
+use weaverail_model::{metadata::Metadata, model::*};
 
 use crate::{
     WeaverailIoError,

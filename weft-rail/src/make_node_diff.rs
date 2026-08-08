@@ -7,17 +7,9 @@
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use weaverail_model::error::ModelError;
-use weaverail_model::result_weft::StopType;
+use weaverail_model::result_weft::StopType as WeftStopType;
 use weaverail_model::{
-    model::{
-        DiagramRoot,
-        line_segment::LineSegmentId,
-        station::StationId,
-        template_train::StopType as TemplateTrainStopType,
-        time::Time,
-        timetable::{Timetable, TimetableId},
-        train::{Train, TrainId},
-    },
+    model::*,
     result_weft::{LookupNodeKey, NodeId, NodeType, WeftNode, WeftTempObj},
 };
 
@@ -65,7 +57,7 @@ pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Result<WeftTe
             segment_id: LineSegmentId::default(),
             edges: SmallVec::new(),
             node_type: NodeType::Root,
-            stop_type: StopType::Pass,
+            stop_type: WeftStopType::Pass,
         };
         result.nodes.push(root_node);
     }
@@ -120,8 +112,8 @@ fn add_train_node(
                 edges: SmallVec::new(),
                 node_type: NodeType::Departure,
                 stop_type: match start.stop_time {
-                    TemplateTrainStopType::Stop(_) => StopType::Stop,
-                    TemplateTrainStopType::Pass => StopType::Pass,
+                    StopType::Stop(_) => WeftStopType::Stop,
+                    StopType::Pass => WeftStopType::Pass,
                 },
             };
             match start.stop_time {
@@ -158,8 +150,8 @@ fn add_train_node(
                 edges: SmallVec::new(),
                 node_type: NodeType::Arrival,
                 stop_type: match end.stop_time {
-                    TemplateTrainStopType::Stop(_) => StopType::Stop,
-                    TemplateTrainStopType::Pass => StopType::Pass,
+                    StopType::Stop(_) => WeftStopType::Stop,
+                    StopType::Pass => WeftStopType::Pass,
                 },
             };
             tmp_obj.nodes[before_node_index]
