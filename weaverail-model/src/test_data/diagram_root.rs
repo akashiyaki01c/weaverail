@@ -277,7 +277,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                         .tracks
                         .values()
                         .find(|track| track.name == "1番線" && track.station_id == end_station.id)
-                        .unwrap()
+                        .unwrap_or_else(|| panic!("{end_station_name}"))
                         .id,
                     stop_time: if is_passing {
                         StopType::Pass
@@ -919,10 +919,13 @@ pub fn get_test_data_shortly() -> CommandManager {
 
 #[test]
 fn test() {
+    use crate::primitives::total_sizable::TotalSizable;
+
     let start = std::time::Instant::now();
     let manager = get_test_data();
     let duration = start.elapsed();
     println!("モデル初期化時間: {}ms", duration.as_millis());
+    println!("モデルのサイズ: {}", manager.root.get_total_memory_size());
 
     let mut file = std::fs::File::create("./src/test_data/test.ron").unwrap();
     let serialized = ron::to_string(&manager.root).unwrap();

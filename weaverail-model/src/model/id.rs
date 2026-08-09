@@ -123,5 +123,11 @@ macro_rules! weaverail_id {
                 }
             }
         }
+
+        impl $crate::primitives::TotalSizable<$name> for $name {
+            fn get_heap_memory_size(&self) -> usize {
+                0
+            }
+        }
     };
 }

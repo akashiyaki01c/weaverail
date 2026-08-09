@@ -22,7 +22,7 @@ weaverail_id!(StationId, "STA_");
     Debug,
     Default,
     Serialize,
-    Deserialize,
+    Deserialize
 )]
 pub struct Station {
     /// 識別ID

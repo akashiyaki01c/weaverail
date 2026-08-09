@@ -22,36 +22,17 @@ use crate::{
     path::Heddle,
 };
 
-pub use station::Station;
-pub use track::Track;
-pub use track::TrackId;
-pub use station::StationId;
-pub use line::Line;
-pub use line::LineId;
-pub use line::SegmentRef;
-pub use line_segment::LineSegment;
-pub use line_segment::LineSegmentId;
-pub use train_type::TrainType;
-pub use train_type::TrainTypeId;
-pub use template_train::TemplateTrain;
-pub use template_train::TemplateTrainId;
-pub use template_train::TemplateTrainSection;
-pub use template_train::TemplateTrainSegment;
-pub use template_train::TemplateTrainSegmentId;
-pub use template_train::TemplateTrainStation;
-pub use template_train::TemplateTrainStationId;
-pub use template_train::StopType;
-pub use timetable::Timetable;
-pub use timetable::TimetableId;
-pub use timetable::SegmentTrainOrders;
-pub use segment_train_order::SegmentTrainOrder;
-pub use train::Train;
-pub use train::TrainId;
-pub use train::TemplateSegment;
+pub use station::*;
+pub use track::*;
+pub use line::*;
+pub use line_segment::*;
+pub use train_type::*;
+pub use template_train::*;
+pub use timetable::*;
+pub use segment_train_order::*;
+pub use train::*;
 pub use time::Time;
-pub use diagram_view_settings::DiagramViewSegment;
-pub use diagram_view_settings::DiagramViewSettings;
-pub use diagram_view_settings::DiagramViewSettingsId;
+pub use diagram_view_settings::*;
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(
@@ -62,7 +43,7 @@ pub use diagram_view_settings::DiagramViewSettingsId;
     Default,
     Serialize,
     Deserialize,
-    weaverail_object::RnaObjectable,
+    weaverail_object::RnaObjectable
 )]
 pub struct ExtensionProperty(IndexMap<String, Heddle>);
 impl ExtensionProperty {
@@ -440,6 +421,12 @@ impl TryFrom<Heddle> for Time {
             _ => Err(crate::model::RnaError::TypeMismatch),
         }
     }
+}
+
+/// 合計メモリ量を取得できる型が実装するトレイト
+pub trait TotalSizable {
+    /// オブジェクトの合計メモリ量
+    fn total_bytes(&self) -> usize;
 }
 
 #[cfg(test)]

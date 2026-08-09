@@ -1,5 +1,5 @@
 [workspace]
-members = ["src-tauri", "warp-rail", "weaverail-io", "weaverail-model", "weaverail-object", "weft-rail"]
+members = ["src-tauri", "warp-rail", "weaverail-io", "weaverail-model", "weaverail-object", "weaverail-operation", "weaverail-testdata", "weft-rail"]
 resolver = "3"
 
 [profile.release]

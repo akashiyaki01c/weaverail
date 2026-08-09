@@ -56,6 +56,8 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
             let mut get_mut_arms = Vec::new();
             let mut set_arms = Vec::new();
             let mut to_heddle = Vec::new();
+            let mut stack_count_arms = Vec::new();
+            let mut heap_count_arms = Vec::new();
 
             match &data.fields {
                 // ① 名前付きフィールド構造体: struct Station { id: String, name: String }
@@ -81,6 +83,13 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
 
                         to_heddle.push(quote! {
                             obj.insert(crate::path::Heddle::String(stringify!(#field_name).to_string()), self.#field_name.to_heddle()?);
+                        });
+
+                        stack_count_arms.push(quote! {
+                            + self.#field_name.get_stack_memory_size()
+                        });
+                        heap_count_arms.push(quote! {
+                            + self.#field_name.get_heap_memory_size()
                         });
                     }
                 }
@@ -158,6 +167,15 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         value.try_into().map_err(|_| crate::model::RnaError::TypeMismatch)
                     }
                 }
+
+                impl crate::primitives::TotalSizable<#name> for #name {
+                    fn get_stack_memory_size(&self) -> usize {
+                        0 #(#stack_count_arms)*
+                    }
+                    fn get_heap_memory_size(&self) -> usize {
+                        0 #(#heap_count_arms)*
+                    }
+                }
             }
         }
 
@@ -168,6 +186,8 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
             let mut get_arms = Vec::new();
             let mut get_mut_arms = Vec::new();
             let mut set_arms = Vec::new();
+            let mut stack_count_arms = Vec::new();
+            let mut heap_count_arms = Vec::new();
 
             for variant in &data.variants {
                 let v_ident = &variant.ident;
@@ -178,6 +198,8 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         let mut inner_get = Vec::new();
                         let mut inner_get_mut = Vec::new();
                         let mut inner_set = Vec::new();
+                        let mut inner_stack_count_arms = Vec::new();
+                        let mut inner_heap_count_arms = Vec::new();
 
                         let field_names: Vec<_> = fields
                             .named
@@ -200,6 +222,12 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                     Ok(())
                                 }
                             });
+                            inner_stack_count_arms.push(quote! {
+                                + #field_name.get_stack_memory_size()
+                            });
+                            inner_heap_count_arms.push(quote! {
+                                + #field_name.get_heap_memory_size()
+                            });
                         }
 
                         get_arms.push(quote! {
@@ -220,6 +248,12 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                 _ => Err(crate::model::RnaError::FieldNotFound(key.to_string())),
                             },
                         });
+                        stack_count_arms.push(quote! {
+                            Self::#v_ident { #(#field_names),* } => 0 #(#inner_stack_count_arms)*,
+                        });
+                        heap_count_arms.push(quote! {
+                            Self::#v_ident { #(#field_names),* } => 0 #(#inner_heap_count_arms)*,
+                        });
                     }
 
                     // ② タプル型バリアント: Sub(u32, String) -> インデックス "0", "1" でアクセス
@@ -231,6 +265,8 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         let mut inner_get = Vec::new();
                         let mut inner_get_mut = Vec::new();
                         let mut inner_set = Vec::new();
+                        let mut inner_stack_count_arms = Vec::new();
+                        let mut inner_heap_count_arms = Vec::new();
 
                         for (i, binding) in bindings.iter().enumerate() {
                             let idx_str = i.to_string();
@@ -247,6 +283,12 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                     Ok(())
                                 }
                             });
+                            inner_stack_count_arms.push(quote! {
+                                + #binding.get_stack_memory_size()
+                            });
+                            inner_heap_count_arms.push(quote! {
+                                + #binding.get_heap_memory_size()
+                            });
                         }
 
                         get_arms.push(quote! {
@@ -267,6 +309,12 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                                 _ => Err(crate::model::RnaError::FieldNotFound(key.to_string())),
                             },
                         });
+                        stack_count_arms.push(quote! {
+                            Self::#v_ident ( #(#bindings),* ) => 0 #(#inner_stack_count_arms)*,
+                        });
+                        heap_count_arms.push(quote! {
+                            Self::#v_ident ( #(#bindings),* ) => 0 #(#inner_heap_count_arms)*,
+                        });
                     }
 
                     // ③ ユニットバリアント: Main
@@ -279,6 +327,12 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         });
                         set_arms.push(quote! {
                             Self::#v_ident => Err(crate::model::RnaError::FieldNotFound(key.to_string())),
+                        });
+                        stack_count_arms.push(quote! {
+                            Self::#v_ident => 0
+                        });
+                        heap_count_arms.push(quote! {
+                            Self::#v_ident => 0
                         });
                     }
                 }
@@ -316,6 +370,19 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                         value.try_into().map_err(|_| crate::model::RnaError::TypeMismatch)
                     }
                 }
+
+                impl crate::primitives::TotalSizable<#name> for #name {
+                    fn get_stack_memory_size(&self) -> usize {
+                        match self {
+                            #(#stack_count_arms)*
+                        }
+                    }
+                    fn get_heap_memory_size(&self) -> usize {
+                        match self {
+                            #(#heap_count_arms)*
+                        }
+                    }
+                } 
             }
         }
 
