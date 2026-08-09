@@ -446,7 +446,7 @@ mod tests {
     #[test]
     fn test_rna() {
         let data = crate::test_data::diagram_root::get_test_data_shortly();
-        let station = Station::new(StationId(WeaverailId(0)), "test");
+        let _station = Station::new(StationId(WeaverailId(0)), "test");
         println!("{:#?}", data.root.to_heddle());
     }
 }

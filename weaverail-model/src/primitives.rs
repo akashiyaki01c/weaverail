@@ -32,11 +32,10 @@
 
 pub mod total_sizable;
 
-use deepsize::DeepSizeOf;
 use serde::{Deserialize, Serialize};
 
 use crate::model::PropertiableObject;
 
 pub use total_sizable::TotalSizable;
 
-pub trait WeaverailObjectable<'a>: DeepSizeOf + Serialize + Deserialize<'a> + PropertiableObject {}
+pub trait WeaverailObjectable<'a>: Serialize + Deserialize<'a> + PropertiableObject {}

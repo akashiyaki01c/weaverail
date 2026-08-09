@@ -193,7 +193,7 @@ fn write_read() {
     let duration = start.elapsed();
     println!("write_time: {}us", duration.as_micros());
     let start = std::time::Instant::now();
-    let data = read_file(&path);
+    let _data = read_file(&path);
     let duration = start.elapsed();
     println!("read_time: {}us", duration.as_micros());
 }
