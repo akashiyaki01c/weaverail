@@ -1,11 +1,7 @@
 use std::sync::Mutex;
 
 use indexmap::IndexMap;
-use weaverail_model::{
-    app::AppState,
-    command::CommandError,
-    model::*,
-};
+use weaverail_model::{app::AppState, command::CommandError, model::*};
 
 #[tauri::command]
 pub async fn get_root(

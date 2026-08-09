@@ -2,7 +2,9 @@ use rustc_hash::{FxBuildHasher, FxHashMap};
 use weaverail_model::{
     error::ModelError,
     model::*,
-    result_weft::{NodeType, ResultWeftTime, ResultWeftTrain, StopType as WeftStopType, WeftTempObj},
+    result_weft::{
+        NodeType, ResultWeftTime, ResultWeftTrain, StopType as WeftStopType, WeftTempObj,
+    },
 };
 
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]

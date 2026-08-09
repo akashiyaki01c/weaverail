@@ -16,23 +16,19 @@ pub mod train_type;
 use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    error::ModelError,
-    id_issuer::IdIssuer,
-    path::Heddle,
-};
+use crate::{error::ModelError, id_issuer::IdIssuer, path::Heddle};
 
-pub use station::*;
-pub use track::*;
+pub use diagram_view_settings::*;
 pub use line::*;
 pub use line_segment::*;
-pub use train_type::*;
-pub use template_train::*;
-pub use timetable::*;
 pub use segment_train_order::*;
-pub use train::*;
+pub use station::*;
+pub use template_train::*;
 pub use time::Time;
-pub use diagram_view_settings::*;
+pub use timetable::*;
+pub use track::*;
+pub use train::*;
+pub use train_type::*;
 
 /// ユーザ定義で拡張が行える拡張プロパティを表す構造体
 #[derive(
@@ -43,7 +39,7 @@ pub use diagram_view_settings::*;
     Default,
     Serialize,
     Deserialize,
-    weaverail_object::RnaObjectable
+    weaverail_object::RnaObjectable,
 )]
 pub struct ExtensionProperty(IndexMap<String, Heddle>);
 impl ExtensionProperty {

@@ -382,7 +382,7 @@ pub fn derive_weaverail_rna(item: TokenStream) -> TokenStream {
                             #(#heap_count_arms)*
                         }
                     }
-                } 
+                }
             }
         }
 

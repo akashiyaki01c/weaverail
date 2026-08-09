@@ -97,14 +97,11 @@ where
     }
 }
 
-
 impl<T> TotalSizable<Cell<T>> for Cell<T>
 where
     T: TotalSizable<T>,
 {
     fn get_heap_memory_size(&self) -> usize {
-        unsafe {
-            (*self.as_ptr()).get_heap_memory_size()
-        }
+        unsafe { (*self.as_ptr()).get_heap_memory_size() }
     }
 }
