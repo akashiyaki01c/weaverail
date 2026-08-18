@@ -213,3 +213,189 @@ impl TemplateSegment {
             .ok_or(ModelError::ObjectNotFound)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::id::WeaverailId;
+
+    /// Train の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_train_creation() {
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let train = Train::new(train_id, timetable_id);
+
+        assert_eq!(train.id, train_id);
+        assert_eq!(train.timetable_id, timetable_id);
+        assert_eq!(train.template_segments.len(), 0);
+        assert_eq!(train.start_departure_time, Time::new_from_total_second(0));
+        assert_eq!(train.properties, ExtensionProperty::new());
+    }
+
+    /// DiagramRoot に Train を追加・削除できることをテスト
+    #[test]
+    fn test_add_and_delete_train() {
+        let mut root = DiagramRoot::default();
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let train = Train::new(train_id, timetable_id);
+
+        // 追加テスト
+        assert!(root.add_train(train.clone()).is_ok());
+        assert_eq!(root.trains.len(), 1);
+        assert_eq!(
+            root.trains.get(&train_id).unwrap().timetable_id,
+            timetable_id
+        );
+
+        // 削除テスト
+        let removed_train = root.delete_train(train_id);
+        assert!(removed_train.is_ok());
+        assert_eq!(removed_train.unwrap().id, train_id);
+        assert_eq!(root.trains.len(), 0);
+    }
+
+    /// 同一IDの Train を2つ追加しようとするとエラーになることをテスト
+    #[test]
+    fn test_duplicate_train_id_error() {
+        let mut root = DiagramRoot::default();
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let train1 = Train::new(train_id, timetable_id);
+        let train2 = Train::new(train_id, timetable_id);
+
+        assert!(root.add_train(train1).is_ok());
+
+        // 同一IDで追加しようとする
+        let result = root.add_train(train2);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
+        assert_eq!(root.trains.len(), 1);
+    }
+
+    /// 存在しない Train ID を削除しようとするとエラーになることをテスト
+    #[test]
+    fn test_delete_nonexistent_train() {
+        let mut root = DiagramRoot::default();
+        let train_id = TrainId::new(WeaverailId::new(1));
+
+        let result = root.delete_train(train_id);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
+    }
+
+    /// Train の出発時刻が正しく設定・変更されることをテスト
+    #[test]
+    fn test_train_departure_time() {
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let mut train = Train::new(train_id, timetable_id);
+
+        // デフォルトは 00:00:00
+        assert_eq!(train.start_departure_time, Time::new_from_total_second(0));
+
+        // 時刻を設定
+        train.start_departure_time = Time::new_from_total_second(3600); // 01:00:00
+        assert_eq!(train.start_departure_time, Time::new_from_total_second(3600));
+    }
+
+    /// Train の拡張プロパティを取得・設定・削除できることをテスト
+    #[test]
+    fn test_train_properties() {
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let mut train = Train::new(train_id, timetable_id);
+
+        // プロパティを設定
+        let value = Heddle::String("express".to_string());
+        let result = train.set_property("train_type", value.clone());
+        assert!(result.is_none());
+
+        // プロパティを取得
+        let retrieved = train.get_property("train_type");
+        assert!(retrieved.is_some());
+        assert_eq!(retrieved.unwrap(), &value);
+
+        // プロパティを削除
+        let removed = train.remove_property("train_type");
+        assert!(removed.is_some());
+        assert!(train.get_property("train_type").is_none());
+    }
+
+    /// Train に template_segments が存在しない場合、contain_template_train は false を返す
+    #[test]
+    fn test_contain_template_train_empty() {
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let train = Train::new(train_id, timetable_id);
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+
+        assert!(!train.contain_template_train(template_train_id));
+    }
+
+    /// Train に template_segments が存在する場合、contain_template_train は true を返す
+    #[test]
+    fn test_contain_template_train_exists() {
+        let train_id = TrainId::new(WeaverailId::new(1));
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let mut train = Train::new(train_id, timetable_id);
+
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let start_station_id = StationId::new(WeaverailId::new(1));
+        let end_station_id = StationId::new(WeaverailId::new(2));
+
+        let template_segment = TemplateSegment {
+            template_train_id,
+            start_station_id,
+            end_station_id,
+        };
+
+        train.template_segments.push(template_segment);
+
+        assert!(train.contain_template_train(template_train_id));
+    }
+
+    /// 複数の Train を追加・管理できることをテスト
+    #[test]
+    fn test_multiple_trains() {
+        let mut root = DiagramRoot::default();
+        let timetable_id = TimetableId::new(WeaverailId::new(1));
+        let mut train_ids = Vec::new();
+
+        // 5つの列車を追加
+        for i in 1..=5 {
+            let train_id = TrainId::new(WeaverailId::new(i));
+            let train = Train::new(train_id, timetable_id);
+            train_ids.push(train_id);
+            assert!(root.add_train(train).is_ok());
+        }
+
+        assert_eq!(root.trains.len(), 5);
+
+        // 全列車を削除
+        for train_id in train_ids {
+            assert!(root.delete_train(train_id).is_ok());
+        }
+
+        assert_eq!(root.trains.len(), 0);
+    }
+
+    /// TemplateSegment の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_template_segment_creation() {
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let start_station_id = StationId::new(WeaverailId::new(1));
+        let end_station_id = StationId::new(WeaverailId::new(2));
+
+        let segment = TemplateSegment {
+            template_train_id,
+            start_station_id,
+            end_station_id,
+        };
+
+        assert_eq!(segment.template_train_id, template_train_id);
+        assert_eq!(segment.start_station_id, start_station_id);
+        assert_eq!(segment.end_station_id, end_station_id);
+    }
+}

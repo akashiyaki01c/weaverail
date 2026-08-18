@@ -583,3 +583,260 @@ impl Default for StopType {
         Self::Stop(Time::new(0, 0, 30))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::id::WeaverailId;
+
+    /// TemplateTrain の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_template_train_creation() {
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let start_station_id = StationId::new(WeaverailId::new(1));
+        let track_id = TrackId::new(WeaverailId::new(1));
+
+        let start_station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id: start_station_id,
+            track_id,
+            stop_time: StopType::Stop(Time::new(0, 0, 0)),
+            properties: ExtensionProperty::new(),
+        };
+
+        let template_train = TemplateTrain {
+            id: template_train_id,
+            name: "本線下り普通".to_string(),
+            train_type_id,
+            start_station: start_station.clone(),
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        assert_eq!(template_train.id, template_train_id);
+        assert_eq!(template_train.name, "本線下り普通");
+        assert_eq!(template_train.train_type_id, train_type_id);
+        assert_eq!(template_train.start_station, start_station);
+        assert_eq!(template_train.segments.len(), 0);
+    }
+
+    /// TemplateTrain の名前が正しく設定・変更されることをテスト
+    #[test]
+    fn test_template_train_name_change() {
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let start_station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id: StationId::new(WeaverailId::new(1)),
+            track_id: TrackId::new(WeaverailId::new(1)),
+            stop_time: StopType::Stop(Time::new(0, 0, 0)),
+            properties: ExtensionProperty::new(),
+        };
+
+        let mut template_train = TemplateTrain {
+            id: template_train_id,
+            name: "本線下り普通".to_string(),
+            train_type_id,
+            start_station,
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        assert_eq!(template_train.name, "本線下り普通");
+
+        template_train.name = "支線下り急行".to_string();
+        assert_eq!(template_train.name, "支線下り急行");
+    }
+
+    /// DiagramRoot に TemplateTrain を追加・削除できることをテスト
+    #[test]
+    fn test_add_and_delete_template_train() {
+        let mut root = DiagramRoot::default();
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let start_station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id: StationId::new(WeaverailId::new(1)),
+            track_id: TrackId::new(WeaverailId::new(1)),
+            stop_time: StopType::Stop(Time::new(0, 0, 0)),
+            properties: ExtensionProperty::new(),
+        };
+
+        let template_train = TemplateTrain {
+            id: template_train_id,
+            name: "本線下り普通".to_string(),
+            train_type_id,
+            start_station,
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        // 追加テスト
+        assert!(root.add_template_train(template_train.clone()).is_ok());
+        assert_eq!(root.template_trains.len(), 1);
+
+        // 削除テスト
+        let removed = root.delete_template_train(template_train_id);
+        assert!(removed.is_ok());
+        assert_eq!(removed.unwrap().name, "本線下り普通");
+        assert_eq!(root.template_trains.len(), 0);
+    }
+
+    /// 同一IDの TemplateTrain を2つ追加しようとするとエラーになることをテスト
+    #[test]
+    fn test_duplicate_template_train_id_error() {
+        let mut root = DiagramRoot::default();
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let start_station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id: StationId::new(WeaverailId::new(1)),
+            track_id: TrackId::new(WeaverailId::new(1)),
+            stop_time: StopType::Stop(Time::new(0, 0, 0)),
+            properties: ExtensionProperty::new(),
+        };
+
+        let template_train1 = TemplateTrain {
+            id: template_train_id,
+            name: "本線下り普通".to_string(),
+            train_type_id,
+            start_station: start_station.clone(),
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        let template_train2 = TemplateTrain {
+            id: template_train_id,
+            name: "支線下り急行".to_string(),
+            train_type_id,
+            start_station,
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        assert!(root.add_template_train(template_train1).is_ok());
+
+        let result = root.add_template_train(template_train2);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
+        assert_eq!(root.template_trains.len(), 1);
+    }
+
+    /// 存在しない TemplateTrain ID を削除しようとするとエラーになることをテスト
+    #[test]
+    fn test_delete_nonexistent_template_train() {
+        let mut root = DiagramRoot::default();
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+
+        let result = root.delete_template_train(template_train_id);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
+    }
+
+    /// TemplateTrain の拡張プロパティを取得・設定・削除できることをテスト
+    #[test]
+    fn test_template_train_properties() {
+        let template_train_id = TemplateTrainId::new(WeaverailId::new(1));
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let start_station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id: StationId::new(WeaverailId::new(1)),
+            track_id: TrackId::new(WeaverailId::new(1)),
+            stop_time: StopType::Stop(Time::new(0, 0, 0)),
+            properties: ExtensionProperty::new(),
+        };
+
+        let mut template_train = TemplateTrain {
+            id: template_train_id,
+            name: "本線下り普通".to_string(),
+            train_type_id,
+            start_station,
+            segments: Vec::new(),
+            properties: ExtensionProperty::new(),
+        };
+
+        let value = Heddle::String("limited".to_string());
+        let result = template_train.set_property("service_type", value.clone());
+        assert!(result.is_none());
+
+        let retrieved = template_train.get_property("service_type");
+        assert!(retrieved.is_some());
+        assert_eq!(retrieved.unwrap(), &value);
+
+        let removed = template_train.remove_property("service_type");
+        assert!(removed.is_some());
+        assert!(template_train.get_property("service_type").is_none());
+    }
+
+    /// TemplateTrain が複数追加・削除できることをテスト
+    #[test]
+    fn test_multiple_template_trains() {
+        let mut root = DiagramRoot::default();
+        let train_type_id = TrainTypeId::new(WeaverailId::new(1));
+        let mut template_train_ids = Vec::new();
+
+        for i in 1..=3 {
+            let template_train_id = TemplateTrainId::new(WeaverailId::new(i));
+            let start_station = TemplateTrainStation {
+                id: TemplateTrainStationId::new(WeaverailId::new(i)),
+                station_id: StationId::new(WeaverailId::new(i)),
+                track_id: TrackId::new(WeaverailId::new(i)),
+                stop_time: StopType::Stop(Time::new(0, 0, 0)),
+                properties: ExtensionProperty::new(),
+            };
+
+            let template_train = TemplateTrain {
+                id: template_train_id,
+                name: format!("テンプレート{}", i),
+                train_type_id,
+                start_station,
+                segments: Vec::new(),
+                properties: ExtensionProperty::new(),
+            };
+
+            template_train_ids.push(template_train_id);
+            assert!(root.add_template_train(template_train).is_ok());
+        }
+
+        assert_eq!(root.template_trains.len(), 3);
+
+        for template_train_id in template_train_ids {
+            assert!(root.delete_template_train(template_train_id).is_ok());
+        }
+
+        assert_eq!(root.template_trains.len(), 0);
+    }
+
+    /// StopType が正しく設定・変更されることをテスト
+    #[test]
+    fn test_stop_type_variations() {
+        let stop_time = Time::new(0, 0, 30);
+        let stop_type_stop = StopType::Stop(stop_time);
+        assert_eq!(stop_type_stop, StopType::Stop(stop_time));
+
+        let stop_type_pass = StopType::Pass;
+        assert_eq!(stop_type_pass, StopType::Pass);
+
+        assert_ne!(stop_type_stop, stop_type_pass);
+    }
+
+    /// TemplateTrainStation の生成が正しく行われることをテスト
+    #[test]
+    fn test_template_train_station_creation() {
+        let station_id = StationId::new(WeaverailId::new(1));
+        let track_id = TrackId::new(WeaverailId::new(1));
+
+        let station = TemplateTrainStation {
+            id: TemplateTrainStationId::new(WeaverailId::new(1)),
+            station_id,
+            track_id,
+            stop_time: StopType::Stop(Time::new(0, 0, 30)),
+            properties: ExtensionProperty::new(),
+        };
+
+        assert_eq!(station.station_id, station_id);
+        assert_eq!(station.track_id, track_id);
+        assert_eq!(station.stop_time, StopType::Stop(Time::new(0, 0, 30)));
+    }
+}

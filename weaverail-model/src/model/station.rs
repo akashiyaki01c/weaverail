@@ -111,3 +111,170 @@ impl PropertiableObject for Station {
         self.properties.remove(id)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::id::WeaverailId;
+
+    /// Station の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_station_creation() {
+        let station_id = StationId::new(WeaverailId::new(1));
+        let station = Station::new(station_id, "梅田");
+
+        assert_eq!(station.id, station_id);
+        assert_eq!(station.name, "梅田");
+        assert_eq!(station.properties, ExtensionProperty::new());
+    }
+
+    /// Station の名前が正しく設定・変更されることをテスト
+    #[test]
+    fn test_station_name_change() {
+        let station_id = StationId::new(WeaverailId::new(1));
+        let mut station = Station::new(station_id, "梅田");
+
+        assert_eq!(station.name, "梅田");
+
+        station.name = "北梅田".to_string();
+        assert_eq!(station.name, "北梅田");
+    }
+
+    /// DiagramRoot に Station を追加・削除できることをテスト
+    #[test]
+    fn test_add_and_delete_station() {
+        let mut root = DiagramRoot::default();
+        let station_id = StationId::new(WeaverailId::new(1));
+        let station = Station::new(station_id, "京都");
+
+        // 追加テスト
+        assert!(root.add_station(station.clone()).is_ok());
+        assert_eq!(root.stations.len(), 1);
+        assert_eq!(
+            root.stations.get(&station_id).unwrap().name,
+            "京都"
+        );
+
+        // 削除テスト
+        let removed_station = root.delete_station(station_id);
+        assert!(removed_station.is_ok());
+        assert_eq!(removed_station.unwrap().name, "京都");
+        assert_eq!(root.stations.len(), 0);
+    }
+
+    /// 同一IDの Station を2つ追加しようとするとエラーになることをテスト
+    #[test]
+    fn test_duplicate_station_id_error() {
+        let mut root = DiagramRoot::default();
+        let station_id = StationId::new(WeaverailId::new(1));
+        let station1 = Station::new(station_id, "梅田");
+        let station2 = Station::new(station_id, "北梅田");
+
+        assert!(root.add_station(station1).is_ok());
+
+        // 同一IDで追加しようとする
+        let result = root.add_station(station2);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
+        assert_eq!(root.stations.len(), 1);
+    }
+
+    /// 存在しない Station ID を削除しようとするとエラーになることをテスト
+    #[test]
+    fn test_delete_nonexistent_station() {
+        let mut root = DiagramRoot::default();
+        let station_id = StationId::new(WeaverailId::new(1));
+
+        let result = root.delete_station(station_id);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
+    }
+
+    /// Station を名前で検索できることをテスト
+    #[test]
+    fn test_find_station_by_name() {
+        let mut root = DiagramRoot::default();
+        let station1 = Station::new(StationId::new(WeaverailId::new(1)), "京都");
+        let station2 = Station::new(StationId::new(WeaverailId::new(2)), "大阪");
+
+        root.add_station(station1.clone()).unwrap();
+        root.add_station(station2.clone()).unwrap();
+
+        // 存在する駅を検索
+        let found = root.find_station_by_name("京都");
+        assert!(found.is_some());
+        assert_eq!(found.unwrap().name, "京都");
+
+        // 存在しない駅を検索
+        let not_found = root.find_station_by_name("東京");
+        assert!(not_found.is_none());
+    }
+
+    /// Station の拡張プロパティを取得・設定・削除できることをテスト
+    #[test]
+    fn test_station_properties() {
+        let station_id = StationId::new(WeaverailId::new(1));
+        let mut station = Station::new(station_id, "梅田");
+
+        // プロパティを設定
+        let value = Heddle::String("test_value".to_string());
+        let result = station.set_property("custom_prop", value.clone());
+        assert!(result.is_none());
+
+        // プロパティを取得
+        let retrieved = station.get_property("custom_prop");
+        assert!(retrieved.is_some());
+        assert_eq!(retrieved.unwrap(), &value);
+
+        // プロパティを上書き
+        let new_value = Heddle::String("new_value".to_string());
+        let overwritten = station.set_property("custom_prop", new_value.clone());
+        assert!(overwritten.is_some());
+
+        // プロパティを削除
+        let removed = station.remove_property("custom_prop");
+        assert!(removed.is_some());
+        assert!(station.get_property("custom_prop").is_none());
+    }
+
+    /// Station を validate できることをテスト
+    #[test]
+    fn test_validate_station() {
+        let mut root = DiagramRoot::default();
+        let station_id = StationId::new(WeaverailId::new(1));
+        let station = Station::new(station_id, "大阪");
+
+        // 存在しない駅を validate
+        let result = root.validate_station(station_id);
+        assert!(result.is_err());
+
+        // 駅を追加して validate
+        root.add_station(station).unwrap();
+        let result = root.validate_station(station_id);
+        assert!(result.is_ok());
+    }
+
+    /// 複数の Station を追加・管理できることをテスト
+    #[test]
+    fn test_multiple_stations() {
+        let mut root = DiagramRoot::default();
+        let mut station_ids = Vec::new();
+
+        // 5つの駅を追加
+        for i in 1..=5 {
+            let station_id = StationId::new(WeaverailId::new(i));
+            let station = Station::new(station_id, &format!("駅{}", i));
+            station_ids.push(station_id);
+            assert!(root.add_station(station).is_ok());
+        }
+
+        assert_eq!(root.stations.len(), 5);
+
+        // 全駅を削除
+        for station_id in station_ids {
+            assert!(root.delete_station(station_id).is_ok());
+        }
+
+        assert_eq!(root.stations.len(), 0);
+    }
+}

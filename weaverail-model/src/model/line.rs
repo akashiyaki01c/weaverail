@@ -383,3 +383,178 @@ impl DiagramRoot {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::id::WeaverailId;
+
+    /// Line の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_line_creation() {
+        let line_id = LineId::new(WeaverailId::new(1));
+        let line = Line::new(line_id, "神明線", &[]);
+
+        assert_eq!(line.id, line_id);
+        assert_eq!(line.name, "神明線");
+        assert_eq!(line.segments.len(), 0);
+        assert_eq!(line.properties, ExtensionProperty::new());
+    }
+
+    /// Line の名前が正しく設定・変更されることをテスト
+    #[test]
+    fn test_line_name_change() {
+        let line_id = LineId::new(WeaverailId::new(1));
+        let mut line = Line::new(line_id, "神明線", &[]);
+
+        assert_eq!(line.name, "神明線");
+
+        line.name = "七夕線".to_string();
+        assert_eq!(line.name, "七夕線");
+    }
+
+    /// DiagramRoot に Line を追加・削除できることをテスト
+    #[test]
+    fn test_add_and_delete_line() {
+        let mut root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(1));
+        let line = Line::new(line_id, "神明線", &[]);
+
+        // 追加テスト
+        assert!(root.add_line(line.clone()).is_ok());
+        assert_eq!(root.lines.len(), 1);
+        assert_eq!(root.lines.get(&line_id).unwrap().name, "神明線");
+
+        // 削除テスト
+        let removed_line = root.delete_line(line_id);
+        assert!(removed_line.is_ok());
+        assert_eq!(removed_line.unwrap().name, "神明線");
+        assert_eq!(root.lines.len(), 0);
+    }
+
+    /// 同一IDの Line を2つ追加しようとするとエラーになることをテスト
+    #[test]
+    fn test_duplicate_line_id_error() {
+        let mut root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(1));
+        let line1 = Line::new(line_id, "神明線", &[]);
+        let line2 = Line::new(line_id, "七夕線", &[]);
+
+        assert!(root.add_line(line1).is_ok());
+
+        // 同一IDで追加しようとする
+        let result = root.add_line(line2);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
+        assert_eq!(root.lines.len(), 1);
+    }
+
+    /// 存在しない Line ID を削除しようとするとエラーになることをテスト
+    #[test]
+    fn test_delete_nonexistent_line() {
+        let mut root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(1));
+
+        let result = root.delete_line(line_id);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
+    }
+
+    /// Line の拡張プロパティを取得・設定・削除できることをテスト
+    #[test]
+    fn test_line_properties() {
+        let line_id = LineId::new(WeaverailId::new(1));
+        let mut line = Line::new(line_id, "神明線", &[]);
+
+        // プロパティを設定
+        let value = Heddle::String("local".to_string());
+        let result = line.set_property("line_type", value.clone());
+        assert!(result.is_none());
+
+        // プロパティを取得
+        let retrieved = line.get_property("line_type");
+        assert!(retrieved.is_some());
+        assert_eq!(retrieved.unwrap(), &value);
+
+        // プロパティを削除
+        let removed = line.remove_property("line_type");
+        assert!(removed.is_some());
+        assert!(line.get_property("line_type").is_none());
+    }
+
+    /// SegmentRef の生成と基本プロパティが正しく設定されることをテスト
+    #[test]
+    fn test_segment_ref_creation() {
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+        let segment_ref = SegmentRef {
+            segment_id,
+            is_reversed: false,
+        };
+
+        assert_eq!(segment_ref.segment_id, segment_id);
+        assert!(!segment_ref.is_reversed);
+    }
+
+    /// SegmentRef の reverse フラグが正しく設定できることをテスト
+    #[test]
+    fn test_segment_ref_reversed() {
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+        let mut segment_ref = SegmentRef {
+            segment_id,
+            is_reversed: false,
+        };
+
+        assert!(!segment_ref.is_reversed);
+
+        segment_ref.is_reversed = true;
+        assert!(segment_ref.is_reversed);
+    }
+
+    /// 複数の Line を追加・管理できることをテスト
+    #[test]
+    fn test_multiple_lines() {
+        let mut root = DiagramRoot::default();
+        let mut line_ids = Vec::new();
+
+        // 5つの路線を追加
+        for i in 1..=5 {
+            let line_id = LineId::new(WeaverailId::new(i));
+            let line = Line::new(line_id, &format!("路線{}", i), &[]);
+            line_ids.push(line_id);
+            assert!(root.add_line(line).is_ok());
+        }
+
+        assert_eq!(root.lines.len(), 5);
+
+        // 全路線を削除
+        for line_id in line_ids {
+            assert!(root.delete_line(line_id).is_ok());
+        }
+
+        assert_eq!(root.lines.len(), 0);
+    }
+
+    /// Line が空の segments を持つ場合、first_segment は None を返す
+    #[test]
+    fn test_first_segment_empty() {
+        let root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(1));
+        let line = Line::new(line_id, "神明線", &[]);
+
+        let result = line.first_segment(&root);
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_none());
+    }
+
+    /// Line が空の segments を持つ場合、last_segment は None を返す
+    #[test]
+    fn test_last_segment_empty() {
+        let root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(1));
+        let line = Line::new(line_id, "神明線", &[]);
+
+        let result = line.last_segment(&root);
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_none());
+    }
+}
