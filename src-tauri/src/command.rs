@@ -5,14 +5,16 @@ use std::{collections::HashMap, sync::Mutex};
 use tauri::{AppHandle, Emitter};
 use warp_rail::{warp_coords, warp_stations};
 use weaverail_model::{
-    app::AppState,
-    command::{CommandError, EventEmitter},
     diagram_logical_coord::DiagramLogicalConvert,
     event::EmitEventType,
     model::*,
     result_svg::ResultSvg,
     result_warp::{ResultWarpCoords, ResultWarpStations},
     result_weft::WeftTempStore,
+};
+use weaverail_operation::{
+    app::AppState,
+    command::{CommandError, EventEmitter},
 };
 use weft_rail::{make_node_diff, ripple_diff::ripple_node_diff, sort_diff};
 

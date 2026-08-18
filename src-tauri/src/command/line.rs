@@ -1,12 +1,12 @@
 use std::sync::Mutex;
 
-use weaverail_model::{
+use weaverail_model::model::line::{Line, LineId};
+use weaverail_operation::{
     app::AppState,
     command::{
         CommandError,
         line::{AddLineCommand, RemoveLineCommand},
     },
-    model::line::{Line, LineId},
 };
 
 #[tauri::command]

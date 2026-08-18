@@ -1,14 +1,14 @@
 use std::sync::Mutex;
 
-use weaverail_model::{
+use weaverail_model::model::{
+    station::{Station, StationId},
+    track::TrackId,
+};
+use weaverail_operation::{
     app::AppState,
     command::{
         CommandError,
         station::{AddStationCommand, RemoveStationCommand},
-    },
-    model::{
-        station::{Station, StationId},
-        track::TrackId,
     },
 };
 

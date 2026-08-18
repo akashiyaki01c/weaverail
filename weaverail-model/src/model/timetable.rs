@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::path::Heddle;
 use crate::{
-    command::CommandError,
     error::ModelError,
     model::{
         DiagramRoot, ExtensionProperty, PropertiableObject, line_segment::LineSegmentId,
@@ -51,13 +50,13 @@ impl Timetable {
 impl DiagramRoot {
     /// 時刻表を追加する関数
     /// 既に同一IDの時刻表が存在している場合はエラーを返す
-    pub fn add_timetable(&mut self, timetable: Timetable) -> Result<(), CommandError> {
+    pub fn add_timetable(&mut self, timetable: Timetable) -> Result<(), ModelError> {
         match self.timetables.entry(timetable.id) {
             Entry::Vacant(entry) => {
                 entry.insert(timetable);
                 Ok(())
             }
-            Entry::Occupied(_) => Err(CommandError::DuplicateKey),
+            Entry::Occupied(_) => Err(ModelError::DuplicateKey),
         }
     }
 
@@ -66,10 +65,10 @@ impl DiagramRoot {
     pub fn delete_timetable(
         &mut self,
         timetable_id: TimetableId,
-    ) -> Result<Timetable, CommandError> {
+    ) -> Result<Timetable, ModelError> {
         self.timetables
             .shift_remove(&timetable_id)
-            .ok_or(CommandError::TargetObjectNotFound)
+            .ok_or(ModelError::ObjectNotFound)
     }
 
     /// 時刻表データが正常な値であるかを検証する
@@ -192,7 +191,7 @@ mod tests {
         // 同一IDで追加しようとする
         let result = root.add_timetable(timetable2);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), CommandError::DuplicateKey);
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
         assert_eq!(root.timetables.len(), 1);
     }
 
@@ -204,7 +203,7 @@ mod tests {
 
         let result = root.delete_timetable(timetable_id);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), CommandError::TargetObjectNotFound);
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
     }
 
     /// Timetable の拡張プロパティを取得・設定・削除できることをテスト

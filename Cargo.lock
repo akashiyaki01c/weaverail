@@ -4476,6 +4476,8 @@ dependencies = [
  "tauri-plugin-opener",
  "warp-rail",
  "weaverail-model",
+ "weaverail-operation",
+ "weaverail-testdata",
  "weft-rail",
 ]
 
@@ -4488,6 +4490,7 @@ dependencies = [
  "serde",
  "thiserror 2.0.19",
  "weaverail-model",
+ "weaverail-testdata",
  "zstd",
 ]
 
@@ -4518,10 +4521,22 @@ dependencies = [
 [[package]]
 name = "weaverail-operation"
 version = "0.2.3"
+dependencies = [
+ "serde",
+ "strum",
+ "thiserror 2.0.19",
+ "weaverail-model",
+]
 
 [[package]]
 name = "weaverail-testdata"
 version = "0.2.3"
+dependencies = [
+ "ron",
+ "weaverail-model",
+ "weaverail-operation",
+ "zstd",
+]
 
 [[package]]
 name = "web-sys"
@@ -4633,6 +4648,7 @@ dependencies = [
  "rustc-hash",
  "smallvec",
  "weaverail-model",
+ "weaverail-testdata",
 ]
 
 [[package]]

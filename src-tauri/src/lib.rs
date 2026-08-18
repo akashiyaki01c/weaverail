@@ -3,7 +3,8 @@ pub mod command;
 use std::sync::Mutex;
 
 use tauri::Manager;
-use weaverail_model::{app::AppState, result_weft::WeftTempStore};
+use weaverail_model::result_weft::WeftTempStore;
+use weaverail_operation::app::AppState;
 
 use crate::command::TauriEmitter;
 
@@ -15,7 +16,7 @@ pub fn run() {
             let handle = app.handle();
             let mut app_state = AppState::new(Box::new(TauriEmitter::new(handle.clone())));
             app_state.command_manager =
-                weaverail_model::test_data::diagram_root::get_test_data_shortly();
+                weaverail_testdata::diagram_root::get_test_data_shortly();
             app_state.command_manager.emitter = Box::new(TauriEmitter::new(handle.clone()));
 
             app.manage(Mutex::new(app_state));

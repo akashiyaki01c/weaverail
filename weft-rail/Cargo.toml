@@ -8,6 +8,7 @@ documentation.workspace = true
 
 [dependencies]
 weaverail-model = { path = "../weaverail-model" }
+weaverail-testdata = { path = "../weaverail-testdata" }
 smallvec = "1.15.1"
 rustc-hash = "2.1.2"
 

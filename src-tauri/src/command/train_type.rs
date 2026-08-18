@@ -1,12 +1,12 @@
 use std::sync::Mutex;
 
-use weaverail_model::{
+use weaverail_model::model::train_type::{TrainType, TrainTypeId};
+use weaverail_operation::{
     app::AppState,
     command::{
         CommandError,
         train_type::{AddTrainTypeCommand, RemoveTrainTypeCommand},
     },
-    model::train_type::{TrainType, TrainTypeId},
 };
 
 #[tauri::command]

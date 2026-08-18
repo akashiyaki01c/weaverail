@@ -7,3 +7,7 @@ description.workspace = true
 documentation.workspace = true
 
 [dependencies]
+ron = "0.12.2"
+weaverail-model = { path = "../weaverail-model" }
+weaverail-operation = { path = "../weaverail-operation" }
+zstd = "0.13.3"

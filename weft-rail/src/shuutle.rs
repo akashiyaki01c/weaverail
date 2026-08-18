@@ -547,7 +547,7 @@ pub fn insert_train_order(
 #[test]
 fn test() {
     use weaverail_model::model::train::Train;
-    use weaverail_model::test_data::diagram_root::get_test_data_shortly;
+    use weaverail_testdata::diagram_root::get_test_data_shortly;
 
     let mut test_data = get_test_data_shortly();
     let timetable_id = test_data

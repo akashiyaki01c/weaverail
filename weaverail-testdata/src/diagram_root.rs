@@ -1,15 +1,7 @@
 /// テストデータを取得するクレート群
-use crate::{
-    command::{
-        Command, EmptyEventEmitter,
-        command_manager::CommandManager,
-        line::AddLineCommand,
-        segment::{AddSegmentCommand, PushBackSegmentCommand},
-        station::AddStationCommand,
-        track::AddTrackCommand,
-        train_type::AddTrainTypeCommand,
-    },
-    model::{
+use weaverail_model::{
+    error::ModelError, metadata::Metadata, model::{
+        DiagramRoot,
         ExtensionProperty,
         diagram_view_settings::{DiagramViewSegment, DiagramViewSettings, DiagramViewSettingsId},
         line::{Line, LineId, SegmentRef},
@@ -25,9 +17,9 @@ use crate::{
         track::{Track, TrackId},
         train::{TemplateSegment, Train, TrainId},
         train_type::{TrainType, TrainTypeId},
-    },
-    path::Heddle,
+    }, path::Heddle,
 };
+use weaverail_operation::{command::{Command, CommandManager, EmptyEventEmitter, line::AddLineCommand, segment::{AddSegmentCommand, PushBackSegmentCommand}, station::AddStationCommand, track::AddTrackCommand, train_type::AddTrainTypeCommand}, pop_back_line_segment, push_back_line_segment};
 
 fn remove_brackets(mut s: &str) -> &str {
     s = s.split("\t").collect::<Vec<&str>>()[0];
@@ -250,7 +242,7 @@ fn add_template_trains(manager: &mut CommandManager, input: &str) {
                         .find(|track| track.name == "1番線" && track.station_id == start_station.id)
                         .unwrap()
                         .id,
-                    stop_time: crate::model::template_train::StopType::Stop(Time::new(0, 0, 0)),
+                    stop_time: weaverail_model::model::template_train::StopType::Stop(Time::new(0, 0, 0)),
                     properties: ExtensionProperty::new(),
                 }
             }
@@ -919,7 +911,7 @@ pub fn get_test_data_shortly() -> CommandManager {
 
 #[test]
 fn test() {
-    use crate::primitives::total_sizable::TotalSizable;
+    use weaverail_model::primitives::total_sizable::TotalSizable;
 
     let start = std::time::Instant::now();
     let manager = get_test_data();
@@ -927,7 +919,7 @@ fn test() {
     println!("モデル初期化時間: {}ms", duration.as_millis());
     println!("モデルのサイズ: {}", manager.root.get_total_memory_size());
 
-    let mut file = std::fs::File::create("./src/test_data/test.ron").unwrap();
+    let mut file = std::fs::File::create("./test.ron").unwrap();
     let serialized = ron::to_string(&manager.root).unwrap();
     let bytes = serialized.as_bytes();
     let bytes = zstd::encode_all(bytes, 0).unwrap();

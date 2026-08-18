@@ -68,7 +68,7 @@ fn weave_test() {
     use weaverail_model::model::train::Train;
     use weaverail_model::model::train::TrainId;
 
-    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let test_data = weaverail_testdata::diagram_root::get_test_data();
     let timetable_id = test_data
         .root
         .timetables
@@ -149,7 +149,7 @@ fn weave_test() {
 
 #[test]
 fn weave_test_diff() {
-    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let test_data = weaverail_testdata::diagram_root::get_test_data();
     let timetable_id = test_data
         .root
         .timetables
@@ -191,7 +191,7 @@ fn make_node_test() {
     use weaverail_model::model::train::TrainId;
 
     // 前処理 開始
-    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let test_data = weaverail_testdata::diagram_root::get_test_data();
     let timetable_id = test_data
         .root
         .timetables

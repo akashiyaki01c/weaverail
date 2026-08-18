@@ -7,3 +7,7 @@ description.workspace = true
 documentation.workspace = true
 
 [dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+strum = { version = "0.27", features = ["strum_macros", "derive"] }
+thiserror = "2.0.18"
+weaverail-model = { path = "../weaverail-model" }

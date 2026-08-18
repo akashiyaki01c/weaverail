@@ -2,8 +2,6 @@ use std::sync::Mutex;
 
 use tauri::{AppHandle, Emitter};
 use weaverail_model::{
-    app::AppState,
-    command::CommandError,
     event::EmitEventType,
     model::{
         time::Time,
@@ -12,6 +10,7 @@ use weaverail_model::{
     },
     result_weft::ResultWeftTrain,
 };
+use weaverail_operation::{app::AppState, command::CommandError};
 use weft_rail::shuutle::insert_train_order;
 
 #[tauri::command]

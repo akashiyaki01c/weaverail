@@ -185,7 +185,7 @@ pub fn write_file(
 
 #[test]
 fn write_read() {
-    let test_data = weaverail_model::test_data::diagram_root::get_test_data();
+    let test_data = weaverail_testdata::diagram_root::get_test_data();
     let start = std::time::Instant::now();
     let path = PathBuf::from("./test.wvd");
     let result = write_file(&path, &test_data.root, &test_data.metadata);
