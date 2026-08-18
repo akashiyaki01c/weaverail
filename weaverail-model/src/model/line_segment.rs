@@ -129,3 +129,128 @@ impl PropertiableObject for LineSegment {
         self.properties.remove(id)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::{
+        id::WeaverailId,
+        line::{Line, LineId, SegmentRef},
+        station::Station,
+    };
+
+    #[test]
+    fn test_line_segment_creation() {
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+
+        let segment = LineSegment::new(segment_id, start_station, end_station);
+
+        assert_eq!(segment.id, segment_id);
+        assert_eq!(segment.start_station, start_station);
+        assert_eq!(segment.end_station, end_station);
+        assert_eq!(segment.properties, ExtensionProperty::new());
+    }
+
+    #[test]
+    fn test_add_and_delete_segment() {
+        let mut root = DiagramRoot::default();
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+
+        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(end_station, "大阪")).unwrap();
+
+        let segment = LineSegment::new(segment_id, start_station, end_station);
+        assert!(root.add_segment(segment.clone()).is_ok());
+        assert_eq!(root.segments.len(), 1);
+
+        let removed = root.delete_segment(segment_id);
+        assert!(removed.is_ok());
+        assert_eq!(removed.unwrap().id, segment_id);
+        assert_eq!(root.segments.len(), 0);
+    }
+
+    #[test]
+    fn test_duplicate_segment_id_error() {
+        let mut root = DiagramRoot::default();
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+
+        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(end_station, "大阪")).unwrap();
+
+        let segment1 = LineSegment::new(segment_id, start_station, end_station);
+        let segment2 = LineSegment::new(segment_id, end_station, start_station);
+
+        assert!(root.add_segment(segment1).is_ok());
+        let result = root.add_segment(segment2);
+        assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
+    }
+
+    #[test]
+    fn test_delete_nonexistent_segment() {
+        let mut root = DiagramRoot::default();
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+
+        let result = root.delete_segment(segment_id);
+        assert_eq!(result.unwrap_err(), ModelError::ObjectNotFound);
+    }
+
+    #[test]
+    fn test_segment_contains_station() {
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+        let segment = LineSegment::new(LineSegmentId::new(WeaverailId::new(1)), start_station, end_station);
+
+        assert!(segment.contains_station(start_station));
+        assert!(segment.contains_station(end_station));
+        assert!(!segment.contains_station(StationId::new(WeaverailId::new(99))));
+    }
+
+    #[test]
+    fn test_validate_segment() {
+        let mut root = DiagramRoot::default();
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+
+        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(end_station, "大阪")).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start_station, end_station)).unwrap();
+
+        assert!(root.validate_segment(segment_id).is_ok());
+        assert!(root.validate_segment(LineSegmentId::new(WeaverailId::new(2))).is_err());
+    }
+
+    #[test]
+    fn test_segment_properties() {
+        let mut segment = LineSegment::new(LineSegmentId::new(WeaverailId::new(1)), StationId::new(WeaverailId::new(10)), StationId::new(WeaverailId::new(11)));
+        let value = Heddle::String("priority".to_string());
+
+        assert!(segment.set_property("ranking", value.clone()).is_none());
+        assert_eq!(segment.get_property("ranking").unwrap(), &value);
+        assert!(segment.remove_property("ranking").is_some());
+        assert!(segment.get_property("ranking").is_none());
+    }
+
+    #[test]
+    fn test_delete_segment_referenced_by_line_is_rejected() {
+        let mut root = DiagramRoot::default();
+        let start_station = StationId::new(WeaverailId::new(10));
+        let end_station = StationId::new(WeaverailId::new(11));
+        let segment_id = LineSegmentId::new(WeaverailId::new(1));
+        let line_id = LineId::new(WeaverailId::new(2));
+
+        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(end_station, "大阪")).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start_station, end_station)).unwrap();
+        root.add_line(Line::new(line_id, "大阪線", &[SegmentRef { segment_id, is_reversed: false }])).unwrap();
+
+        let result = root.delete_segment(segment_id);
+        assert_eq!(result.unwrap_err(), ModelError::ExternalReferenced);
+    }
+}
