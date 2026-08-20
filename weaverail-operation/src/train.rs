@@ -16,16 +16,16 @@ pub fn delete_train(root: &mut DiagramRoot, train_id: TrainId) -> Result<Train, 
 }
 
 /// 列車が通過する駅 ID を順序付きで取得する。
-pub fn get_train_stations<'a>(
-    root: &'a DiagramRoot,
+pub fn get_train_stations(
+    root: &DiagramRoot,
     train: &Train,
 ) -> Result<Vec<StationId>, ModelError> {
     root.get_train_stations(train)
 }
 
 /// 列車が通過するテンプレート駅間の一覧を取得する。
-pub fn get_train_segment<'a>(
-    root: &'a DiagramRoot,
+pub fn get_train_segment(
+    root: &DiagramRoot,
     train: &Train,
 ) -> Result<Vec<TemplateTrainSegment>, ModelError> {
     root.get_train_segment(train)
