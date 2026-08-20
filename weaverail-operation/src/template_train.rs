@@ -1,8 +1,8 @@
 use weaverail_model::{
     error::ModelError,
     model::{
-        DiagramRoot, LineSegmentId, StopType, TemplateTrain, TemplateTrainId,
-        TemplateTrainSegment, TemplateTrainStation, TemplateTrainStationId,
+        DiagramRoot, LineSegmentId, TemplateTrain, TemplateTrainId,
+        TemplateTrainSegment, TemplateTrainStation,
     },
 };
 
@@ -92,6 +92,8 @@ mod tests {
         track::TrackId,
         train_type::TrainType,
         train_type::TrainTypeId,
+        StopType,
+        TemplateTrainStationId
     };
 
     #[test]

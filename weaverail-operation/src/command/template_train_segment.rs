@@ -2,7 +2,7 @@ use weaverail_model::{
     event::EmitEventType,
     model::{
         DiagramRoot,
-        template_train::{TemplateTrainId, TemplateTrainSegment, TemplateTrainSection, TemplateTrainStation},
+        template_train::{TemplateTrainId, TemplateTrainSegment, TemplateTrainStation},
     },
 };
 
