@@ -19,15 +19,13 @@ use weaverail_model::{
     },
     path::Heddle,
 };
-use weaverail_operation::{
-    command::{
-        Command, CommandManager, EmptyEventEmitter,
-        line::AddLineCommand,
-        segment::{AddSegmentCommand, PushBackSegmentCommand},
-        station::AddStationCommand,
-        track::AddTrackCommand,
-        train_type::AddTrainTypeCommand,
-    },
+use weaverail_operation::command::{
+    Command, CommandManager, EmptyEventEmitter,
+    line::AddLineCommand,
+    segment::{AddSegmentCommand, PushBackSegmentCommand},
+    station::AddStationCommand,
+    track::AddTrackCommand,
+    train_type::AddTrainTypeCommand,
 };
 
 fn remove_brackets(mut s: &str) -> &str {

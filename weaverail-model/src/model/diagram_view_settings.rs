@@ -115,9 +115,11 @@ mod tests {
         let segment_id = LineSegmentId::new(WeaverailId::new(3));
         let settings_id = DiagramViewSettingsId::new(WeaverailId::new(4));
 
-        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(start_station, "梅田"))
+            .unwrap();
         root.add_station(Station::new(end_station, "大阪")).unwrap();
-        root.add_segment(LineSegment::new(segment_id, start_station, end_station)).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start_station, end_station))
+            .unwrap();
 
         let settings = DiagramViewSettings {
             id: settings_id,
@@ -133,7 +135,10 @@ mod tests {
         root.diagram_view_settings.insert(settings_id, settings);
 
         assert!(root.validate_diagram_view_settings(settings_id).is_ok());
-        assert!(root.validate_diagram_view_settings(DiagramViewSettingsId::new(WeaverailId::new(99))).is_err());
+        assert!(
+            root.validate_diagram_view_settings(DiagramViewSettingsId::new(WeaverailId::new(99)))
+                .is_err()
+        );
     }
 
     #[test]
@@ -146,7 +151,11 @@ mod tests {
         };
         let value = Heddle::String("zoom".to_string());
 
-        assert!(settings.set_property("display_mode", value.clone()).is_none());
+        assert!(
+            settings
+                .set_property("display_mode", value.clone())
+                .is_none()
+        );
         assert_eq!(settings.get_property("display_mode").unwrap(), &value);
         assert!(settings.remove_property("display_mode").is_some());
         assert!(settings.get_property("display_mode").is_none());

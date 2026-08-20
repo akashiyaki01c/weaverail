@@ -1,8 +1,6 @@
 use weaverail_model::{
     error::ModelError,
-    model::{
-        DiagramRoot, Line, LineId, LineSegment, LineSegmentId, SegmentRef, Station,
-    },
+    model::{DiagramRoot, Line, LineId, LineSegment, LineSegmentId, SegmentRef, Station},
 };
 
 /// 路線を `DiagramRoot` に追加する。
@@ -18,12 +16,18 @@ pub fn delete_line(root: &mut DiagramRoot, line_id: LineId) -> Result<Line, Mode
 }
 
 /// 路線を構成する駅の一覧を、順番付きで取得する。
-pub fn get_line_stations<'a>(root: &'a DiagramRoot, line: &Line) -> Result<Vec<&'a Station>, ModelError> {
+pub fn get_line_stations<'a>(
+    root: &'a DiagramRoot,
+    line: &Line,
+) -> Result<Vec<&'a Station>, ModelError> {
     root.get_line_stations(line)
 }
 
 /// 駅間 ID から駅間本体を取得する。
-pub fn get_segment<'a>(root: &'a DiagramRoot, segment_id: LineSegmentId) -> Option<&'a LineSegment> {
+pub fn get_segment<'a>(
+    root: &'a DiagramRoot,
+    segment_id: LineSegmentId,
+) -> Option<&'a LineSegment> {
     root.get_segment(segment_id)
 }
 
@@ -50,12 +54,18 @@ pub fn push_front_line_segment(
 }
 
 /// 路線の末尾の駅間参照を取り出す。
-pub fn pop_back_line_segment(root: &mut DiagramRoot, line_id: LineId) -> Result<SegmentRef, ModelError> {
+pub fn pop_back_line_segment(
+    root: &mut DiagramRoot,
+    line_id: LineId,
+) -> Result<SegmentRef, ModelError> {
     root.pop_back_line_segment(line_id)
 }
 
 /// 路線の先頭の駅間参照を取り出す。
-pub fn pop_front_line_segment(root: &mut DiagramRoot, line_id: LineId) -> Result<SegmentRef, ModelError> {
+pub fn pop_front_line_segment(
+    root: &mut DiagramRoot,
+    line_id: LineId,
+) -> Result<SegmentRef, ModelError> {
     root.pop_front_line_segment(line_id)
 }
 
@@ -108,7 +118,8 @@ mod tests {
 
         root.add_station(Station::new(start, "梅田")).unwrap();
         root.add_station(Station::new(end, "大阪")).unwrap();
-        root.add_segment(LineSegment::new(segment_id, start, end)).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start, end))
+            .unwrap();
         add_line(&mut root, Line::new(line_id, "神明線", &[])).unwrap();
 
         assert!(validate_line(&root, line_id).is_ok());

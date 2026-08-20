@@ -23,17 +23,17 @@ pub fn validate_track(root: &DiagramRoot, track_id: TrackId) -> Result<(), Model
 /// 番線に紐づく駅を取得する。
 ///
 /// 参照先が存在しない場合は `ModelError::ObjectNotFound` を返す。
-pub fn station_of_track<'a>(root: &'a DiagramRoot, track: &Track) -> Result<&'a Station, ModelError> {
+pub fn station_of_track<'a>(
+    root: &'a DiagramRoot,
+    track: &Track,
+) -> Result<&'a Station, ModelError> {
     track.station(root)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use weaverail_model::model::{
-        id::WeaverailId,
-        station::StationId,
-    };
+    use weaverail_model::model::{id::WeaverailId, station::StationId};
 
     #[test]
     fn operation_add_and_delete_track_matches_model_behavior() {

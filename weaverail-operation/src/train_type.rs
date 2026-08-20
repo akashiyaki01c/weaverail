@@ -11,7 +11,10 @@ pub fn add_train_type(root: &mut DiagramRoot, train_type: TrainType) -> Result<(
 }
 
 /// 指定 ID の列車種別を削除し、削除前のデータを返す。
-pub fn delete_train_type(root: &mut DiagramRoot, train_type_id: TrainTypeId) -> Result<TrainType, ModelError> {
+pub fn delete_train_type(
+    root: &mut DiagramRoot,
+    train_type_id: TrainTypeId,
+) -> Result<TrainType, ModelError> {
     root.delete_train_type(train_type_id)
 }
 
@@ -44,8 +47,16 @@ mod tests {
     #[test]
     fn operation_find_train_type_by_name_matches_model_behavior() {
         let mut root = DiagramRoot::default();
-        root.add_train_type(TrainType::new(TrainTypeId::new(WeaverailId::new(1)), "普通")).unwrap();
-        root.add_train_type(TrainType::new(TrainTypeId::new(WeaverailId::new(2)), "快速")).unwrap();
+        root.add_train_type(TrainType::new(
+            TrainTypeId::new(WeaverailId::new(1)),
+            "普通",
+        ))
+        .unwrap();
+        root.add_train_type(TrainType::new(
+            TrainTypeId::new(WeaverailId::new(2)),
+            "快速",
+        ))
+        .unwrap();
 
         assert_eq!(find_train_type_by_name(&root, "普通").unwrap().name, "普通");
         assert!(find_train_type_by_name(&root, "特急").is_none());

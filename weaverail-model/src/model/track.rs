@@ -120,8 +120,7 @@ mod tests {
         id::WeaverailId,
         station::{Station, StationId},
         template_train::{
-            StopType, TemplateTrain, TemplateTrainId, TemplateTrainStation,
-            TemplateTrainStationId,
+            StopType, TemplateTrain, TemplateTrainId, TemplateTrainStation, TemplateTrainStationId,
         },
         time::Time,
         train_type::{TrainType, TrainTypeId},
@@ -165,7 +164,8 @@ mod tests {
         let track_id = TrackId::new(WeaverailId::new(2));
 
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
 
         let result = root.add_track(Track::new(track_id, station_id, "2番線"));
         assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
@@ -200,15 +200,23 @@ mod tests {
         let track_id = TrackId::new(WeaverailId::new(2));
 
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
 
         assert!(root.validate_track(track_id).is_ok());
-        assert!(root.validate_track(TrackId::new(WeaverailId::new(99))).is_err());
+        assert!(
+            root.validate_track(TrackId::new(WeaverailId::new(99)))
+                .is_err()
+        );
     }
 
     #[test]
     fn test_track_properties() {
-        let mut track = Track::new(TrackId::new(WeaverailId::new(2)), StationId::new(WeaverailId::new(1)), "1番線");
+        let mut track = Track::new(
+            TrackId::new(WeaverailId::new(2)),
+            StationId::new(WeaverailId::new(1)),
+            "1番線",
+        );
         let value = Heddle::String("platform".to_string());
 
         assert!(track.set_property("platform_type", value.clone()).is_none());
@@ -226,8 +234,10 @@ mod tests {
         let template_train_id = TemplateTrainId::new(WeaverailId::new(4));
 
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
 
         let template_train = TemplateTrain {
             id: template_train_id,
@@ -259,7 +269,10 @@ mod tests {
         for i in 1..=3 {
             let track_id = TrackId::new(WeaverailId::new(i + 10));
             ids.push(track_id);
-            assert!(root.add_track(Track::new(track_id, station_id, &format!("{}番線", i))).is_ok());
+            assert!(
+                root.add_track(Track::new(track_id, station_id, &format!("{}番線", i)))
+                    .is_ok()
+            );
         }
 
         assert_eq!(root.tracks.len(), 3);

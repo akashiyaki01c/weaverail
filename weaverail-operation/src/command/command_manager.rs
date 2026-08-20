@@ -1,7 +1,4 @@
-use weaverail_model::{
-    metadata::Metadata,
-    model::DiagramRoot,
-};
+use weaverail_model::{metadata::Metadata, model::DiagramRoot};
 
 use super::{Command, CommandError, EventEmitter};
 

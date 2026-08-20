@@ -1,8 +1,8 @@
 use weaverail_model::{
     error::ModelError,
     model::{
-        DiagramRoot, LineSegmentId, TemplateTrain, TemplateTrainId,
-        TemplateTrainSegment, TemplateTrainStation,
+        DiagramRoot, LineSegmentId, TemplateTrain, TemplateTrainId, TemplateTrainSegment,
+        TemplateTrainStation,
     },
 };
 
@@ -85,6 +85,7 @@ pub fn validate_template_train(
 mod tests {
     use super::*;
     use weaverail_model::model::{
+        StopType, TemplateTrainStationId,
         id::WeaverailId,
         station::{Station, StationId},
         time::Time,
@@ -92,8 +93,6 @@ mod tests {
         track::TrackId,
         train_type::TrainType,
         train_type::TrainTypeId,
-        StopType,
-        TemplateTrainStationId
     };
 
     #[test]
@@ -105,8 +104,10 @@ mod tests {
         let template_train_id = TemplateTrainId::new(WeaverailId::new(4));
 
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
 
         let template_train = TemplateTrain {
             id: template_train_id,
@@ -140,8 +141,10 @@ mod tests {
         let template_train_id = TemplateTrainId::new(WeaverailId::new(4));
 
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
 
         let template_train = TemplateTrain {
             id: template_train_id,
@@ -160,6 +163,8 @@ mod tests {
         add_template_train(&mut root, template_train).unwrap();
 
         assert!(validate_template_train(&root, template_train_id).is_ok());
-        assert!(validate_template_train(&root, TemplateTrainId::new(WeaverailId::new(99))).is_err());
+        assert!(
+            validate_template_train(&root, TemplateTrainId::new(WeaverailId::new(99))).is_err()
+        );
     }
 }

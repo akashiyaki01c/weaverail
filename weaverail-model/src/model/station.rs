@@ -150,10 +150,7 @@ mod tests {
         // 追加テスト
         assert!(root.add_station(station.clone()).is_ok());
         assert_eq!(root.stations.len(), 1);
-        assert_eq!(
-            root.stations.get(&station_id).unwrap().name,
-            "京都"
-        );
+        assert_eq!(root.stations.get(&station_id).unwrap().name, "京都");
 
         // 削除テスト
         let removed_station = root.delete_station(station_id);

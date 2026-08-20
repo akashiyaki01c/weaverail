@@ -11,7 +11,10 @@ pub fn add_timetable(root: &mut DiagramRoot, timetable: Timetable) -> Result<(),
 }
 
 /// 指定した時刻表 ID を削除して、削除前の時刻表を返す。
-pub fn delete_timetable(root: &mut DiagramRoot, timetable_id: TimetableId) -> Result<Timetable, ModelError> {
+pub fn delete_timetable(
+    root: &mut DiagramRoot,
+    timetable_id: TimetableId,
+) -> Result<Timetable, ModelError> {
     root.delete_timetable(timetable_id)
 }
 

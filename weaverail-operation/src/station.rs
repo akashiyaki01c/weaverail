@@ -13,7 +13,10 @@ pub fn add_station(root: &mut DiagramRoot, station: Station) -> Result<(), Model
 /// 指定した駅 ID の駅を削除し、削除前の値を返す。
 ///
 /// 参照が残っている場合には `ModelError` で失敗することがある。
-pub fn delete_station(root: &mut DiagramRoot, station_id: StationId) -> Result<Station, ModelError> {
+pub fn delete_station(
+    root: &mut DiagramRoot,
+    station_id: StationId,
+) -> Result<Station, ModelError> {
     root.delete_station(station_id)
 }
 
@@ -46,8 +49,10 @@ mod tests {
     #[test]
     fn operation_find_station_by_name_matches_model_behavior() {
         let mut root = DiagramRoot::default();
-        root.add_station(Station::new(StationId::new(WeaverailId::new(1)), "京都")).unwrap();
-        root.add_station(Station::new(StationId::new(WeaverailId::new(2)), "大阪")).unwrap();
+        root.add_station(Station::new(StationId::new(WeaverailId::new(1)), "京都"))
+            .unwrap();
+        root.add_station(Station::new(StationId::new(WeaverailId::new(2)), "大阪"))
+            .unwrap();
 
         assert_eq!(find_station_by_name(&root, "京都").unwrap().name, "京都");
         assert!(find_station_by_name(&root, "東京").is_none());

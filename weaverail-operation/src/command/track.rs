@@ -1,6 +1,9 @@
 use weaverail_model::{
     event::EmitEventType,
-    model::{DiagramRoot, track::{Track, TrackId}},
+    model::{
+        DiagramRoot,
+        track::{Track, TrackId},
+    },
 };
 
 use crate::command::{Command, CommandError, EventEmitter};
@@ -48,7 +51,10 @@ pub struct RemoveTrackCommand {
 
 impl RemoveTrackCommand {
     pub fn new(track_id: TrackId) -> Self {
-        Self { track_id, track: None }
+        Self {
+            track_id,
+            track: None,
+        }
     }
 }
 

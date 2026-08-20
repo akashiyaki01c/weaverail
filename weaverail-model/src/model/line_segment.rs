@@ -160,7 +160,8 @@ mod tests {
         let end_station = StationId::new(WeaverailId::new(11));
         let segment_id = LineSegmentId::new(WeaverailId::new(1));
 
-        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(start_station, "梅田"))
+            .unwrap();
         root.add_station(Station::new(end_station, "大阪")).unwrap();
 
         let segment = LineSegment::new(segment_id, start_station, end_station);
@@ -180,7 +181,8 @@ mod tests {
         let end_station = StationId::new(WeaverailId::new(11));
         let segment_id = LineSegmentId::new(WeaverailId::new(1));
 
-        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(start_station, "梅田"))
+            .unwrap();
         root.add_station(Station::new(end_station, "大阪")).unwrap();
 
         let segment1 = LineSegment::new(segment_id, start_station, end_station);
@@ -204,7 +206,11 @@ mod tests {
     fn test_segment_contains_station() {
         let start_station = StationId::new(WeaverailId::new(10));
         let end_station = StationId::new(WeaverailId::new(11));
-        let segment = LineSegment::new(LineSegmentId::new(WeaverailId::new(1)), start_station, end_station);
+        let segment = LineSegment::new(
+            LineSegmentId::new(WeaverailId::new(1)),
+            start_station,
+            end_station,
+        );
 
         assert!(segment.contains_station(start_station));
         assert!(segment.contains_station(end_station));
@@ -218,17 +224,26 @@ mod tests {
         let end_station = StationId::new(WeaverailId::new(11));
         let segment_id = LineSegmentId::new(WeaverailId::new(1));
 
-        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(start_station, "梅田"))
+            .unwrap();
         root.add_station(Station::new(end_station, "大阪")).unwrap();
-        root.add_segment(LineSegment::new(segment_id, start_station, end_station)).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start_station, end_station))
+            .unwrap();
 
         assert!(root.validate_segment(segment_id).is_ok());
-        assert!(root.validate_segment(LineSegmentId::new(WeaverailId::new(2))).is_err());
+        assert!(
+            root.validate_segment(LineSegmentId::new(WeaverailId::new(2)))
+                .is_err()
+        );
     }
 
     #[test]
     fn test_segment_properties() {
-        let mut segment = LineSegment::new(LineSegmentId::new(WeaverailId::new(1)), StationId::new(WeaverailId::new(10)), StationId::new(WeaverailId::new(11)));
+        let mut segment = LineSegment::new(
+            LineSegmentId::new(WeaverailId::new(1)),
+            StationId::new(WeaverailId::new(10)),
+            StationId::new(WeaverailId::new(11)),
+        );
         let value = Heddle::String("priority".to_string());
 
         assert!(segment.set_property("ranking", value.clone()).is_none());
@@ -245,10 +260,20 @@ mod tests {
         let segment_id = LineSegmentId::new(WeaverailId::new(1));
         let line_id = LineId::new(WeaverailId::new(2));
 
-        root.add_station(Station::new(start_station, "梅田")).unwrap();
+        root.add_station(Station::new(start_station, "梅田"))
+            .unwrap();
         root.add_station(Station::new(end_station, "大阪")).unwrap();
-        root.add_segment(LineSegment::new(segment_id, start_station, end_station)).unwrap();
-        root.add_line(Line::new(line_id, "大阪線", &[SegmentRef { segment_id, is_reversed: false }])).unwrap();
+        root.add_segment(LineSegment::new(segment_id, start_station, end_station))
+            .unwrap();
+        root.add_line(Line::new(
+            line_id,
+            "大阪線",
+            &[SegmentRef {
+                segment_id,
+                is_reversed: false,
+            }],
+        ))
+        .unwrap();
 
         let result = root.delete_segment(segment_id);
         assert_eq!(result.unwrap_err(), ModelError::ExternalReferenced);

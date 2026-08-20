@@ -1,8 +1,4 @@
-use weaverail_model::{
-    error::ModelError,
-    event::EmitEventType,
-    model::DiagramRoot,
-};
+use weaverail_model::{error::ModelError, event::EmitEventType, model::DiagramRoot};
 
 pub mod command_manager;
 pub mod line;
@@ -47,7 +43,9 @@ pub trait Command: Send + Sync {
 }
 
 /// コマンドのエラー一覧
-#[derive(Clone, PartialEq, Debug, serde::Serialize, serde::Deserialize, thiserror::Error, strum::Display)]
+#[derive(
+    Clone, PartialEq, Debug, serde::Serialize, serde::Deserialize, thiserror::Error, strum::Display,
+)]
 pub enum CommandError {
     /// モデルのエラー
     #[error(transparent)]

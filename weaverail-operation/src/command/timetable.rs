@@ -1,6 +1,9 @@
 use weaverail_model::{
     event::EmitEventType,
-    model::{DiagramRoot, timetable::{Timetable, TimetableId}},
+    model::{
+        DiagramRoot,
+        timetable::{Timetable, TimetableId},
+    },
 };
 
 use crate::command::{Command, CommandError, EventEmitter};
@@ -48,7 +51,10 @@ pub struct RemoveTimetableCommand {
 
 impl RemoveTimetableCommand {
     pub fn new(timetable_id: TimetableId) -> Self {
-        Self { timetable_id, timetable: None }
+        Self {
+            timetable_id,
+            timetable: None,
+        }
     }
 }
 

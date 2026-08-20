@@ -39,11 +39,7 @@ impl PropertiableObject for SegmentTrainOrder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{
-        id::WeaverailId,
-        line_segment::LineSegmentId,
-        train::TrainId,
-    };
+    use crate::model::{id::WeaverailId, line_segment::LineSegmentId, train::TrainId};
 
     #[test]
     fn test_segment_train_order_properties() {
@@ -67,7 +63,7 @@ mod tests {
     #[test]
     fn test_segment_train_order_default_and_ordering() {
         let order = SegmentTrainOrder::default();
-        assert_eq!(order.segment_id, LineSegmentId::new(WeaverailId::new(0))); 
+        assert_eq!(order.segment_id, LineSegmentId::new(WeaverailId::new(0)));
         assert!(!order.is_reversed);
         assert!(order.order.is_empty());
         assert_eq!(order.properties, ExtensionProperty::new());

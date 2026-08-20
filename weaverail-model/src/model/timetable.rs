@@ -62,10 +62,7 @@ impl DiagramRoot {
 
     /// 時刻表を削除する関数
     /// 指定IDの時刻表が存在しない場合はエラーを返す
-    pub fn delete_timetable(
-        &mut self,
-        timetable_id: TimetableId,
-    ) -> Result<Timetable, ModelError> {
+    pub fn delete_timetable(&mut self, timetable_id: TimetableId) -> Result<Timetable, ModelError> {
         self.timetables
             .shift_remove(&timetable_id)
             .ok_or(ModelError::ObjectNotFound)

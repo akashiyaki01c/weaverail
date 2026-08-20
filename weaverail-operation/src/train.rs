@@ -16,12 +16,18 @@ pub fn delete_train(root: &mut DiagramRoot, train_id: TrainId) -> Result<Train, 
 }
 
 /// 列車が通過する駅 ID を順序付きで取得する。
-pub fn get_train_stations<'a>(root: &'a DiagramRoot, train: &Train) -> Result<Vec<StationId>, ModelError> {
+pub fn get_train_stations<'a>(
+    root: &'a DiagramRoot,
+    train: &Train,
+) -> Result<Vec<StationId>, ModelError> {
     root.get_train_stations(train)
 }
 
 /// 列車が通過するテンプレート駅間の一覧を取得する。
-pub fn get_train_segment<'a>(root: &'a DiagramRoot, train: &Train) -> Result<Vec<TemplateTrainSegment>, ModelError> {
+pub fn get_train_segment<'a>(
+    root: &'a DiagramRoot,
+    train: &Train,
+) -> Result<Vec<TemplateTrainSegment>, ModelError> {
     root.get_train_segment(train)
 }
 
@@ -33,10 +39,7 @@ pub fn validate_train(root: &DiagramRoot, train_id: TrainId) -> Result<(), Model
 #[cfg(test)]
 mod tests {
     use super::*;
-    use weaverail_model::model::{
-        id::WeaverailId,
-        timetable::TimetableId,
-    };
+    use weaverail_model::model::{id::WeaverailId, timetable::TimetableId};
 
     #[test]
     fn operation_add_and_delete_train_matches_model_behavior() {

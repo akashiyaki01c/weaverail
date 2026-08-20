@@ -1,6 +1,9 @@
 use weaverail_model::{
     event::EmitEventType,
-    model::{DiagramRoot, line::{Line, LineId}},
+    model::{
+        DiagramRoot,
+        line::{Line, LineId},
+    },
 };
 
 use crate::command::{Command, CommandError, EventEmitter};
@@ -48,7 +51,10 @@ pub struct RemoveLineCommand {
 
 impl RemoveLineCommand {
     pub fn new(line_id: LineId) -> Self {
-        Self { line_id, line: None }
+        Self {
+            line_id,
+            line: None,
+        }
     }
 }
 
@@ -87,7 +93,11 @@ pub struct RenameLineCommand {
 
 impl RenameLineCommand {
     pub fn new(line_id: LineId, new_name: &str) -> Self {
-        Self { line_id, old_name: None, new_name: new_name.to_string() }
+        Self {
+            line_id,
+            old_name: None,
+            new_name: new_name.to_string(),
+        }
     }
 }
 
@@ -97,7 +107,10 @@ impl Command for RenameLineCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        let line = obj.lines.get_mut(&self.line_id).ok_or(CommandError::TargetObjectNotFound)?;
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
         self.old_name = Some(line.name.to_string());
         line.name = self.new_name.clone();
         emitter.emit(EmitEventType::LineRenamed, "");
@@ -109,7 +122,10 @@ impl Command for RenameLineCommand {
         obj: &mut DiagramRoot,
         emitter: &dyn EventEmitter,
     ) -> Result<(), CommandError> {
-        let line = obj.lines.get_mut(&self.line_id).ok_or(CommandError::TargetObjectNotFound)?;
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
         if let Some(name) = &self.old_name {
             line.name = name.clone();
         }

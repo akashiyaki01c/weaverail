@@ -14,7 +14,10 @@ pub struct AddTrainCommand {
 
 impl AddTrainCommand {
     pub fn new(timetable_id: TimetableId, train: Train) -> Self {
-        Self { timetable_id, train }
+        Self {
+            timetable_id,
+            train,
+        }
     }
 }
 

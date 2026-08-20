@@ -115,7 +115,9 @@ mod tests {
         id::WeaverailId,
         station::Station,
         station::StationId,
-        template_train::{StopType, TemplateTrain, TemplateTrainStation, TemplateTrainStationId, TemplateTrainId},
+        template_train::{
+            StopType, TemplateTrain, TemplateTrainId, TemplateTrainStation, TemplateTrainStationId,
+        },
         time::Time,
         track::{Track, TrackId},
     };
@@ -149,7 +151,8 @@ mod tests {
         let mut root = DiagramRoot::default();
         let train_type_id = TrainTypeId::new(WeaverailId::new(1));
 
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
         let result = root.add_train_type(TrainType::new(train_type_id, "快速"));
         assert_eq!(result.unwrap_err(), ModelError::DuplicateKey);
     }
@@ -164,8 +167,16 @@ mod tests {
     #[test]
     fn test_find_train_type_by_name() {
         let mut root = DiagramRoot::default();
-        root.add_train_type(TrainType::new(TrainTypeId::new(WeaverailId::new(1)), "普通")).unwrap();
-        root.add_train_type(TrainType::new(TrainTypeId::new(WeaverailId::new(2)), "快速")).unwrap();
+        root.add_train_type(TrainType::new(
+            TrainTypeId::new(WeaverailId::new(1)),
+            "普通",
+        ))
+        .unwrap();
+        root.add_train_type(TrainType::new(
+            TrainTypeId::new(WeaverailId::new(2)),
+            "快速",
+        ))
+        .unwrap();
 
         assert_eq!(root.find_train_type_by_name("普通").unwrap().name, "普通");
         assert!(root.find_train_type_by_name("特急").is_none());
@@ -175,10 +186,14 @@ mod tests {
     fn test_validate_train_type() {
         let mut root = DiagramRoot::default();
         let train_type_id = TrainTypeId::new(WeaverailId::new(1));
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
 
         assert!(root.validate_train_type(train_type_id).is_ok());
-        assert!(root.validate_train_type(TrainTypeId::new(WeaverailId::new(99))).is_err());
+        assert!(
+            root.validate_train_type(TrainTypeId::new(WeaverailId::new(99)))
+                .is_err()
+        );
     }
 
     #[test]
@@ -186,7 +201,11 @@ mod tests {
         let mut train_type = TrainType::new(TrainTypeId::new(WeaverailId::new(1)), "普通");
         let value = Heddle::String("local".to_string());
 
-        assert!(train_type.set_property("service_level", value.clone()).is_none());
+        assert!(
+            train_type
+                .set_property("service_level", value.clone())
+                .is_none()
+        );
         assert_eq!(train_type.get_property("service_level").unwrap(), &value);
         assert!(train_type.remove_property("service_level").is_some());
         assert!(train_type.get_property("service_level").is_none());
@@ -199,8 +218,10 @@ mod tests {
         let track_id = TrackId::new(WeaverailId::new(2));
         let train_type_id = TrainTypeId::new(WeaverailId::new(3));
         root.add_station(Station::new(station_id, "梅田")).unwrap();
-        root.add_track(Track::new(track_id, station_id, "1番線")).unwrap();
-        root.add_train_type(TrainType::new(train_type_id, "普通")).unwrap();
+        root.add_track(Track::new(track_id, station_id, "1番線"))
+            .unwrap();
+        root.add_train_type(TrainType::new(train_type_id, "普通"))
+            .unwrap();
 
         let template_train = TemplateTrain {
             id: TemplateTrainId::new(WeaverailId::new(4)),
@@ -229,7 +250,10 @@ mod tests {
         for i in 1..=3 {
             let train_type_id = TrainTypeId::new(WeaverailId::new(i));
             ids.push(train_type_id);
-            assert!(root.add_train_type(TrainType::new(train_type_id, &format!("種別{}", i))).is_ok());
+            assert!(
+                root.add_train_type(TrainType::new(train_type_id, &format!("種別{}", i)))
+                    .is_ok()
+            );
         }
 
         assert_eq!(root.train_types.len(), 3);

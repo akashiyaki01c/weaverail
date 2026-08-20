@@ -189,21 +189,45 @@ mod tests {
         let segment = LineSegment::new(segment_id, start, end);
         let mut add = AddSegmentCommand::new(segment.clone());
         let mut push = PushBackSegmentCommand::new(line_id, segment.id, false);
-        assert!(add.redo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
-        assert!(push.redo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
+        assert!(
+            add.redo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
+        assert!(
+            push.redo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
 
         let mut remove = RemoveSegmentCommand::new(segment_id);
         assert!(matches!(
             remove.redo(&mut root, &crate::command::EmptyEventEmitter),
-            Err(CommandError::ModelError(weaverail_model::error::ModelError::ExternalReferenced))
+            Err(CommandError::ModelError(
+                weaverail_model::error::ModelError::ExternalReferenced
+            ))
         ));
 
         assert!(root.pop_back_line_segment(line_id).is_ok());
-        assert!(remove.redo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
-        assert!(remove.undo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
+        assert!(
+            remove
+                .redo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
+        assert!(
+            remove
+                .undo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
 
         let mut push_front = PushFrontSegmentCommand::new(line_id, segment.id, false);
-        assert!(push_front.redo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
-        assert!(push_front.undo(&mut root, &crate::command::EmptyEventEmitter).is_ok());
+        assert!(
+            push_front
+                .redo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
+        assert!(
+            push_front
+                .undo(&mut root, &crate::command::EmptyEventEmitter)
+                .is_ok()
+        );
     }
 }

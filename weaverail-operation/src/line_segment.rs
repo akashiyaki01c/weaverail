@@ -13,7 +13,10 @@ pub fn add_segment(root: &mut DiagramRoot, segment: LineSegment) -> Result<(), M
 /// 指定した駅間 ID を削除し、前の値を返す。
 ///
 /// 路線やテンプレート列車から参照されている場合は `ModelError::ExternalReferenced` を返す。
-pub fn delete_segment(root: &mut DiagramRoot, segment_id: LineSegmentId) -> Result<LineSegment, ModelError> {
+pub fn delete_segment(
+    root: &mut DiagramRoot,
+    segment_id: LineSegmentId,
+) -> Result<LineSegment, ModelError> {
     root.delete_segment(segment_id)
 }
 
@@ -25,11 +28,7 @@ pub fn validate_segment(root: &DiagramRoot, segment_id: LineSegmentId) -> Result
 #[cfg(test)]
 mod tests {
     use super::*;
-    use weaverail_model::model::{
-        id::WeaverailId,
-        station::StationId,
-        station::Station,
-    };
+    use weaverail_model::model::{id::WeaverailId, station::Station, station::StationId};
 
     #[test]
     fn operation_add_and_delete_segment_matches_model_behavior() {

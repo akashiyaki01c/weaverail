@@ -297,7 +297,10 @@ mod tests {
 
         // 時刻を設定
         train.start_departure_time = Time::new_from_total_second(3600); // 01:00:00
-        assert_eq!(train.start_departure_time, Time::new_from_total_second(3600));
+        assert_eq!(
+            train.start_departure_time,
+            Time::new_from_total_second(3600)
+        );
     }
 
     /// Train の拡張プロパティを取得・設定・削除できることをテスト

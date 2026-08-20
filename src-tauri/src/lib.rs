@@ -15,8 +15,7 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle();
             let mut app_state = AppState::new(Box::new(TauriEmitter::new(handle.clone())));
-            app_state.command_manager =
-                weaverail_testdata::diagram_root::get_test_data_shortly();
+            app_state.command_manager = weaverail_testdata::diagram_root::get_test_data_shortly();
             app_state.command_manager.emitter = Box::new(TauriEmitter::new(handle.clone()));
 
             app.manage(Mutex::new(app_state));
