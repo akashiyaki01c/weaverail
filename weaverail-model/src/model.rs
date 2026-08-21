@@ -412,12 +412,6 @@ impl TryFrom<Heddle> for Time {
     }
 }
 
-/// 合計メモリ量を取得できる型が実装するトレイト
-pub trait TotalSizable {
-    /// オブジェクトの合計メモリ量
-    fn total_bytes(&self) -> usize;
-}
-
 #[cfg(test)]
 mod tests {
     use crate::result_weft::ResultWeftTrain;
