@@ -2,8 +2,8 @@
 //!
 //! 以下の操作が含まれる
 //! - AddTrackCommand
-//! - *DeleteTrackCommand*
-//! - *RenameTrackCommand*
+//! - DeleteTrackCommand
+//! - RenameTrackCommand
 
 use crate::{
     command::{Command, CommandError, EventEmitter},

@@ -2,9 +2,9 @@
 //!
 //! 以下の操作が含まれる
 //! - AddTrainCommand
-//! - *DeleteTrainCommand*
-//! - *RenameTrainCommand*
-//! - *ChangeDepartureTimeCommand*
+//! - DeleteTrainCommand
+//! - RenameTrainCommand
+//! - ChangeDepartureTimeCommand
 
 use crate::{
     command::{Command, CommandError, EventEmitter},

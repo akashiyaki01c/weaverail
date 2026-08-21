@@ -2,8 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::{ExtensionProperty, PropertiableObject};
+use crate::model::ExtensionProperty;
 use crate::path::Heddle;
+use crate::primitives::propatiable::PropertiableObject;
 
 /// プロジェクトのメタデータを表す構造体
 #[derive(ts_rs::TS, Clone, PartialEq, Debug, Default, Serialize, Deserialize)]

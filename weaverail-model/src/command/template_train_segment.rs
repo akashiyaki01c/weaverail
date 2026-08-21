@@ -2,9 +2,9 @@
 //!
 //! 以下の操作が含まれる
 //! - PushBackTemplateTrainSegment
-//! - *PushFrontTemplateTrainSegment*
-//! - *PopBackTemplateTrainSegment*
-//! - *PopFrontTemplateTrainSegment*
+//! - PushFrontTemplateTrainSegment
+//! - PopBackTemplateTrainSegment
+//! - PopFrontTemplateTrainSegment
 
 use crate::{
     command::{Command, CommandError, EventEmitter},

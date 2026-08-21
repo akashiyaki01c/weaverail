@@ -2,9 +2,9 @@
 //!
 //! 以下の操作が含まれる
 //! - AddTimetableCommand
-//! - *DeleteTimetableCommand*
-//! - *RenameTimetableCommand*
-//! - *ChangeTrainOrderCommand*
+//! - DeleteTimetableCommand
+//! - RenameTimetableCommand
+//! - ChangeTrainOrderCommand
 
 use crate::{
     command::{Command, EventEmitter},

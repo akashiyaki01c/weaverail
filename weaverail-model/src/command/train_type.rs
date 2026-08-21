@@ -3,7 +3,7 @@
 //! 以下の操作が含まれる
 //! - AddTrainTypeCommand
 //! - RemoveTrainTypeCommand
-//! - *RenameTrainTypeCommand*
+//! - RenameTrainTypeCommand
 
 use crate::{
     command::{Command, CommandError, EventEmitter},

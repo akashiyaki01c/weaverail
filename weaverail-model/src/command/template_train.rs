@@ -2,8 +2,8 @@
 //!
 //! 以下の操作が含まれる
 //! - AddTemplateTrainCommand
-//! - *DeleteTemplateTrainCommand*
-//! - *RenameTemplateTrainCommand*
+//! - DeleteTemplateTrainCommand
+//! - RenameTemplateTrainCommand
 
 use crate::{
     command::{Command, CommandError, EventEmitter},

@@ -30,12 +30,13 @@
 //! - スマートポインタ型
 //! 	- `Cell<T>`
 
+pub mod propatiable;
 pub mod total_sizable;
 
 use serde::{Deserialize, Serialize};
 
-use crate::model::PropertiableObject;
-
 pub use total_sizable::TotalSizable;
+
+use crate::primitives::propatiable::PropertiableObject;
 
 pub trait WeaverailObjectable<'a>: Serialize + Deserialize<'a> + PropertiableObject {}

@@ -5,9 +5,9 @@
 //! - RemoveSegmentCommand
 //! - PushBackSegmentCommand
 //! - PushFrontSegmentCommand
-//! - *PopBackSegmentCommand*
-//! - *PopFrontSegmentCommand*
-//! - *ReplaceSegmentCommand*
+//! - PopBackSegmentCommand
+//! - PopFrontSegmentCommand
+//! - ReplaceSegmentCommand
 
 use crate::{
     command::{Command, CommandError, EventEmitter},
