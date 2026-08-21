@@ -24,10 +24,7 @@ pub fn get_line_stations<'a>(
 }
 
 /// 駅間 ID から駅間本体を取得する。
-pub fn get_segment(
-    root: &DiagramRoot,
-    segment_id: LineSegmentId,
-) -> Option<&LineSegment> {
+pub fn get_segment(root: &DiagramRoot, segment_id: LineSegmentId) -> Option<&LineSegment> {
     root.get_segment(segment_id)
 }
 

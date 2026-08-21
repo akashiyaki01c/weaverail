@@ -132,6 +132,169 @@ pub struct PushFrontSegmentCommand {
     is_reversed: bool,
 }
 
+/// 路線の末尾の駅間を削除する操作。
+///
+/// 削除した参照を保持し、`undo`で同じ向きの参照を末尾へ戻す。
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct PopBackSegmentCommand {
+    line_id: LineId,
+    segment: Option<weaverail_model::model::line::SegmentRef>,
+}
+
+impl PopBackSegmentCommand {
+    /// 指定路線の末尾を削除するコマンドを生成する。
+    pub fn new(line_id: LineId) -> Self {
+        Self {
+            line_id,
+            segment: None,
+        }
+    }
+}
+
+impl Command for PopBackSegmentCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        self.segment = Some(obj.pop_back_line_segment(self.line_id)?);
+        emitter.emit(EmitEventType::SegmentPoped, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let segment = self.segment.take().ok_or(CommandError::Inconsistent)?;
+        obj.push_back_line_segment(self.line_id, segment.segment_id, segment.is_reversed)?;
+        self.segment = Some(segment);
+        emitter.emit(EmitEventType::SegmentPushed, "");
+        Ok(())
+    }
+}
+
+/// 路線の先頭の駅間を削除する操作。
+///
+/// 削除した参照を保持し、`undo`で同じ向きの参照を先頭へ戻す。
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct PopFrontSegmentCommand {
+    line_id: LineId,
+    segment: Option<weaverail_model::model::line::SegmentRef>,
+}
+
+/// 路線上の駅間を複数の駅間に置換する操作。
+///
+/// `target_segment_id`を`replacements`の順序で置換し、元の参照を`undo`用に保持する。
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct ReplaceSegmentCommand {
+    line_id: LineId,
+    target_segment_id: LineSegmentId,
+    replacements: Vec<weaverail_model::model::line::SegmentRef>,
+    original: Option<weaverail_model::model::line::SegmentRef>,
+}
+
+impl ReplaceSegmentCommand {
+    pub fn new(
+        line_id: LineId,
+        target_segment_id: LineSegmentId,
+        replacements: Vec<weaverail_model::model::line::SegmentRef>,
+    ) -> Self {
+        Self {
+            line_id,
+            target_segment_id,
+            replacements,
+            original: None,
+        }
+    }
+}
+
+impl Command for ReplaceSegmentCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        let index = line
+            .segments
+            .iter()
+            .position(|segment| segment.segment_id == self.target_segment_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        let original = line.segments[index].clone();
+        if self.replacements.is_empty() {
+            return Err(CommandError::Inconsistent);
+        }
+        line.segments
+            .splice(index..=index, self.replacements.clone());
+        self.original = Some(original);
+        emitter.emit(EmitEventType::SegmentPushed, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let line = obj
+            .lines
+            .get_mut(&self.line_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        let index = line
+            .segments
+            .iter()
+            .position(|segment| {
+                self.replacements
+                    .iter()
+                    .any(|replacement| replacement == segment)
+            })
+            .ok_or(CommandError::Inconsistent)?;
+        let original = self.original.clone().ok_or(CommandError::Inconsistent)?;
+        line.segments
+            .splice(index..index + self.replacements.len(), [original]);
+        emitter.emit(EmitEventType::SegmentPoped, "");
+        Ok(())
+    }
+}
+
+impl PopFrontSegmentCommand {
+    pub fn new(line_id: LineId) -> Self {
+        Self {
+            line_id,
+            segment: None,
+        }
+    }
+}
+
+impl Command for PopFrontSegmentCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        self.segment = Some(obj.pop_front_line_segment(self.line_id)?);
+        emitter.emit(EmitEventType::SegmentPoped, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let segment = self.segment.take().ok_or(CommandError::Inconsistent)?;
+        obj.push_front_line_segment(self.line_id, segment.segment_id, segment.is_reversed)?;
+        self.segment = Some(segment);
+        emitter.emit(EmitEventType::SegmentPushed, "");
+        Ok(())
+    }
+}
+
 impl PushFrontSegmentCommand {
     pub fn new(line_id: LineId, segment_id: LineSegmentId, is_reversed: bool) -> Self {
         Self {
@@ -169,7 +332,7 @@ mod tests {
     use super::*;
     use weaverail_model::model::{
         id::WeaverailId,
-        line::Line,
+        line::{Line, SegmentRef},
         line_segment::LineSegmentId,
         station::{Station, StationId},
     };
@@ -228,6 +391,81 @@ mod tests {
             push_front
                 .undo(&mut root, &crate::command::EmptyEventEmitter)
                 .is_ok()
+        );
+    }
+
+    #[test]
+    fn pop_and_replace_segment_commands_restore_line() {
+        let mut root = DiagramRoot::default();
+        let start = StationId::new(WeaverailId::new(40));
+        let end = StationId::new(WeaverailId::new(41));
+        let line_id = LineId::new(WeaverailId::new(42));
+        let target_id = LineSegmentId::new(WeaverailId::new(43));
+        let replacement_id = LineSegmentId::new(WeaverailId::new(44));
+        root.add_station(Station::new(start, "A")).unwrap();
+        root.add_station(Station::new(end, "B")).unwrap();
+        root.add_segment(LineSegment::new(target_id, start, end))
+            .unwrap();
+        root.add_segment(LineSegment::new(replacement_id, start, end))
+            .unwrap();
+        root.add_line(Line::new(
+            line_id,
+            "line",
+            &[SegmentRef {
+                segment_id: target_id,
+                is_reversed: false,
+            }],
+        ))
+        .unwrap();
+
+        let mut pop = PopBackSegmentCommand::new(line_id);
+        pop.redo(&mut root, &crate::command::EmptyEventEmitter)
+            .unwrap();
+        assert!(root.lines[&line_id].segments.is_empty());
+        pop.undo(&mut root, &crate::command::EmptyEventEmitter)
+            .unwrap();
+        assert_eq!(root.lines[&line_id].segments[0].segment_id, target_id);
+
+        let mut replace = ReplaceSegmentCommand::new(
+            line_id,
+            target_id,
+            vec![SegmentRef {
+                segment_id: replacement_id,
+                is_reversed: true,
+            }],
+        );
+        replace
+            .redo(&mut root, &crate::command::EmptyEventEmitter)
+            .unwrap();
+        assert_eq!(root.lines[&line_id].segments[0].segment_id, replacement_id);
+        replace
+            .undo(&mut root, &crate::command::EmptyEventEmitter)
+            .unwrap();
+        assert_eq!(root.lines[&line_id].segments[0].segment_id, target_id);
+    }
+
+    #[test]
+    fn segment_commands_handle_errors() {
+        let mut root = DiagramRoot::default();
+        let line_id = LineId::new(WeaverailId::new(50));
+
+        let mut pop_empty = PopBackSegmentCommand::new(line_id);
+        assert_eq!(
+            pop_empty.redo(&mut root, &crate::command::EmptyEventEmitter),
+            Err(CommandError::ModelError(
+                weaverail_model::error::ModelError::ObjectNotFound
+            ))
+        );
+
+        let invalid_line = LineId::new(WeaverailId::new(51));
+        let mut replace = ReplaceSegmentCommand::new(
+            invalid_line,
+            LineSegmentId::new(WeaverailId::new(52)),
+            vec![],
+        );
+        assert_eq!(
+            replace.redo(&mut root, &crate::command::EmptyEventEmitter),
+            Err(CommandError::TargetObjectNotFound)
         );
     }
 }

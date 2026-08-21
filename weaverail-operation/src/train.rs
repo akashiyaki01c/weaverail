@@ -16,10 +16,7 @@ pub fn delete_train(root: &mut DiagramRoot, train_id: TrainId) -> Result<Train, 
 }
 
 /// 列車が通過する駅 ID を順序付きで取得する。
-pub fn get_train_stations(
-    root: &DiagramRoot,
-    train: &Train,
-) -> Result<Vec<StationId>, ModelError> {
+pub fn get_train_stations(root: &DiagramRoot, train: &Train) -> Result<Vec<StationId>, ModelError> {
     root.get_train_stations(train)
 }
 

@@ -35,6 +35,8 @@ weaverail_id!(TrainId, "TRA_");
 pub struct Train {
     /// 識別ID
     pub id: TrainId,
+    /// 列車名
+    pub name: String,
     /// 時刻表ID
     pub timetable_id: TimetableId,
     /// テンプレート列車ID
@@ -48,6 +50,7 @@ impl Train {
     pub fn new(id: TrainId, timetable_id: TimetableId) -> Self {
         Self {
             id,
+            name: String::new(),
             timetable_id,
             ..Default::default()
         }
