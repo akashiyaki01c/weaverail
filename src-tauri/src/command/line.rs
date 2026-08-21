@@ -10,12 +10,14 @@ use weaverail_operation::{
 };
 
 #[tauri::command]
+#[specta::specta]
 pub async fn new_line_id(state: tauri::State<'_, Mutex<AppState>>) -> Result<LineId, CommandError> {
     let state = state.lock().map_err(|_| CommandError::MutexLockError)?;
     Ok(LineId::new(state.command_manager.root.id_issuer.next()))
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn add_line(
     state: tauri::State<'_, Mutex<AppState>>,
     line: Line,
@@ -30,6 +32,7 @@ pub async fn add_line(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn remove_line(
     state: tauri::State<'_, Mutex<AppState>>,
     line_id: LineId,

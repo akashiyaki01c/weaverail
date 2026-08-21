@@ -13,6 +13,7 @@ use weaverail_operation::{
 };
 
 #[tauri::command]
+#[specta::specta]
 pub async fn new_station_id(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<StationId, CommandError> {
@@ -21,6 +22,7 @@ pub async fn new_station_id(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn new_track_id(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<TrackId, CommandError> {
@@ -29,6 +31,7 @@ pub async fn new_track_id(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn add_station(
     state: tauri::State<'_, Mutex<AppState>>,
     station: Station,
@@ -43,6 +46,7 @@ pub async fn add_station(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn remove_station(
     state: tauri::State<'_, Mutex<AppState>>,
     station_id: StationId,

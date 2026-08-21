@@ -5,6 +5,7 @@ use weaverail_model::model::*;
 use weaverail_operation::{app::AppState, command::CommandError};
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_root(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<DiagramRoot, CommandError> {
@@ -17,6 +18,7 @@ pub async fn get_root(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_stations(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<StationId, Station>, CommandError> {
@@ -30,6 +32,7 @@ pub async fn get_stations(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_tracks(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<TrackId, Track>, CommandError> {
@@ -43,6 +46,7 @@ pub async fn get_tracks(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_segments(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<LineSegmentId, LineSegment>, CommandError> {
@@ -56,6 +60,7 @@ pub async fn get_segments(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_lines(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<LineId, Line>, CommandError> {
@@ -69,6 +74,7 @@ pub async fn get_lines(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_train_types(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<TrainTypeId, TrainType>, CommandError> {
@@ -82,6 +88,7 @@ pub async fn get_train_types(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_template_trains(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<TemplateTrainId, TemplateTrain>, CommandError> {
@@ -95,6 +102,7 @@ pub async fn get_template_trains(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_timetables(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<TimetableId, Timetable>, CommandError> {
@@ -108,6 +116,7 @@ pub async fn get_timetables(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn get_trains(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<IndexMap<TrainId, Train>, CommandError> {

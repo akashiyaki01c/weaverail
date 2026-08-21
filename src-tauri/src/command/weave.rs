@@ -14,6 +14,7 @@ use weaverail_operation::{app::AppState, command::CommandError};
 use weft_rail::shuutle::insert_train_order;
 
 #[tauri::command]
+#[specta::specta]
 pub async fn weave(
     timetable_id: TimetableId,
     state: tauri::State<'_, Mutex<AppState>>,
@@ -23,6 +24,7 @@ pub async fn weave(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn debug_insert_train(
     starting_departure_time: Time,
     timetable_id: TimetableId,

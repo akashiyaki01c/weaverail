@@ -10,6 +10,7 @@ use weaverail_operation::{
 };
 
 #[tauri::command]
+#[specta::specta]
 pub async fn new_train_type_id(
     state: tauri::State<'_, Mutex<AppState>>,
 ) -> Result<TrainTypeId, CommandError> {
@@ -20,6 +21,7 @@ pub async fn new_train_type_id(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn add_train_type(
     state: tauri::State<'_, Mutex<AppState>>,
     train_type: TrainType,
@@ -34,6 +36,7 @@ pub async fn add_train_type(
 }
 
 #[tauri::command]
+#[specta::specta]
 pub async fn remove_train_type(
     state: tauri::State<'_, Mutex<AppState>>,
     train_type_id: TrainTypeId,
