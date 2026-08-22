@@ -29,6 +29,10 @@ use weaverail_model::{
 
 use crate::time_result_diff::get_time_result_diff;
 
+/// 指定した時刻表の列車時刻を計算する高水準API。
+///
+/// ノード生成、トポロジカルソート、最長経路計算、結果変換を順に実行する。
+/// 時刻表や参照先のモデルが存在しない場合は [`ModelError`] を返す。
 pub fn weave(
     root: &DiagramRoot,
     timetable_id: TimetableId,

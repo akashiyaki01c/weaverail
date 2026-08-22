@@ -36,6 +36,10 @@ impl NumberIssuer {
 }
 
 /// 有向グラフのノードを生成する関数
+/// 列車時刻グラフを生成する。
+///
+/// 返却値は共有ルートノードと列車ごとの発着ノードで構成される。対象時刻表
+/// や列車が参照するテンプレート列車がない場合は [`ModelError`] を返す。
 pub fn make_node(
     root: &DiagramRoot,
     timetable_id: TimetableId,
@@ -86,6 +90,9 @@ pub fn make_node(
 
 /// NodeIdからノードを取得する関数
 /// 計算オーダは `O(nodes.count)`
+/// ノードIDをベクターの添字として扱える順序にノードを並べ替える。
+///
+/// 欠番がある場合はダミーノードで埋められる。
 pub fn get_node_by_nodeid<'a>(
     root_node: &'a WeftNode,
     nodes: &'a HashMap<TrainId, Vec<WeftNode>>,

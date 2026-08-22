@@ -30,7 +30,10 @@ impl NumberIssuer {
     }
 }
 
-/// 有向グラフのノードを生成する関数 (最適化済)
+/// 有向グラフのノードを生成する関数 (最適化済)。
+///
+/// [`crate::make_node::make_node`] と同じグラフを、連続配列を持つ
+/// [`WeftTempObj`] として構築する。
 pub fn make_node(root: &DiagramRoot, timetable_id: TimetableId) -> Result<WeftTempObj, ModelError> {
     let mut number_issuer = NumberIssuer::new();
     let timetable = root

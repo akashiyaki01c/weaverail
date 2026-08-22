@@ -7,9 +7,11 @@ use weaverail_model::{
     },
 };
 
+/// 列車・駅・ノード種別からノードを検索するためのキー。
 #[derive(Clone, PartialEq, Default, Eq, Hash, Copy)]
 pub struct LookupNodeKey(u64);
 impl LookupNodeKey {
+    /// 検索キーを生成する。
     pub fn new(train_id: TrainId, station_id: StationId, node_type: NodeType) -> Self {
         let raw_train_id = train_id.0.0;
         let raw_station_id = station_id.0.0;
@@ -22,6 +24,7 @@ impl LookupNodeKey {
     }
 }
 
+/// 最適化済みノードと計算済み時刻を列車ごとの駅時刻結果へ変換する。
 pub fn get_time_result_diff(
     diagram_root: &DiagramRoot,
     timetable_id: TimetableId,

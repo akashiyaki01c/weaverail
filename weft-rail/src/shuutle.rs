@@ -6,7 +6,10 @@ use weaverail_model::{
     result_weft::{NodeType, WeftTempObj},
 };
 
-/// 始発駅時点における発車順序を求める関数
+/// 始発駅時点における発車順序を求める。
+///
+/// 指定時刻より後に発車するノードの先頭位置を返し、該当ノードがない
+/// 場合は `0` を返す。
 pub fn get_starting_order_index(
     root: &DiagramRoot,
     obj: &WeftTempObj,
@@ -50,7 +53,7 @@ pub fn get_starting_order_index(
     Ok(0)
 }
 
-/// 次区間における発車順序を求める関数
+/// 前区間の列車順序から次区間の発車順序を推定する。
 ///
 /// 戻り値が`Some(usize)`の場合、順序が定まったことを、
 /// `None`の場合は順序が定まらず再計算が必要であることを表す。
@@ -340,6 +343,10 @@ fn get_train_segment(
 }
 
 /// 列車の発車順序を頭から求め、列車順序を挿入する関数
+/// 列車を時刻表の各区間の発車順序へ挿入する。
+///
+/// 列車が経路を持たない場合は [`ModelError::Empty`]、参照先がない場合は
+/// [`ModelError::ObjectNotFound`] を返す。
 pub fn insert_train_order(
     root: &mut DiagramRoot,
     // 対象時刻表ID

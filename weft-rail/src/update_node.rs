@@ -4,6 +4,10 @@ use weaverail_model::{error::ModelError, model::*, result_weft::NodeType};
 
 use crate::WeftNode;
 
+/// 時刻表の変更を既存ノードグラフへ反映する。
+///
+/// 始発駅の発車時刻変更は現在 no-op で、列車順序変更では隣接列車間の
+/// 制約エッジを付け替える。参照対象がない場合はエラーを返す。
 pub fn update_node(
     timetable: &Timetable,
     nodes: &mut (WeftNode, HashMap<TrainId, Vec<WeftNode>>),
@@ -163,7 +167,7 @@ pub fn update_node(
     }
 }
 
-/// 更新の種類
+/// 既存ノードグラフへ適用できる更新の種類。
 pub enum UpdateType {
     /// 始発駅の時刻変更
     ChangeStartStationDepartureTime(TrainId, Time),

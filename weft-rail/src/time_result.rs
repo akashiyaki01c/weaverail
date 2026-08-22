@@ -8,6 +8,9 @@ use weaverail_model::{
 
 use crate::{ResultWeftTrain, WeftNode};
 
+/// 計算済みノードと時刻を列車ごとの駅時刻結果へ変換する。
+///
+/// `times` は `nodes` のノードIDを添字として参照できる必要がある。
 pub fn get_time_result(
     diagram_root: &DiagramRoot,
     timetable_id: TimetableId,

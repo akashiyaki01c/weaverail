@@ -6,7 +6,9 @@ use weaverail_model::model::time::Time;
 
 use crate::WeftNode;
 
-/// 列車時刻ノードの実際の時刻を関数
+/// トポロジカル順に並んだノードから各ノードの最早時刻を計算する。
+///
+/// 各エッジの重みを制約時間として、始点からの最長経路を求める。
 pub fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
     let mut times = vec![Time::new(0, 0, 0); sorted_nodes.len()];
 
@@ -22,4 +24,40 @@ pub fn ripple_time(sorted_nodes: &Vec<&WeftNode>) -> Vec<Time> {
     }
 
     times
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use weaverail_model::result_weft::NodeId;
+
+    #[test]
+    fn ripple_time_uses_longest_path() {
+        let first = WeftNode {
+            node_id: NodeId::new(0),
+            edges: smallvec::smallvec![
+                (NodeId::new(1), Time::new(0, 0, 5)),
+                (NodeId::new(2), Time::new(0, 0, 2)),
+            ],
+            ..Default::default()
+        };
+        let second = WeftNode {
+            node_id: NodeId::new(1),
+            edges: smallvec::smallvec![(NodeId::new(2), Time::new(0, 0, 4))],
+            ..Default::default()
+        };
+        let third = WeftNode {
+            node_id: NodeId::new(2),
+            ..Default::default()
+        };
+        let nodes = vec![&first, &second, &third];
+        assert_eq!(
+            ripple_time(&nodes),
+            vec![
+                Time::default(),
+                Time::new_from_total_second(5),
+                Time::new_from_total_second(9)
+            ]
+        );
+    }
 }
