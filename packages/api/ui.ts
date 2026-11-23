@@ -1,6 +1,8 @@
 export interface UiEventMap {
 	"extension-added": { id: string };
+	"extension-removed": { id: string };
 	"panel-registered": { panelId: string, slot: WeaverailSlot, name: string };
+	"panel-unregistered": { panelId: string };
 	"open-tab": { id: string; name: string; component: string };
 	"close-tab": { id: string };
 }
@@ -8,11 +10,11 @@ export interface UiEventMap {
 export type UiListener<K extends keyof UiEventMap> = (payload: UiEventMap[K]) => void;
 
 export interface WeaverailUiApi {
-	registerPanel(panel: Panel): void;
+	registerPanel(panel: Panel): () => void;
 
 	getPanels(slot: WeaverailSlot): Panel[];
 
-	getPanelById(id: string): Panel;
+	getPanelById(id: string): Panel | undefined;
 }
 
 export type WeaverailSlot = 'sidebar' | 'main' | 'inspector' | 'toolbar' | 'bottom';

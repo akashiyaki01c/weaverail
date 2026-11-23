@@ -325,7 +325,7 @@ function DiagramViewer() {
 export class DiagramViewerExtension implements WeaverailExtension {
   id: string = "weaverail.core.diagram-viewer";
   metadata = { name: "コア拡張機能", description: "" };
-  init(api: WeaverailApi) {
+  activate(api: WeaverailApi) {
     api.ui.registerPanel({
       id: "weaverail.diagram-viewer.main-panel",
       label: "",
@@ -335,5 +335,5 @@ export class DiagramViewerExtension implements WeaverailExtension {
       },
     });
   }
-  destroy(): void {}
+  deactivate(): void {}
 }

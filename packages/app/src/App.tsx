@@ -22,7 +22,6 @@ function App() {
 
   useEffect(() => {
     const unbindPanelRegistered = manager.on("panel-registered", (payload) => {
-      console.log(payload);
       setModel((currentModel) => {
         if (payload.slot === "main") {
           const json = currentModel.toJson();
@@ -68,15 +67,35 @@ function App() {
           return Model.fromJson(json);
         }
       });
-      console.log(model.toJson());
     });
 
-    manager.addExtension(new CoreExtensions());
-    manager.addExtension(new StationViewerExtension());
-    manager.addExtension(new DiagramViewerExtension());
+    const unbindPanelUnregistered = manager.on("panel-unregistered", (payload) => {
+      setModel((currentModel) => {
+        const json = currentModel.toJson();
+        json.layout.children[0].children =
+          json.layout.children[0].children.filter(
+            (node) => node.id !== payload.panelId,
+          );
+        json.borders?.forEach((border) => {
+          border.children = border.children.filter(
+            (node) => node.id !== payload.panelId,
+          );
+        });
+        return Model.fromJson(json);
+      });
+    });
+
+    void Promise.all([
+      manager.addExtension(new CoreExtensions()),
+      manager.addExtension(new StationViewerExtension()),
+      manager.addExtension(new DiagramViewerExtension()),
+    ]).catch((error: unknown) => {
+      console.error("Failed to activate extension", error);
+    });
 
     return () => {
       unbindPanelRegistered();
+      unbindPanelUnregistered();
     };
   }, [manager]);
 

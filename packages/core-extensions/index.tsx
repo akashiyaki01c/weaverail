@@ -7,7 +7,7 @@ export * from "./StationViewer";
 export class CoreExtensions implements WeaverailExtension {
 	id: string = "weaverail.core-extensions";
 	metadata = { name: "コア拡張機能", description: "" };
-	init(api: WeaverailApi) {
+	activate(api: WeaverailApi) {
 		api.ui.registerPanel({
 			id: "weaverail.core-extensions.main-panel",
 			label: "",
@@ -33,7 +33,7 @@ export class CoreExtensions implements WeaverailExtension {
 			}
 		})
 	}
-	destroy(): void {
+	deactivate(): void {
 	
 	}
 }

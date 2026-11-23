@@ -47,7 +47,7 @@ function StationViewer() {
 export class StationViewerExtension implements WeaverailExtension {
   id: string = "weaverail.core.station-viewer";
   metadata = { name: "コア拡張機能", description: "" };
-  init(api: WeaverailApi) {
+  activate(api: WeaverailApi) {
     api.ui.registerPanel({
       id: "weaverail.station-viewer.main-panel",
       label: "",
@@ -57,5 +57,5 @@ export class StationViewerExtension implements WeaverailExtension {
       },
     });
   }
-  destroy(): void {}
+  deactivate(): void {}
 }
