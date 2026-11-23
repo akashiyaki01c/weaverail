@@ -60,7 +60,6 @@ pub fn sort_node<'a>(nodes: &'a Vec<&'a WeftNode>) -> Result<Vec<&'a WeftNode>, 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use smallvec::smallvec;
     use weaverail_model::{model::Time, result_weft::NodeId};
 
     fn node(id: usize, edges: &[(usize, Time)]) -> WeftNode {
