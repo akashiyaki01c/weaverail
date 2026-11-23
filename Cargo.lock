@@ -4520,7 +4520,7 @@ dependencies = [
 
 [[package]]
 name = "warp-rail"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "weaverail-model",
 ]
@@ -4610,7 +4610,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "indexmap 2.14.0",
  "specta 1.0.5",
@@ -4627,7 +4627,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-io"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "indexmap 2.14.0",
  "ron",
@@ -4640,7 +4640,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-model"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "indexmap 2.14.0",
  "ron",
@@ -4656,7 +4656,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-object"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "quote",
  "syn 2.0.119",
@@ -4664,7 +4664,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-operation"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "serde",
  "strum",
@@ -4674,7 +4674,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-testdata"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "ron",
  "weaverail-model",
@@ -4786,7 +4786,7 @@ dependencies = [
 
 [[package]]
 name = "weft-rail"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "criterion",
  "rustc-hash",
