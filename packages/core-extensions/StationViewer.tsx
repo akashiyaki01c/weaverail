@@ -8,17 +8,12 @@ import { Button, Group, Stack, Table, TextInput } from "@mantine/core";
 function StationViewer() {
   const { manager } = useExtensionManager();
   const [stations, setStations] = useState<{ [x: string]: Station }>();
-  const [tracks, setTracks] = useState<{ [x: string]: Track }>();
   const [newStationName, setNewStationName] = useState("");
-  const [newTrackNames, setNewTrackNames] = useState<{ [stationId: string]: string }>({});
   const [editingStationId, setEditingStationId] = useState<string | null>(null);
   const [editingStationName, setEditingStationName] = useState("");
-  const [editingTrackId, setEditingTrackId] = useState<string | null>(null);
-  const [editingTrackName, setEditingTrackName] = useState("");
 
   const reload = useCallback(async () => {
     setStations(await manager.api.data.getStations());
-    setTracks(await manager.api.data.getTracks());
   }, [manager]);
 
   useEffect(() => {
@@ -43,38 +38,19 @@ function StationViewer() {
     if (!name) return;
     await manager.api.ops.station.rename_station(stationId, name);
     setEditingStationId(null);
+    manager.dispatch("station-selected", {
+      stationId,
+      stationName: name,
+    });
     await reload();
   };
 
   const removeStation = async (stationId: string) => {
     await manager.api.ops.station.remove_station(stationId);
-    await reload();
-  };
-
-  const addTrack = async (stationId: string) => {
-    const name = newTrackNames[stationId]?.trim();
-    if (!name) return;
-    const id = await manager.api.ops.station.new_track_id();
-    await manager.api.ops.station.add_track({
-      id,
-      station_id: stationId,
-      name,
-      properties: {},
+    manager.dispatch("station-selected", {
+      stationId: null,
+      stationName: null,
     });
-    setNewTrackNames((current) => ({ ...current, [stationId]: "" }));
-    await reload();
-  };
-
-  const renameTrack = async (trackId: string) => {
-    const name = editingTrackName.trim();
-    if (!name) return;
-    await manager.api.ops.station.rename_track(trackId, name);
-    setEditingTrackId(null);
-    await reload();
-  };
-
-  const removeTrack = async (trackId: string) => {
-    await manager.api.ops.station.remove_track(trackId);
     await reload();
   };
 
@@ -107,6 +83,10 @@ function StationViewer() {
               onClick={() => {
                 setEditingStationId(element.id);
                 setEditingStationName(element.name);
+                manager.dispatch("station-selected", {
+                  stationId: element.id,
+                  stationName: element.name,
+                });
               }}
             >
               {element.name}
@@ -114,51 +94,6 @@ function StationViewer() {
           )}
         </Table.Td>
         <Table.Td>{element.id}</Table.Td>
-        <Table.Td>
-          <Stack gap="xs">
-            {Object.values(tracks ?? {}).filter((track) => track.station_id === element.id).map((track) => (
-              <Group key={track.id} gap="xs">
-                {editingTrackId === track.id ? (
-                  <>
-                    <TextInput
-                      value={editingTrackName}
-                      onChange={(event) => setEditingTrackName(event.currentTarget.value)}
-                      size="xs"
-                    />
-                    <Button size="xs" onClick={() => void renameTrack(track.id)}>保存</Button>
-                    <Button size="xs" variant="subtle" onClick={() => setEditingTrackId(null)}>取消</Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="subtle"
-                      size="compact-xs"
-                      onClick={() => {
-                        setEditingTrackId(track.id);
-                        setEditingTrackName(track.name);
-                      }}
-                    >
-                      {track.name}
-                    </Button>
-                    <Button size="xs" color="red" variant="subtle" onClick={() => void removeTrack(track.id)}>削除</Button>
-                  </>
-                )}
-              </Group>
-            ))}
-            <Group gap="xs">
-              <TextInput
-                placeholder="番線名"
-                value={newTrackNames[element.id] ?? ""}
-                onChange={(event) => setNewTrackNames((current) => ({
-                  ...current,
-                  [element.id]: event.currentTarget.value,
-                }))}
-                size="xs"
-              />
-              <Button size="xs" onClick={() => void addTrack(element.id)}>追加</Button>
-            </Group>
-          </Stack>
-        </Table.Td>
         <Table.Td>
           <Button size="xs" color="red" variant="subtle" onClick={() => void removeStation(element.id)}>削除</Button>
         </Table.Td>
@@ -185,7 +120,6 @@ function StationViewer() {
         <Table.Tr>
 		  <Table.Th>駅名</Table.Th>
           <Table.Th>ID</Table.Th>
-          <Table.Th>番線</Table.Th>
           <Table.Th>操作</Table.Th>
         </Table.Tr>
       </Table.Thead>
@@ -195,6 +129,143 @@ function StationViewer() {
       </Table>
     </Stack>
   );
+}
+
+function TrackInspector() {
+  const { manager } = useExtensionManager();
+  const [stationId, setStationId] = useState<string | null>(null);
+  const [stationName, setStationName] = useState<string | null>(null);
+  const [tracks, setTracks] = useState<{ [x: string]: Track }>({});
+  const [newTrackName, setNewTrackName] = useState("");
+  const [editingTrackId, setEditingTrackId] = useState<string | null>(null);
+  const [editingTrackName, setEditingTrackName] = useState("");
+
+  const reloadTracks = useCallback(async (selectedStationId: string) => {
+    const allTracks = await manager.api.data.getTracks();
+    setTracks(
+      Object.fromEntries(
+        Object.entries(allTracks).filter(
+          ([, track]) => track.station_id === selectedStationId,
+        ),
+      ),
+    );
+  }, [manager]);
+
+  useEffect(() => {
+    const unbind = manager.on("station-selected", (payload) => {
+      setStationId(payload.stationId);
+      setStationName(payload.stationName);
+      setNewTrackName("");
+      setEditingTrackId(null);
+      if (payload.stationId) {
+        void reloadTracks(payload.stationId);
+      } else {
+        setTracks({});
+      }
+    });
+    return unbind;
+  }, [manager, reloadTracks]);
+
+  useEffect(() => {
+    if (stationId) {
+      void reloadTracks(stationId);
+    }
+  }, [stationId, reloadTracks]);
+
+  const addTrack = async () => {
+    if (!stationId) return;
+    const name = newTrackName.trim();
+    if (!name) return;
+    const id = await manager.api.ops.station.new_track_id();
+    await manager.api.ops.station.add_track({
+      id,
+      station_id: stationId,
+      name,
+      properties: {},
+    });
+    setNewTrackName("");
+    await reloadTracks(stationId);
+  };
+
+  const renameTrack = async (trackId: string) => {
+    const name = editingTrackName.trim();
+    if (!name) return;
+    await manager.api.ops.station.rename_track(trackId, name);
+    setEditingTrackId(null);
+    if (stationId) await reloadTracks(stationId);
+  };
+
+  const removeTrack = async (trackId: string) => {
+    await manager.api.ops.station.remove_track(trackId);
+    if (stationId) await reloadTracks(stationId);
+  };
+
+  if (!stationId) {
+    return <Stack gap="xs"><strong>番線編集</strong><p>駅一覧から駅を選択してください。</p></Stack>;
+  }
+
+  return (
+    <Stack gap="sm">
+      <strong>{stationName ?? "番線編集"}</strong>
+      {Object.values(tracks).map((track) => (
+        <Group key={track.id} gap="xs" wrap="nowrap">
+          {editingTrackId === track.id ? (
+            <>
+              <TextInput
+                value={editingTrackName}
+                onChange={(event) => setEditingTrackName(event.currentTarget.value)}
+                size="xs"
+              />
+              <Button size="xs" onClick={() => void renameTrack(track.id)}>保存</Button>
+              <Button size="xs" variant="subtle" onClick={() => setEditingTrackId(null)}>取消</Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="subtle"
+                size="compact-xs"
+                onClick={() => {
+                  setEditingTrackId(track.id);
+                  setEditingTrackName(track.name);
+                }}
+              >
+                {track.name}
+              </Button>
+              <Button size="xs" color="red" variant="subtle" onClick={() => void removeTrack(track.id)}>削除</Button>
+            </>
+          )}
+        </Group>
+      ))}
+      <Group gap="xs" wrap="nowrap">
+        <TextInput
+          placeholder="番線名"
+          value={newTrackName}
+          onChange={(event) => setNewTrackName(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") void addTrack();
+          }}
+          size="xs"
+        />
+        <Button size="xs" onClick={() => void addTrack()}>追加</Button>
+      </Group>
+    </Stack>
+  );
+}
+
+export class TrackInspectorExtension implements WeaverailExtension {
+  id: string = "weaverail.core.track-inspector";
+  metadata = { name: "番線編集", description: "" };
+  activate(api: WeaverailApi) {
+    api.ui.registerPanel({
+      id: "weaverail.track-inspector.inspector-panel",
+      label: "番線",
+      slot: "inspector",
+      render: function (): React.ReactNode {
+        return <TrackInspector />;
+      },
+    });
+  }
+  deactivate(): void {}
 }
 
 export class StationViewerExtension implements WeaverailExtension {

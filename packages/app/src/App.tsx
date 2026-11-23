@@ -10,6 +10,7 @@ import { InitLayout } from "./initLayout";
 import {
   CoreExtensions,
   StationViewerExtension,
+  TrackInspectorExtension,
 } from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
 import { DiagramViewerExtension } from "@weaverail/core-extensions/DiagramViewer";
@@ -88,6 +89,7 @@ function App() {
     void Promise.all([
       manager.addExtension(new CoreExtensions()),
       manager.addExtension(new StationViewerExtension()),
+      manager.addExtension(new TrackInspectorExtension()),
       manager.addExtension(new DiagramViewerExtension()),
     ]).catch((error: unknown) => {
       console.error("Failed to activate extension", error);
