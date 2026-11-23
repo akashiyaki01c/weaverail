@@ -14,6 +14,10 @@ export type Train = {
  */
 id: TrainId, 
 /**
+ * 列車名
+ */
+name: string, 
+/**
  * 時刻表ID
  */
 timetable_id: TimetableId, 

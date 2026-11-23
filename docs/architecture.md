@@ -26,6 +26,7 @@ graph TD
 		WeaverailIO[Weaverail IO]
 		WeaverailModel[Weaverail Model]
 		WeaverailObject[Weaverail Object]
+		WeaverailOperation[Weaverail Operation]
     end
 
 	Extensions --> API
@@ -38,9 +39,13 @@ graph TD
 	APP --> Extensions
 	APP --> Types
     
+	Tauri --> WeaverailOperation
 	Tauri --> WeftRail
 	Tauri --> WarpRail
 	Tauri --> WeaverailModel
+	WeaverailOperation --> WeaverailModel
+	WeaverailOperation --> WeftRail
+	WeaverailOperation --> WarpRail
 	WeaverailModel --> WeaverailObject
 	WarpRail --> WeaverailModel
 	WeftRail --> WeaverailModel
@@ -62,6 +67,8 @@ graph TD
 	Weaverailで用いるデータ構造を定義するクレート
 - weaverail-object
 	データ構造定義で用いるヘルパ関数を定義するクレート
+- weaverail-operation
+	モデルに対するCRUD操作や状態遷移、ビジネスロジックを担うクレート
 - weft-rail
 	各種制約から列車時刻を算出するクレート
 
