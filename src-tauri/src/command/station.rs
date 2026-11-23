@@ -2,13 +2,15 @@ use std::sync::Mutex;
 
 use weaverail_model::model::{
     station::{Station, StationId},
-    track::TrackId,
+    track::{Track, TrackId},
 };
 use weaverail_operation::{
     app::AppState,
     command::{
         CommandError,
+        station::RenameStationCommand,
         station::{AddStationCommand, RemoveStationCommand},
+        track::{AddTrackCommand, RemoveTrackCommand, RenameTrackCommand},
     },
 };
 
@@ -57,5 +59,58 @@ pub async fn remove_station(
     let command_manager = &mut state.command_manager;
     command_manager.execute(Box::new(command));
 
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn rename_station(
+    state: tauri::State<'_, Mutex<AppState>>,
+    station_id: StationId,
+    name: String,
+) -> Result<(), CommandError> {
+    let command = RenameStationCommand::new(station_id, &name);
+    let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
+    state.command_manager.execute(Box::new(command));
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn add_track(
+    state: tauri::State<'_, Mutex<AppState>>,
+    track: Track,
+) -> Result<(), CommandError> {
+    let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
+    state
+        .command_manager
+        .execute(Box::new(AddTrackCommand::new(track)));
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn remove_track(
+    state: tauri::State<'_, Mutex<AppState>>,
+    track_id: TrackId,
+) -> Result<(), CommandError> {
+    let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
+    state
+        .command_manager
+        .execute(Box::new(RemoveTrackCommand::new(track_id)));
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn rename_track(
+    state: tauri::State<'_, Mutex<AppState>>,
+    track_id: TrackId,
+    name: String,
+) -> Result<(), CommandError> {
+    let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
+    state
+        .command_manager
+        .execute(Box::new(RenameTrackCommand::new(track_id, &name)));
     Ok(())
 }
