@@ -9,8 +9,12 @@ import {
 import { InitLayout } from "./initLayout";
 import {
   CoreExtensions,
+  LineViewerExtension,
   StationViewerExtension,
   TrackInspectorExtension,
+  TimetableViewerExtension,
+  TemplateTrainViewerExtension,
+  TrainTypeViewerExtension,
 } from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
 import { DiagramViewerExtension } from "@weaverail/core-extensions/DiagramViewer";
@@ -90,6 +94,10 @@ function App() {
       manager.addExtension(new CoreExtensions()),
       manager.addExtension(new StationViewerExtension()),
       manager.addExtension(new TrackInspectorExtension()),
+      manager.addExtension(new LineViewerExtension()),
+      manager.addExtension(new TrainTypeViewerExtension()),
+      manager.addExtension(new TemplateTrainViewerExtension()),
+      manager.addExtension(new TimetableViewerExtension()),
       manager.addExtension(new DiagramViewerExtension()),
     ]).catch((error: unknown) => {
       console.error("Failed to activate extension", error);

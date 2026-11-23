@@ -3,6 +3,10 @@ import { WeaverailApi } from "../api";
 import { TestViwer } from "./TestViewer";
 
 export * from "./StationViewer";
+export * from "./LineViewer";
+export * from "./TrainTypeViewer";
+export * from "./TemplateTrainViewer";
+export * from "./TimetableViewer";
 
 export class CoreExtensions implements WeaverailExtension {
 	id: string = "weaverail.core-extensions";
