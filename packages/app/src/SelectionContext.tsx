@@ -3,12 +3,14 @@ import { createContext, useContext, useMemo, useState } from "react";
 export type WeaverailSelection =
   | { kind: "station"; id: string; name: string }
   | { kind: "line"; id: string; name: string }
+  | { kind: "template-train"; id: string; name: string }
   | null;
 
 interface SelectionContextValue {
   selection: WeaverailSelection;
   selectStation: (id: string, name: string) => void;
   selectLine: (id: string, name: string) => void;
+  selectTemplateTrain: (id: string, name: string) => void;
   clearSelection: () => void;
 }
 
@@ -22,6 +24,8 @@ export function SelectionProvider({ children }: { children: React.ReactNode }) {
       selection,
       selectStation: (id, name) => setSelection({ kind: "station", id, name }),
       selectLine: (id, name) => setSelection({ kind: "line", id, name }),
+      selectTemplateTrain: (id, name) =>
+        setSelection({ kind: "template-train", id, name }),
       clearSelection: () => setSelection(null),
     }),
     [selection],

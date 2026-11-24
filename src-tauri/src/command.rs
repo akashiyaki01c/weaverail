@@ -24,6 +24,7 @@ pub mod station;
 pub mod script;
 pub mod train_type;
 pub mod weave;
+pub mod template_train;
 
 pub struct TauriEmitter {
     handle: AppHandle,

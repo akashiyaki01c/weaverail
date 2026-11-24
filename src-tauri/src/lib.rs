@@ -59,6 +59,12 @@ pub fn run() {
             crate::command::train_type::new_train_type_id,
             crate::command::train_type::add_train_type,
             crate::command::train_type::remove_train_type,
+            crate::command::template_train::new_template_train_segment_id,
+            crate::command::template_train::new_template_train_station_id,
+            crate::command::template_train::add_template_train_segment,
+            crate::command::template_train::pop_front_template_train_segment,
+            crate::command::template_train::pop_back_template_train_segment,
+            crate::command::template_train::update_template_train_section,
             crate::command::weave::weave,
             crate::command::weave::debug_insert_train
         ])

@@ -7,6 +7,7 @@ export * from "./LineViewer";
 export * from "./LineSegmentInspector";
 export * from "./TrainTypeViewer";
 export * from "./TemplateTrainViewer";
+export * from "./TemplateTrainSegmentInspector";
 export * from "./TimetableViewer";
 export * from "./ScriptConsoleExtension";
 
