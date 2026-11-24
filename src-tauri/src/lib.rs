@@ -20,6 +20,10 @@ pub fn run() {
 
             app.manage(Mutex::new(app_state));
             app.manage::<Mutex<Option<WeftTempStore>>>(Mutex::new(None));
+            app.manage(Mutex::new(
+                crate::command::script::ScriptSession::new()
+                    .expect("Failed to initialize scripting session"),
+            ));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -48,6 +52,7 @@ pub fn run() {
             crate::command::station::remove_track,
             crate::command::station::rename_track,
             crate::command::script::run_script,
+            crate::command::script::reset_script_session,
             crate::command::line::new_line_id,
             crate::command::line::add_line,
             crate::command::line::remove_line,

@@ -34,6 +34,31 @@ pub struct ScriptError {
     pub message: String,
 }
 
+pub struct ScriptSession {
+    runtime: Runtime,
+    context: Context,
+}
+
+impl ScriptSession {
+    pub fn new() -> Result<Self, String> {
+        let runtime = Runtime::new().map_err(|error| error.to_string())?;
+        runtime.set_max_stack_size(256 * 1024);
+        runtime.set_memory_limit(16 * 1024 * 1024);
+        let context = Context::full(&runtime).map_err(|error| error.to_string())?;
+        Ok(Self { runtime, context })
+    }
+
+    pub fn reset(&mut self) -> Result<(), String> {
+        let runtime = Runtime::new().map_err(|error| error.to_string())?;
+        runtime.set_max_stack_size(256 * 1024);
+        runtime.set_memory_limit(16 * 1024 * 1024);
+        let context = Context::full(&runtime).map_err(|error| error.to_string())?;
+        self.runtime = runtime;
+        self.context = context;
+        Ok(())
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StationCreateInput {
@@ -79,6 +104,7 @@ fn execute_quickjs(
     source: &str,
     initial_root: &DiagramRoot,
     timeout: Duration,
+    session: &mut ScriptSession,
 ) -> Result<(DiagramRoot, usize, String), String> {
     let forbidden = [
         "fetch(", "XMLHttpRequest", "WebSocket", "eval(", "Function(", "import(", "require(",
@@ -88,17 +114,13 @@ fn execute_quickjs(
         return Err("Forbidden API detected in script".to_string());
     }
 
-    let runtime = Runtime::new().map_err(|error| error.to_string())?;
-    runtime.set_max_stack_size(256 * 1024);
-    runtime.set_memory_limit(16 * 1024 * 1024);
     let started = Instant::now();
-    runtime.set_interrupt_handler(Some(Box::new(move || started.elapsed() >= timeout)));
+    session.runtime.set_interrupt_handler(Some(Box::new(move || started.elapsed() >= timeout)));
 
-    let context = Context::full(&runtime).map_err(|error| error.to_string())?;
     let working_root = Arc::new(Mutex::new(initial_root.clone()));
     let operation_count = Arc::new(AtomicUsize::new(0));
 
-    context.with(|ctx| -> Result<(), String> {
+    session.context.with(|ctx| -> Result<(), String> {
         let globals = ctx.globals();
 
         {
@@ -281,8 +303,11 @@ fn execute_quickjs(
         }
 
         let api = r#"
-const _scriptOutput = [];
-const console = {
+if (typeof _scriptOutput === "undefined") {
+  var _scriptOutput = [];
+}
+_scriptOutput.length = 0;
+var console = {
   log(...args) {
     _scriptOutput.push(args.map(value => {
       if (typeof value === "string") return value;
@@ -290,7 +315,7 @@ const console = {
     }).join(" "));
   }
 };
-const weaverail = {
+var weaverail = {
   project: {
     stations: {
       list: () => JSON.parse(_weaverailStationsList()),
@@ -341,7 +366,7 @@ const weaverail = {
         .clone();
     let final_root = final_root;
     let change_count = operation_count.load(Ordering::SeqCst);
-    let output = context.with(|ctx| {
+    let output = session.context.with(|ctx| {
         ctx.globals().get("__script_output__").unwrap_or_default()
     });
     let mut final_root = final_root;
@@ -354,6 +379,7 @@ const weaverail = {
 #[specta::specta]
 pub async fn run_script(
     state: tauri::State<'_, Mutex<AppState>>,
+    session_state: tauri::State<'_, Mutex<ScriptSession>>,
     source: String,
 ) -> Result<ScriptExecutionResult, CommandError> {
     if source.len() > 256 * 1024 {
@@ -373,9 +399,12 @@ pub async fn run_script(
 
     let started = Instant::now();
     let mut state = state.lock().map_err(|_| CommandError::MutexLockError)?;
+    let mut session = session_state
+        .lock()
+        .map_err(|_| CommandError::MutexLockError)?;
     let old_root = state.command_manager.root.clone();
 
-    match execute_quickjs(&source, &old_root, Duration::from_secs(30)) {
+    match execute_quickjs(&source, &old_root, Duration::from_secs(30), &mut session) {
         Ok((new_root, changed_objects, output)) => {
             state
                 .command_manager
@@ -403,6 +432,19 @@ pub async fn run_script(
     }
 }
 
+#[tauri::command]
+#[specta::specta]
+pub async fn reset_script_session(
+    session_state: tauri::State<'_, Mutex<ScriptSession>>,
+) -> Result<(), CommandError> {
+    session_state
+        .lock()
+        .map_err(|_| CommandError::MutexLockError)?
+        .reset()
+        .map_err(|_| CommandError::Inconsistent)?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -415,8 +457,9 @@ const station = weaverail.project.stations.create({ name: "Tokyo" });
 console.log(station.name);
 "#;
 
+        let mut session = ScriptSession::new().unwrap();
         let (root, changed, output) =
-            execute_quickjs(source, &initial, Duration::from_secs(1)).unwrap();
+            execute_quickjs(source, &initial, Duration::from_secs(1), &mut session).unwrap();
         assert_eq!(root.stations.len(), 1);
         assert_eq!(changed, 1);
         assert_eq!(root.stations.values().next().unwrap().name, "Tokyo");
@@ -432,7 +475,7 @@ throw new Error("abort");
 "#;
 
         assert!(
-            execute_quickjs(source, &initial, Duration::from_secs(1)).is_err()
+            execute_quickjs(source, &initial, Duration::from_secs(1), &mut ScriptSession::new().unwrap()).is_err()
         );
     }
 
@@ -440,8 +483,24 @@ throw new Error("abort");
     fn forbidden_api_is_rejected_before_execution() {
         let initial = DiagramRoot::default();
         assert!(
-            execute_quickjs("fetch('https://example.com')", &initial, Duration::from_secs(1))
+            execute_quickjs("fetch('https://example.com')", &initial, Duration::from_secs(1), &mut ScriptSession::new().unwrap())
                 .is_err()
         );
+    }
+
+    #[test]
+    fn variables_persist_between_interactive_blocks() {
+        let initial = DiagramRoot::default();
+        let mut session = ScriptSession::new().unwrap();
+        execute_quickjs("const answer = 42;", &initial, Duration::from_secs(1), &mut session)
+            .unwrap();
+        let (_, _, output) = execute_quickjs(
+            "console.log(answer);",
+            &initial,
+            Duration::from_secs(1),
+            &mut session,
+        )
+        .unwrap();
+        assert_eq!(output, "42");
     }
 }

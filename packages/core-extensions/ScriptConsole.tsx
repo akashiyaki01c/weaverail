@@ -24,6 +24,8 @@ export function ScriptConsole() {
     '// station/track API example\nconst stations = weaverail.project.stations.list();\nconsole.log(stations.length + " station(s)");',
   );
   const [output, setOutput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +42,7 @@ export function ScriptConsole() {
       true,
       ts.ScriptKind.TS,
     );
+    let scriptSource = source;
 
     let blocked: string | null = null;
     const visit = (node: ts.Node) => {
@@ -60,7 +63,20 @@ export function ScriptConsole() {
       return null;
     }
 
-    const result = ts.transpileModule(source, {
+    const lastStatement = sourceFile.statements.at(-1);
+    if (lastStatement && ts.isExpressionStatement(lastStatement)) {
+      const expressionText = lastStatement.getText(sourceFile);
+      if (!expressionText.trimStart().startsWith("console.")) {
+        const start = lastStatement.getStart(sourceFile);
+        const end = lastStatement.getEnd();
+        scriptSource =
+          source.slice(0, start) +
+          `console.log(${expressionText})` +
+          source.slice(end);
+      }
+    }
+
+    const result = ts.transpileModule(scriptSource, {
       compilerOptions: {
         target: ts.ScriptTarget.ES2020,
         module: ts.ModuleKind.None,
@@ -95,7 +111,16 @@ export function ScriptConsole() {
     setRunning(true);
     try {
       const result: ScriptExecutionResult = await manager.api.data.runScript(javascript);
-      setOutput(result.output);
+      setOutput((current) =>
+        [current, result.output, result.success ? "" : result.error?.message ?? "実行に失敗しました。"]
+          .filter((value) => value.length > 0)
+          .join("\n"),
+      );
+      setHistory((current) => {
+        const next = [...current, source];
+        setHistoryIndex(next.length);
+        return next;
+      });
       if (!result.success) {
         setError(result.error?.message ?? "スクリプト実行に失敗しました。");
       }
@@ -112,6 +137,20 @@ export function ScriptConsole() {
         <Button onClick={() => void run()} loading={running} disabled={running}>
           実行
         </Button>
+        <Button
+          variant="light"
+          disabled={running}
+          onClick={async () => {
+            await manager.api.data.resetScriptSession();
+            setHistory([]);
+            setHistoryIndex(-1);
+            setOutput("");
+            setError(null);
+          }}
+        >
+          セッションリセット
+        </Button>
+        <Text c="dimmed" size="xs">Ctrl/Cmd+Enterでブロック実行</Text>
       </Group>
       <Textarea
         label="スクリプト"
@@ -120,6 +159,22 @@ export function ScriptConsole() {
         autosize
         minRows={18}
         disabled={running}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            void run();
+          } else if (event.key === "ArrowUp" && history.length > 0 && event.ctrlKey) {
+            event.preventDefault();
+            const nextIndex = Math.max(0, historyIndex - 1);
+            setHistoryIndex(nextIndex);
+            setSource(history[nextIndex]);
+          } else if (event.key === "ArrowDown" && history.length > 0 && event.ctrlKey) {
+            event.preventDefault();
+            const nextIndex = Math.min(history.length - 1, historyIndex + 1);
+            setHistoryIndex(nextIndex);
+            setSource(history[nextIndex]);
+          }
+        }}
       />
       {error && (
         <Text c="red" style={{ whiteSpace: "pre-wrap" }}>
