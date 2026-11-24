@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Stack, Table } from "@mantine/core";
+import { Button, Stack, Table } from "@mantine/core";
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
@@ -33,7 +33,20 @@ export function LineViewer() {
         <Table.Tbody>
           {values.map((line) => (
             <Table.Tr key={line.id}>
-              <Table.Td>{line.name}</Table.Td>
+              <Table.Td>
+                <Button
+                  variant="subtle"
+                  size="compact-xs"
+                  onClick={() => {
+                    manager.dispatch("line-selected", {
+                      lineId: line.id,
+                      lineName: line.name,
+                    });
+                  }}
+                >
+                  {line.name}
+                </Button>
+              </Table.Td>
               <Table.Td>{line.id}</Table.Td>
               <Table.Td>{line.segments.length}</Table.Td>
             </Table.Tr>

@@ -4,6 +4,7 @@ export interface UiEventMap {
 	"panel-registered": { panelId: string, slot: WeaverailSlot, name: string };
 	"panel-unregistered": { panelId: string };
 	"station-selected": { stationId: string | null; stationName: string | null };
+	"line-selected": { lineId: string | null; lineName: string | null };
 	"open-tab": { id: string; name: string; component: string };
 	"close-tab": { id: string };
 }

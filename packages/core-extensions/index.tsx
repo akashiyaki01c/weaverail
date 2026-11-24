@@ -4,6 +4,7 @@ import { TestViwer } from "./TestViewer";
 
 export * from "./StationViewer";
 export * from "./LineViewer";
+export * from "./LineSegmentInspector";
 export * from "./TrainTypeViewer";
 export * from "./TemplateTrainViewer";
 export * from "./TimetableViewer";

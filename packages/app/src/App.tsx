@@ -10,6 +10,7 @@ import { InitLayout } from "./initLayout";
 import {
   CoreExtensions,
   LineViewerExtension,
+  LineSegmentInspectorExtension,
   StationViewerExtension,
   TrackInspectorExtension,
   TimetableViewerExtension,
@@ -95,6 +96,7 @@ function App() {
       manager.addExtension(new StationViewerExtension()),
       manager.addExtension(new TrackInspectorExtension()),
       manager.addExtension(new LineViewerExtension()),
+      manager.addExtension(new LineSegmentInspectorExtension()),
       manager.addExtension(new TrainTypeViewerExtension()),
       manager.addExtension(new TemplateTrainViewerExtension()),
       manager.addExtension(new TimetableViewerExtension()),
