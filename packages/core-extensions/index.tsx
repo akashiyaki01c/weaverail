@@ -15,7 +15,7 @@ export class CoreExtensions implements WeaverailExtension {
 	activate(api: WeaverailApi) {
 		api.ui.registerPanel({
 			id: "weaverail.core-extensions.main-panel",
-			label: "",
+			label: "メイン",
 			slot: "main",
 			render: function (): React.ReactNode {
 				return <></>
@@ -23,7 +23,7 @@ export class CoreExtensions implements WeaverailExtension {
 		})
 		api.ui.registerPanel({
 			id: "weaverail.core-extensions.toolbar-panel",
-			label: "",
+			label: "ツール",
 			slot: "sidebar",
 			render: function (): React.ReactNode {
 				return <><TestViwer /></>
@@ -31,7 +31,7 @@ export class CoreExtensions implements WeaverailExtension {
 		})
 		api.ui.registerPanel({
 			id: "weaverail.core-extensions.toolbar2-panel",
-			label: "",
+			label: "サブ",
 			slot: "sidebar",
 			render: function (): React.ReactNode {
 				return <>さぶ2だよ〜(拡張機能側)</>

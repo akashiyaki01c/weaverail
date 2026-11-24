@@ -35,6 +35,7 @@ function App() {
             type: "tab",
             component: payload.panelId,
             id: payload.panelId,
+            name: payload.name,
             children: [],
           });
           return Model.fromJson(json);
@@ -48,6 +49,7 @@ function App() {
                 type: "tab",
                 component: payload.panelId,
                 id: payload.panelId,
+                name: payload.name,
               } satisfies IJsonTabNode);
               break;
             }
@@ -57,6 +59,7 @@ function App() {
                 type: "tab",
                 component: payload.panelId,
                 id: payload.panelId,
+                name: payload.name,
               } satisfies IJsonTabNode);
               break;
             }
@@ -66,6 +69,7 @@ function App() {
                 type: "tab",
                 component: payload.panelId,
                 id: payload.panelId,
+                name: payload.name,
               } satisfies IJsonTabNode);
               break;
             }

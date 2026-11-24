@@ -259,7 +259,7 @@ export class StationViewerExtension implements WeaverailExtension {
   activate(api: WeaverailApi) {
     api.ui.registerPanel({
       id: "weaverail.station-viewer.main-panel",
-      label: "",
+      label: "駅一覧",
       slot: "main",
       render: function (): React.ReactNode {
         return <StationViewer />;

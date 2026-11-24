@@ -328,7 +328,7 @@ export class DiagramViewerExtension implements WeaverailExtension {
   activate(api: WeaverailApi) {
     api.ui.registerPanel({
       id: "weaverail.diagram-viewer.main-panel",
-      label: "",
+      label: "ダイヤグラム",
       slot: "main",
       render: function (): React.ReactNode {
         return <DiagramViewer />;
