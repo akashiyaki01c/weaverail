@@ -18,6 +18,7 @@
     "@weaverail/api": "workspace:*",
     "@weaverail/extensions": "workspace:*",
     "@weaverail/types": "workspace:*",
-    "react": "^19.2.5"
+    "react": "^19.2.5",
+    "typescript": "~5.8.3"
   }
 }

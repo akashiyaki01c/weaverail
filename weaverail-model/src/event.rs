@@ -10,6 +10,9 @@
     strum::EnumIter,
 )]
 pub enum EmitEventType {
+    /// スクリプトによる一括変更が適用された
+    #[strum(serialize = "script::executed")]
+    ScriptExecuted,
     /// 駅が追加された
     #[strum(serialize = "station::added")]
     StationAdded,

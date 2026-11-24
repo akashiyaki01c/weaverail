@@ -10,6 +10,7 @@ pub mod timetable;
 pub mod track;
 pub mod train;
 pub mod train_type;
+pub mod script;
 
 /// フロントエンド側へのイベント通知を行う構造体
 pub trait EventEmitter: Send + Sync {

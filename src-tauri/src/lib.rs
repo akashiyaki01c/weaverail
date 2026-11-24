@@ -47,6 +47,7 @@ pub fn run() {
             crate::command::station::add_track,
             crate::command::station::remove_track,
             crate::command::station::rename_track,
+            crate::command::script::run_script,
             crate::command::line::new_line_id,
             crate::command::line::add_line,
             crate::command::line::remove_line,
