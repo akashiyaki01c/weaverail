@@ -3,11 +3,13 @@ import { Button, Stack, Table } from "@mantine/core";
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
+import { useSelection } from "../app/src/SelectionContext";
 import type { Line } from "@weaverail/types";
 import { EmptyMessage } from "./EmptyMessage";
 
 export function LineViewer() {
   const { manager } = useExtensionManager();
+  const { selectLine } = useSelection();
   const [lines, setLines] = useState<Record<string, Line>>({});
 
   const reload = useCallback(async () => {
@@ -38,10 +40,7 @@ export function LineViewer() {
                   variant="subtle"
                   size="compact-xs"
                   onClick={() => {
-                    manager.dispatch("line-selected", {
-                      lineId: line.id,
-                      lineName: line.name,
-                    });
+                    selectLine(line.id, line.name);
                   }}
                 >
                   {line.name}

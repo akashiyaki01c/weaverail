@@ -1,12 +1,14 @@
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "../api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
+import { useSelection } from "../app/src/SelectionContext";
 import { useCallback, useEffect, useState } from "react";
 import { Station, Track } from "@weaverail/types";
 import { Button, Group, Stack, Table, TextInput } from "@mantine/core";
 
 function StationViewer() {
   const { manager } = useExtensionManager();
+  const { selectStation, clearSelection } = useSelection();
   const [stations, setStations] = useState<{ [x: string]: Station }>();
   const [newStationName, setNewStationName] = useState("");
   const [editingStationId, setEditingStationId] = useState<string | null>(null);
@@ -38,19 +40,13 @@ function StationViewer() {
     if (!name) return;
     await manager.api.ops.station.rename_station(stationId, name);
     setEditingStationId(null);
-    manager.dispatch("station-selected", {
-      stationId,
-      stationName: name,
-    });
+    selectStation(stationId, name);
     await reload();
   };
 
   const removeStation = async (stationId: string) => {
     await manager.api.ops.station.remove_station(stationId);
-    manager.dispatch("station-selected", {
-      stationId: null,
-      stationName: null,
-    });
+    clearSelection();
     await reload();
   };
 
@@ -83,10 +79,7 @@ function StationViewer() {
               onClick={() => {
                 setEditingStationId(element.id);
                 setEditingStationName(element.name);
-                manager.dispatch("station-selected", {
-                  stationId: element.id,
-                  stationName: element.name,
-                });
+                selectStation(element.id, element.name);
               }}
             >
               {element.name}
@@ -133,8 +126,9 @@ function StationViewer() {
 
 function TrackInspector() {
   const { manager } = useExtensionManager();
-  const [stationId, setStationId] = useState<string | null>(null);
-  const [stationName, setStationName] = useState<string | null>(null);
+  const { selection } = useSelection();
+  const stationId = selection?.kind === "station" ? selection.id : null;
+  const stationName = selection?.kind === "station" ? selection.name : null;
   const [tracks, setTracks] = useState<{ [x: string]: Track }>({});
   const [newTrackName, setNewTrackName] = useState("");
   const [editingTrackId, setEditingTrackId] = useState<string | null>(null);
@@ -152,23 +146,14 @@ function TrackInspector() {
   }, [manager]);
 
   useEffect(() => {
-    const unbind = manager.on("station-selected", (payload) => {
-      setStationId(payload.stationId);
-      setStationName(payload.stationName);
-      setNewTrackName("");
-      setEditingTrackId(null);
-      if (payload.stationId) {
-        void reloadTracks(payload.stationId);
-      } else {
-        setTracks({});
-      }
-    });
-    return unbind;
-  }, [manager, reloadTracks]);
-
-  useEffect(() => {
+    setNewTrackName("");
+    setEditingTrackId(null);
+    setEditingTrackName("");
+    setTracks({});
     if (stationId) {
       void reloadTracks(stationId);
+    } else {
+      setTracks({});
     }
   }, [stationId, reloadTracks]);
 

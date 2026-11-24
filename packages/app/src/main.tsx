@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { ExtensionProvider } from "./ExtensionContext";
+import { SelectionProvider } from "./SelectionContext";
 import "@mantine/core/styles.css";
 
 const theme = createTheme({
@@ -11,7 +12,9 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <MantineProvider theme={theme}>
     <ExtensionProvider>
-      <App />
+      <SelectionProvider>
+        <App />
+      </SelectionProvider>
     </ExtensionProvider>
   </MantineProvider>,
 );

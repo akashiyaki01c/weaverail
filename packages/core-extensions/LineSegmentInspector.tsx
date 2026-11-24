@@ -3,12 +3,14 @@ import { Stack, Table, Text } from "@mantine/core";
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
+import { useSelection } from "../app/src/SelectionContext";
 import type { Line, LineSegment, Station } from "@weaverail/types";
 
 export function LineSegmentInspector() {
   const { manager } = useExtensionManager();
-  const [lineId, setLineId] = useState<string | null>(null);
-  const [lineName, setLineName] = useState<string | null>(null);
+  const { selection } = useSelection();
+  const lineId = selection?.kind === "line" ? selection.id : null;
+  const lineName = selection?.kind === "line" ? selection.name : null;
   const [line, setLine] = useState<Line | null>(null);
   const [segments, setSegments] = useState<Record<string, LineSegment>>({});
   const [stations, setStations] = useState<Record<string, Station>>({});
@@ -25,18 +27,7 @@ export function LineSegmentInspector() {
   }, [manager]);
 
   useEffect(() => {
-    const unbind = manager.on("line-selected", (payload) => {
-      setLineId(payload.lineId);
-      setLineName(payload.lineName);
-      setLine(null);
-      if (payload.lineId) {
-        void reload(payload.lineId);
-      }
-    });
-    return unbind;
-  }, [manager, reload]);
-
-  useEffect(() => {
+    setLine(null);
     if (lineId) {
       void reload(lineId);
     }
