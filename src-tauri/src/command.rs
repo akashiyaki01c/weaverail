@@ -21,6 +21,7 @@ use weft_rail::{make_node_diff, ripple_diff::ripple_node_diff, sort_diff};
 pub mod data;
 pub mod line;
 pub mod station;
+pub mod script;
 pub mod train_type;
 pub mod weave;
 

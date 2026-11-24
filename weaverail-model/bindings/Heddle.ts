@@ -5,4 +5,4 @@ import type { WeaverailId } from "./WeaverailId";
 /**
  * オブジェクトを走査する際のオブジェクトを表す
  */
-export type Heddle = "Null" | { "Id": WeaverailId } | { "Boolean": boolean } | { "U8": number } | { "I8": number } | { "U16": number } | { "I16": number } | { "U32": number } | { "I32": number } | { "U64": bigint } | { "I64": bigint } | { "U128": bigint } | { "I128": bigint } | { "F32": number } | { "F64": number } | { "String": string } | { "Array": Array<Heddle> } | { "Compound": { [key in Heddle]?: Heddle } } | { "Time": Time };
+export type Heddle = "Null" | { "Id": WeaverailId } | { "Boolean": boolean } | { "U8": number } | { "I8": number } | { "U16": number } | { "I16": number } | { "U32": number } | { "I32": number } | { "U64": bigint } | { "I64": bigint } | { "U128": bigint } | { "I128": bigint } | { "F32": number } | { "F64": number } | { "String": string } | { "Array": Array<Heddle> } | { "Compound": Record<string, Heddle> } | { "Time": Time };

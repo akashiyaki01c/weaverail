@@ -26,6 +26,22 @@ export interface WeaverailDataApi {
 	}[]>;
 	weave(timetableId: TimetableId): Promise<ResultWeftTrain[]>;
 	debugInsertTrain(timetableId: TimetableId, departureTime: Time): Promise<void>;
+	runScript(source: string): Promise<ScriptExecutionResult>;
+	resetScriptSession(): Promise<void>;
+}
+
+export interface ScriptExecutionResult {
+	success: boolean;
+	output: string;
+	changed_objects: number;
+	project_version: number;
+	elapsed_ms: number;
+	error: ScriptError | null;
+}
+
+export interface ScriptError {
+	kind: string;
+	message: string;
 }
 
 /** WeaverailのAPI群を表すオブジェクト */
@@ -94,6 +110,14 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 
 	async debugInsertTrain(timetableId: TimetableId, startingDepartureTime: Time): Promise<void> {
 		return await invoke("debug_insert_train", { timetableId, startingDepartureTime });
+	}
+
+	async runScript(source: string): Promise<ScriptExecutionResult> {
+		return await invoke("run_script", { source });
+	}
+
+	async resetScriptSession(): Promise<void> {
+		return await invoke("reset_script_session");
 	}
 
 	constructor() {

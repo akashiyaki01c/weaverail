@@ -16,6 +16,7 @@ import {
   TimetableViewerExtension,
   TemplateTrainViewerExtension,
   TrainTypeViewerExtension,
+  ScriptConsoleExtension,
 } from "@weaverail/core-extensions";
 import { useExtensionManager } from "./ExtensionContext";
 import { DiagramViewerExtension } from "@weaverail/core-extensions/DiagramViewer";
@@ -104,6 +105,7 @@ function App() {
       manager.addExtension(new TrainTypeViewerExtension()),
       manager.addExtension(new TemplateTrainViewerExtension()),
       manager.addExtension(new TimetableViewerExtension()),
+      manager.addExtension(new ScriptConsoleExtension()),
       manager.addExtension(new DiagramViewerExtension()),
     ]).catch((error: unknown) => {
       console.error("Failed to activate extension", error);

@@ -8,6 +8,7 @@ export * from "./LineSegmentInspector";
 export * from "./TrainTypeViewer";
 export * from "./TemplateTrainViewer";
 export * from "./TimetableViewer";
+export * from "./ScriptConsoleExtension";
 
 export class CoreExtensions implements WeaverailExtension {
 	id: string = "weaverail.core-extensions";

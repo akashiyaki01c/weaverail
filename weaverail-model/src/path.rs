@@ -46,7 +46,7 @@ pub enum Heddle {
     /// Array value
     Array(Vec<Heddle>),
     /// Compount value
-    Compound(IndexMap<Heddle, Heddle>),
+    Compound(#[ts(type = "Record<string, Heddle>")] IndexMap<Heddle, Heddle>),
     /// Time value
     Time(Time),
 }
