@@ -181,6 +181,70 @@ pub struct PopFrontTemplateTrainSegmentCommand {
     section: Option<TemplateTrainSection>,
 }
 
+/// テンプレート列車の指定位置にある駅間区画を更新する操作。
+#[derive(Clone, PartialEq, Debug, Default)]
+pub struct UpdateTemplateTrainSectionCommand {
+    template_train_id: TemplateTrainId,
+    index: usize,
+    section: TemplateTrainSection,
+    old_section: Option<TemplateTrainSection>,
+}
+
+impl UpdateTemplateTrainSectionCommand {
+    pub fn new(
+        template_train_id: TemplateTrainId,
+        index: usize,
+        section: TemplateTrainSection,
+    ) -> Self {
+        Self {
+            template_train_id,
+            index,
+            section,
+            old_section: None,
+        }
+    }
+}
+
+impl Command for UpdateTemplateTrainSectionCommand {
+    fn redo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let train = obj
+            .template_trains
+            .get_mut(&self.template_train_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        let old = train
+            .segments
+            .get_mut(self.index)
+            .ok_or(CommandError::IndexOutOfBounds)?;
+        self.old_section = Some(old.clone());
+        *old = self.section.clone();
+        emitter.emit(EmitEventType::TemplateTrainSegmentPushed, "");
+        Ok(())
+    }
+
+    fn undo(
+        &mut self,
+        obj: &mut DiagramRoot,
+        emitter: &dyn EventEmitter,
+    ) -> Result<(), CommandError> {
+        let section = self.old_section.clone().ok_or(CommandError::Inconsistent)?;
+        let train = obj
+            .template_trains
+            .get_mut(&self.template_train_id)
+            .ok_or(CommandError::TargetObjectNotFound)?;
+        let target = train
+            .segments
+            .get_mut(self.index)
+            .ok_or(CommandError::IndexOutOfBounds)?;
+        *target = section;
+        emitter.emit(EmitEventType::TemplateTrainSegmentPushed, "");
+        Ok(())
+    }
+}
+
 impl PopFrontTemplateTrainSegmentCommand {
     pub fn new(template_train_id: TemplateTrainId) -> Self {
         Self {

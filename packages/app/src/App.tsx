@@ -15,6 +15,7 @@ import {
   TrackInspectorExtension,
   TimetableViewerExtension,
   TemplateTrainViewerExtension,
+  TemplateTrainSegmentInspectorExtension,
   TrainTypeViewerExtension,
   ScriptConsoleExtension,
 } from "@weaverail/core-extensions";
@@ -104,6 +105,7 @@ function App() {
       manager.addExtension(new LineSegmentInspectorExtension()),
       manager.addExtension(new TrainTypeViewerExtension()),
       manager.addExtension(new TemplateTrainViewerExtension()),
+      manager.addExtension(new TemplateTrainSegmentInspectorExtension()),
       manager.addExtension(new TimetableViewerExtension()),
       manager.addExtension(new ScriptConsoleExtension()),
       manager.addExtension(new DiagramViewerExtension()),

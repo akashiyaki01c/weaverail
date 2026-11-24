@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, ResultSvg, DiagramRoot, Time, DiagramViewSettingsId } from "@weaverail/types";
+import { StationId, Station, TrackId, Track, LineSegmentId, LineSegment, LineId, Line, TrainTypeId, TrainType, TemplateTrainId, TemplateTrain, TemplateTrainSegmentId, TemplateTrainSegment, TemplateTrainStationId, TemplateTrainStation, TemplateTrainSection, TimetableId, Timetable, TrainId, Train, ResultWeftTrain, DiagramLogicalConvert, ResultSvg, DiagramRoot, Time, DiagramViewSettingsId } from "@weaverail/types";
 
 /** WeaverailのAPI群を表すオブジェクト */
 export interface WeaverailDataApi {
@@ -10,6 +10,12 @@ export interface WeaverailDataApi {
 	getLines(): Promise<{ [key in LineId]: Line }>;
 	getTrainTypes(): Promise<{ [key in TrainTypeId]: TrainType }>;
 	getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }>;
+	newTemplateTrainSegmentId(): Promise<TemplateTrainSegmentId>;
+	newTemplateTrainStationId(): Promise<TemplateTrainStationId>;
+	addTemplateTrainSegment(templateTrainId: TemplateTrainId, segment: TemplateTrainSegment, station: TemplateTrainStation): Promise<void>;
+	popFrontTemplateTrainSegment(templateTrainId: TemplateTrainId): Promise<void>;
+	popBackTemplateTrainSegment(templateTrainId: TemplateTrainId): Promise<void>;
+	updateTemplateTrainSection(templateTrainId: TemplateTrainId, index: number, section: TemplateTrainSection): Promise<void>;
 	getTimetables(): Promise<{ [key in TimetableId]: Timetable }>;
 	getTrains(): Promise<{ [key in TrainId]: Train }>;
 	getSvg(timetableId: TimetableId, viewSettings: DiagramViewSettingsId, settings: DiagramLogicalConvert, startTime: Time, endTime: Time): Promise<ResultSvg>;
@@ -73,6 +79,30 @@ export class WeaverailDataApiObject implements WeaverailDataApi {
 
 	async getTemplateTrains(): Promise<{ [key in TemplateTrainId]: TemplateTrain }> {
 		return await invoke("get_template_trains");
+	}
+
+	async newTemplateTrainSegmentId(): Promise<TemplateTrainSegmentId> {
+		return await invoke("new_template_train_segment_id");
+	}
+
+	async newTemplateTrainStationId(): Promise<TemplateTrainStationId> {
+		return await invoke("new_template_train_station_id");
+	}
+
+	async addTemplateTrainSegment(templateTrainId: TemplateTrainId, segment: TemplateTrainSegment, station: TemplateTrainStation): Promise<void> {
+		return await invoke("add_template_train_segment", { templateTrainId, segment, station });
+	}
+
+	async popFrontTemplateTrainSegment(templateTrainId: TemplateTrainId): Promise<void> {
+		return await invoke("pop_front_template_train_segment", { templateTrainId });
+	}
+
+	async popBackTemplateTrainSegment(templateTrainId: TemplateTrainId): Promise<void> {
+		return await invoke("pop_back_template_train_segment", { templateTrainId });
+	}
+
+	async updateTemplateTrainSection(templateTrainId: TemplateTrainId, index: number, section: TemplateTrainSection): Promise<void> {
+		return await invoke("update_template_train_section", { templateTrainId, index, section });
 	}
 
 	async getTimetables(): Promise<{ [key in TimetableId]: Timetable }> {

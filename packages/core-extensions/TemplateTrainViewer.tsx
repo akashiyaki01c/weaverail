@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Stack, Table } from "@mantine/core";
+import { Button, Stack, Table } from "@mantine/core";
 import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
+import { useSelection } from "../app/src/SelectionContext";
 import type { TemplateTrain, TrainType } from "@weaverail/types";
 import { EmptyMessage } from "./EmptyMessage";
 
 export function TemplateTrainViewer() {
   const { manager } = useExtensionManager();
+  const { selectTemplateTrain } = useSelection();
   const [templateTrains, setTemplateTrains] = useState<Record<string, TemplateTrain>>({});
   const [trainTypes, setTrainTypes] = useState<Record<string, TrainType>>({});
 
@@ -40,7 +42,17 @@ export function TemplateTrainViewer() {
         <Table.Tbody>
           {values.map((templateTrain) => (
             <Table.Tr key={templateTrain.id}>
-              <Table.Td>{templateTrain.name}</Table.Td>
+              <Table.Td>
+                <Button
+                  variant="subtle"
+                  size="compact-xs"
+                  onClick={() => {
+                    selectTemplateTrain(templateTrain.id, templateTrain.name);
+                  }}
+                >
+                  {templateTrain.name}
+                </Button>
+              </Table.Td>
               <Table.Td>{templateTrain.id}</Table.Td>
               <Table.Td>
                 {trainTypes[templateTrain.train_type_id]?.name ?? templateTrain.train_type_id}

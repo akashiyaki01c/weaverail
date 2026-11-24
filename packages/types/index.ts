@@ -20,6 +20,7 @@ export * from "./bindings/TemplateTrainId";
 export * from "./bindings/TemplateTrainSegment";
 export * from "./bindings/TemplateTrainSegmentId";
 export * from "./bindings/TemplateTrainStation";
+export * from "./bindings/TemplateTrainSection";
 export * from "./bindings/TemplateTrainStationId";
 export * from "./bindings/StopType";
 export * from "./bindings/Time";
