@@ -207,7 +207,12 @@ function DiagramViewer() {
             waiting.current = false;
           }, 50);
         }}
-        style={{ width: "100%", height: "100%", overflow: "scroll" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "scroll",
+          overscrollBehavior: "none",
+        }}
         ref={outerRef as any}
       >
         <div
@@ -220,6 +225,7 @@ function DiagramViewer() {
             background: "rgb(255 255 255 / 0.75)",
             backdropFilter: "blur(2.5px)",
             zIndex: 50,
+            borderBottom: "1px solid gray",
           }}
         >
           {[...Array(24)].map((_, i) => (
@@ -260,6 +266,7 @@ function DiagramViewer() {
               zIndex: 50,
               background: "rgb(255 255 255 / 0.75)",
               backdropFilter: "blur(2.5px)",
+              borderRight: "1px solid gray",
             }}
           >
             {warpSta?.map((v) => (
@@ -272,7 +279,7 @@ function DiagramViewer() {
                     textAlign: "center",
                     position: "absolute",
                     top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.25px)`,
-                    background: "black"
+                    background: "black",
                   }}
                 />
                 <div
@@ -334,6 +341,19 @@ function DiagramViewer() {
             </svg>
           </div>
         </div>
+        <div
+          style={{
+            width: "100px",
+            height: "50px",
+            background: "white",
+            position: "absolute",
+            top: "0",
+            left: "0",
+            zIndex: "60",
+            borderRight: "1px solid gray",
+            borderBottom: "1px solid gray",
+          }}
+        ></div>
       </div>
     </>
   );
