@@ -219,6 +219,7 @@ function DiagramViewer() {
             width: `${24 * 60 * 60 * viewSettings.scale_x}px`,
             background: "rgb(255 255 255 / 0.75)",
             backdropFilter: "blur(2.5px)",
+            zIndex: 50,
           }}
         >
           {[...Array(24)].map((_, i) => (
@@ -242,10 +243,11 @@ function DiagramViewer() {
         </div>
         <div
           style={{
-            width: `${24 * 60 * 60 * viewSettings.scale_x}px`,
+            width: `${24 * 60 * 60 * viewSettings.scale_x + 100}px`,
+            height: `${maxY * viewSettings.scale_y}px`,
             display: "flex",
             alignItems: "flex-start",
-            position: "relative"
+            position: "relative",
           }}
         >
           <div
@@ -254,27 +256,42 @@ function DiagramViewer() {
               height: `${maxY * viewSettings.scale_y}px`,
               position: "sticky",
               left: "0",
+              top: "0",
+              zIndex: 50,
               background: "rgb(255 255 255 / 0.75)",
               backdropFilter: "blur(2.5px)",
             }}
           >
             {warpSta?.map((v) => (
-              <div
-                key={v.station_id}
-                style={{
-                  width: "100px",
-                  height: "1em",
-                  lineHeight: "1",
-                  textAlign: "center",
-                  position: "absolute",
-                  top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.5em)`,
-                }}
-              >
-                {v.name}
-              </div>
+              <>
+                <div
+                  style={{
+                    width: "100px",
+                    height: "0.5px",
+                    lineHeight: "1",
+                    textAlign: "center",
+                    position: "absolute",
+                    top: `calc(${v.y_coord * viewSettings.scale_y}px - 0.25px)`,
+                    background: "black"
+                  }}
+                />
+                <div
+                  key={v.station_id + v.y_coord}
+                  style={{
+                    width: "100px",
+                    height: "1em",
+                    lineHeight: "1",
+                    textAlign: "center",
+                    position: "absolute",
+                    top: `calc(${v.y_coord * viewSettings.scale_y}px + 0.2em)`,
+                  }}
+                >
+                  {v.name}
+                </div>
+              </>
             ))}
           </div>
-          <div style={{ marginLeft: "100px" }}>
+          <div style={{ zIndex: 40 }}>
             <svg
               width={24 * 60 * 60 * viewSettings.scale_x}
               height={maxY * viewSettings.scale_y}
