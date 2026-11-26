@@ -2,7 +2,7 @@ import { WeaverailExtension } from "@weaverail/extensions";
 import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LineSegmentId, ResultSvg, StationId } from "@weaverail/types";
+import { LineSegmentId, ResultSvg, StationId, TrainId } from "@weaverail/types";
 
 function DiagramViewer() {
   const { manager } = useExtensionManager();
@@ -50,6 +50,7 @@ function DiagramViewer() {
   ]);
   const waiting = useRef(false);
   const [inited, setInited] = useState(false);
+  const [selectedTrainId, setSelectedTrainId] = useState<TrainId>();
 
   useEffect(() => {
     (async () => {
@@ -179,34 +180,36 @@ function DiagramViewer() {
     }
   }
 
+  const onScroll = () => {
+    if (waiting.current) return;
+
+    waiting.current = true;
+
+    const toTimeString = (num: number) => {
+      const hour = Math.floor(num / 60 / 60);
+      const minute = Math.floor(num / 60) % 60;
+      const second = num % 60;
+      return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`;
+    };
+
+    const outerRect = outerRef.current?.getBoundingClientRect();
+    const svgRect = svgRef.current?.getBoundingClientRect();
+    const startCoords = (outerRect?.x || 0) - (svgRect?.x || 0);
+    const startTime = startCoords / viewSettings.scale_x;
+    const endTime = startTime + (outerRect?.width || 0) / viewSettings.scale_x;
+    console.log([toTimeString(startTime), toTimeString(endTime)]);
+    setTimeRange([Math.floor(startTime), Math.ceil(endTime)]);
+
+    setTimeout(() => {
+      waiting.current = false;
+    }, 50);
+  };
+
   return (
     <>
       <div
-        onScroll={() => {
-          if (waiting.current) return;
-
-          waiting.current = true;
-
-          const toTimeString = (num: number) => {
-            const hour = Math.floor(num / 60 / 60);
-            const minute = Math.floor(num / 60) % 60;
-            const second = num % 60;
-            return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`;
-          };
-
-          const outerRect = outerRef.current?.getBoundingClientRect();
-          const svgRect = svgRef.current?.getBoundingClientRect();
-          const startCoords = (outerRect?.x || 0) - (svgRect?.x || 0);
-          const startTime = startCoords / viewSettings.scale_x;
-          const endTime =
-            startTime + (outerRect?.width || 0) / viewSettings.scale_x;
-          console.log([toTimeString(startTime), toTimeString(endTime)]);
-          setTimeRange([Math.floor(startTime), Math.ceil(endTime)]);
-
-          setTimeout(() => {
-            waiting.current = false;
-          }, 50);
-        }}
+        onScroll={onScroll}
+        onScrollEnd={onScroll}
         style={{
           width: "100%",
           height: "100%",
@@ -311,11 +314,13 @@ function DiagramViewer() {
                   <>
                     <path
                       stroke="black"
-                      strokeWidth={2}
+                      strokeWidth={selectedTrainId === t.train_id ? 4 : 2}
                       fill="none"
                       key={`${t.train_id}/}`}
                       d={t.path_string}
                       onClick={(e) => {
+                        setSelectedTrainId(t.train_id);
+
                         const rect = e.currentTarget.getBoundingClientRect();
                         const rawY = e.clientY - rect.top;
 
