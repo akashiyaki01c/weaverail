@@ -288,11 +288,12 @@ function DiagramViewer() {
                 <div
                   key={v.station_id + v.y_coord}
                   style={{
-                    width: "100px",
+                    width: "90px",
                     height: "1em",
                     lineHeight: "1",
-                    textAlign: "center",
+                    textAlignLast: "justify",
                     position: "absolute",
+                    left: "5px",
                     top: `calc(${v.y_coord * viewSettings.scale_y}px + 0.2em)`,
                   }}
                 >
