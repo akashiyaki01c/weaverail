@@ -3,8 +3,20 @@ import { WeaverailApi } from "@weaverail/api";
 import { useExtensionManager } from "../app/src/ExtensionContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LineSegmentId, ResultSvg, StationId, TrainId } from "@weaverail/types";
+import { Button } from "@mantine/core";
 
-function DiagramViewer() {
+interface ViewSettings {
+  scale_x: number;
+  scale_y: number;
+  offset_x: number;
+  offset_y: number;
+}
+
+interface ViewerProps {
+  viewSettings: ViewSettings;
+}
+
+function DiagramViewer({ viewSettings }: ViewerProps) {
   const { manager } = useExtensionManager();
   const outerRef = useRef<HTMLDivElement>(undefined);
   const svgRef = useRef<SVGElement>(undefined);
@@ -38,12 +50,6 @@ function DiagramViewer() {
     return max;
   }, [warp]);
 
-  const [viewSettings, _setViewSettings] = useState({
-    scale_x: 0.125,
-    scale_y: 0.2,
-    offset_x: 0,
-    offset_y: 0,
-  });
   const [timeRange, setTimeRange] = useState<[number, number]>([
     0,
     24 * 60 * 60,
@@ -365,6 +371,52 @@ function DiagramViewer() {
   );
 }
 
+function Editor() {
+  const [viewSettings, setViewSettings] = useState<ViewSettings>({
+    scale_x: 0.125,
+    scale_y: 0.25,
+    offset_x: 0,
+    offset_y: 0,
+  });
+
+  return (
+    <>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            minHeight: "50px",
+            borderBottom: "1px solid black",
+            display: "flex",
+            alignItems: "center",
+            gap: "1em"
+          }}
+        >
+          <div style={{ display: "flex", gap: "0.5em", alignItems: "center" }}>
+            <Button size="compact-sm" onClick={() => setViewSettings(v => ({...v, scale_x: v.scale_x / 1.1}))}>-</Button>
+            <div>scaleX</div>
+            <Button size="compact-sm" onClick={() => setViewSettings(v => ({...v, scale_x: v.scale_x * 1.1}))}>+</Button>
+          </div>
+          <div style={{ display: "flex", gap: "0.5em", alignItems: "center" }}>
+            <Button size="compact-sm" onClick={() => setViewSettings(v => ({...v, scale_y: v.scale_y / 1.1}))}>-</Button>
+            <div>scaleY</div>
+            <Button size="compact-sm" onClick={() => setViewSettings(v => ({...v, scale_y: v.scale_y * 1.1}))}>+</Button>
+          </div>
+        </div>
+        <div style={{ position: "relative", flex: "1" }}>
+          <DiagramViewer viewSettings={viewSettings} />
+        </div>
+      </div>
+    </>
+  );
+}
+
 export class DiagramViewerExtension implements WeaverailExtension {
   id: string = "weaverail.core.diagram-viewer";
   metadata = { name: "コア拡張機能", description: "" };
@@ -374,7 +426,7 @@ export class DiagramViewerExtension implements WeaverailExtension {
       label: "ダイヤグラム",
       slot: "main",
       render: function (): React.ReactNode {
-        return <DiagramViewer />;
+        return <Editor />;
       },
     });
   }
