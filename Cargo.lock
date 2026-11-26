@@ -4569,7 +4569,7 @@ dependencies = [
 
 [[package]]
 name = "warp-rail"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "weaverail-model",
 ]
@@ -4659,7 +4659,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "indexmap 2.14.0",
  "rquickjs",
@@ -4679,7 +4679,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-io"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "indexmap 2.14.0",
  "ron",
@@ -4692,7 +4692,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-model"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "indexmap 2.14.0",
  "ron",
@@ -4708,7 +4708,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-object"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "quote",
  "syn 2.0.119",
@@ -4716,7 +4716,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-operation"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -4727,7 +4727,7 @@ dependencies = [
 
 [[package]]
 name = "weaverail-testdata"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "ron",
  "weaverail-model",
@@ -4839,7 +4839,7 @@ dependencies = [
 
 [[package]]
 name = "weft-rail"
-version = "0.2.6"
+version = "0.2.7"
 dependencies = [
  "criterion",
  "rustc-hash",
